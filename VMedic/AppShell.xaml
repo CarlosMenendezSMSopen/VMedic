@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="VMedic.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:VMedic.MVVM.Views"
+    xmlns:visitas="clr-namespace:VMedic.MVVM.Views.Visitas"
+    FlyoutHeaderBehavior="Default"
+    Shell.BackgroundColor="White"
+    Shell.ForegroundColor="White"
+    FlyoutWidth="300"
+    Shell.TabBarIsVisible="False">
+
+    <Shell.FlyoutHeader>
+        <VerticalStackLayout>
+            <Image x:Name="Logo"
+                   Margin="0,25,0,10"
+                   HeightRequest="100"
+                   Source="logo_app.png"
+                   HorizontalOptions="Fill" />
+            <HorizontalStackLayout VerticalOptions="Center">
+                <Image Margin="20"
+                       HeightRequest="75"
+                       Source="user.png"
+                       WidthRequest="75" />
+                <Label x:Name="lblUserName"
+                       FontSize="18"
+                       HorizontalOptions="Fill"
+                       Text="Usuario"
+                       VerticalTextAlignment="Center" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Shell.FlyoutHeader>
+    
+    <FlyoutItem FlyoutDisplayOptions="AsMultipleItems"
+                FlyoutItemIsVisible="True"
+                Route="LoginView"
+                Shell.FlyoutBehavior="Disabled">
+        <ShellContent Title="Inicio de Sesión"
+                      ContentTemplate="{DataTemplate local:LoginView}"
+                      FlyoutItemIsVisible="False"
+                      Route="LoginPage"
+                      Shell.FlyoutBehavior="Disabled" />
+    </FlyoutItem>
+    
+
+    <FlyoutItem Title="Visitas"
+                FlyoutDisplayOptions="AsMultipleItems"
+                FlyoutItemIsVisible="True"
+                Route="VisitasView"
+                Shell.FlyoutBehavior="Flyout">
+        <Tab Title="Visitas"
+             Icon="visitas.png">
+            <ShellContent Shell.FlyoutHeight="50"
+                          ContentTemplate="{DataTemplate visitas:VisitasView}" />
+        </Tab>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Medicos"
+                FlyoutDisplayOptions="AsMultipleItems"
+                IsVisible="True"
+                Route="MedicosView"
+                Shell.FlyoutBehavior="Flyout">
+        <Tab Title="Medicos"
+             Icon="medics.png">
+            <ShellContent Shell.FlyoutHeight="50"
+                          ContentTemplate="{DataTemplate local:MedicosView}" />
+        </Tab>
+    </FlyoutItem>
+
+    <Shell.FlyoutFooter>
+        <VerticalStackLayout>
+            <Grid ColumnDefinitions=".5*, .5*">
+                <Label x:Name="lbl_version"
+                       Margin="15,0,0,0"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Start"
+                       VerticalOptions="Center" />
+                <Image Grid.Column="1"
+                       HeightRequest="20"
+                       Margin="0,5,5,5"
+                       HorizontalOptions="End" />
+            </Grid>
+            <Frame Padding="10"
+                   BackgroundColor="Transparent"
+                   BorderColor="{StaticResource Gray200}"
+                   CornerRadius="0">
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+                </Frame.GestureRecognizers>
+                <HorizontalStackLayout>
+                    <Image Margin="5,0,20,0"
+                           HeightRequest="25"
+                           Source="logout_b.png"
+                           WidthRequest="25" />
+                    <Label x:Name="lbl_cerrar"
+                           HeightRequest="40"
+                           Margin="10,0,0,0"
+                           VerticalTextAlignment="Center"
+                           FontFamily="Dosis"
+                           FontAttributes="Bold"
+                           Text="Cerrar Sesión"
+                           TextColor="Black" />
+                </HorizontalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </Shell.FlyoutFooter>
+</Shell>

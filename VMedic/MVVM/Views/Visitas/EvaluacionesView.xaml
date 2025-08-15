@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VMedic.MVVM.Views.Visitas.EvaluacionesView"
+             Shell.BackgroundColor="{StaticResource Primary}"
+             Shell.TitleColor="White"
+             Title="Evaluación">
+
+    <Shell.TitleView>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Label Text="Evaluación"
+                   VerticalOptions="Center"
+                   TextColor="White"
+                   FontAttributes="Bold"
+                   FontSize="20" />
+            <ImageButton x:Name="btn_enviarEvaluaciones"
+                         Grid.Column="1"
+                         Source="send_all.png"
+                         HeightRequest="50"
+                         WidthRequest="50"
+                         Padding="15">
+                <ImageButton.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="EnviarEvaluacionesTapped" />
+                </ImageButton.GestureRecognizers>
+            </ImageButton>
+            <ImageButton x:Name="btn_sign"
+                         Grid.Column="2"
+                         Source="sign.png"
+                         HeightRequest="50"
+                         WidthRequest="50"
+                         Padding="15">
+                <ImageButton.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="FirmarTapped" />
+                </ImageButton.GestureRecognizers>
+            </ImageButton>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid HorizontalOptions="Fill"
+          Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Label x:Name="nombre_doctor"
+               Text="Nombre doctor"
+               FontSize="15"
+               FontAttributes="Bold"
+               TextColor="Blue"
+               HorizontalTextAlignment="Center" />
+        <RefreshView x:Name="refresh"
+                     Grid.Row="1"
+                     Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsRefreshing}">
+            <ScrollView x:Name="SCROLL"
+                        Scrolled="SCROLL_Scrolled"
+                        VerticalOptions="Fill">
+                <VerticalStackLayout x:Name="List_Evaluaciones"
+                                     HorizontalOptions="Fill"
+                                     VerticalOptions="Fill" />
+            </ScrollView>
+        </RefreshView>
+        <ActivityIndicator x:Name="SeeStatus"
+                           Grid.Row="1"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           HeightRequest="80"
+                           WidthRequest="80"
+                           IsRunning="True"
+                           IsVisible="{Binding IsStatus}"
+                           Opacity="0.5"
+                           Color="DarkGray" />
+        <Frame x:Name="containerbtn_agregarevaluacion"
+               Grid.Row="1"
+               BackgroundColor="{StaticResource Primary}"
+               BorderColor="Transparent"
+               HorizontalOptions="End"
+               VerticalOptions="End"
+               Margin="0,0,15,0"
+               HeightRequest="50"
+               WidthRequest="50">
+            <Image x:Name="btn_agregarevaluacion"
+                   HeightRequest="25"
+                   Source="add_blanc.png"
+                   WidthRequest="25" />
+            <Frame.GestureRecognizers>
+                <TapGestureRecognizer Tapped="AgregarEvaluacion_Tapped" />
+            </Frame.GestureRecognizers>
+        </Frame>
+        <Label Grid.Row="1"
+               Text="No hay resultados de evaluación"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               FontAttributes="Bold"
+               FontSize="18"
+               IsVisible="{Binding TextoAviso}" />
+    </Grid>
+</ContentPage>

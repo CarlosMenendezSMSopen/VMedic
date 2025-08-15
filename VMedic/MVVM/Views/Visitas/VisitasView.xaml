@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VMedic.MVVM.Views.Visitas.VisitasView"
+             xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             Shell.BackgroundColor="{StaticResource Primary}"
+             Shell.TitleColor="White"
+             Title="Visitas">
+
+    <ScrollView>
+        <VerticalStackLayout Margin="15">
+            <HorizontalStackLayout>
+                <Label Text="Ubicación GPS"
+                       VerticalOptions="Center" />
+                <Image Source="{Binding Ubicacionimg}"
+                       HeightRequest="30"
+                       WidthRequest="30" />
+            </HorizontalStackLayout>
+
+            <Label Text="Seleccione un número de semana:"
+                   IsVisible="{Binding VisibilidadNumeroSemana}" />
+            <Frame x:Name="frame_selectSemana"
+                   BackgroundColor="White"
+                   IsVisible="{Binding VisibilidadNumeroSemana}"
+                   BorderColor="{StaticResource Accent}"
+                   Padding="20,2.5"
+                   CornerRadius="4">
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="Semanas_Tapped" />
+                </Frame.GestureRecognizers>
+                <Grid>
+                    <Picker x:Name="SelectSemanas"
+                            Title="{x:Null}"
+                            BackgroundColor="Transparent"
+                            FontAttributes="Bold"
+                            HeightRequest="45"
+                            FontSize="12"
+                            HorizontalOptions="Fill"
+                            ItemsSource="{Binding Semanas}"
+                            SelectedIndexChanged="SelectSemanas_SelectedIndexChanged"
+                            SelectedItem="{Binding NumeroSemana, Mode=TwoWay}"
+                            TextColor="Black" />
+                    <Image HorizontalOptions="End">
+                        <Image.Source>
+                            <FontImageSource FontFamily="Icon"
+                                             Glyph="&#xE806;"
+                                             Size="20"
+                                             Color="{StaticResource Gray500}" />
+                        </Image.Source>
+                    </Image>
+                </Grid>
+            </Frame>
+            <Label Text="Seleccione un día de la semana:"
+                   IsVisible="{Binding VisibilidadDiaSemana}" />
+            <Frame x:Name="frame_selectDiaSemana"
+                   BackgroundColor="White"
+                   BorderColor="{StaticResource Accent}"
+                   Padding="20,2.5"
+                   IsVisible="{Binding VisibilidadDiaSemana}"
+                   CornerRadius="4">
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="DiasSemana_Tapped" />
+                </Frame.GestureRecognizers>
+                <Grid>
+                    <Picker x:Name="SelectDiasSemana"
+                            Title="{x:Null}"
+                            BackgroundColor="Transparent"
+                            FontAttributes="Bold"
+                            HeightRequest="45"
+                            FontSize="12"
+                            HorizontalOptions="Fill"
+                            ItemsSource="{Binding DiasSemana}"
+                            SelectedIndexChanged="SelectDiasSemana_SelectedIndexChanged"
+                            SelectedItem="{Binding NombreDia, Mode=TwoWay}"
+                            TextColor="Black" />
+                    <Image HorizontalOptions="End">
+                        <Image.Source>
+                            <FontImageSource FontFamily="Icon"
+                                             Glyph="&#xE806;"
+                                             Size="20"
+                                             Color="{StaticResource Gray500}" />
+                        </Image.Source>
+                    </Image>
+                </Grid>
+            </Frame>
+            <Label Text="Seleccione un tipo de visita:" />
+            <Frame x:Name="frame_selectTipoVisita"
+                   BackgroundColor="White"
+                   BorderColor="{StaticResource Accent}"
+                   Padding="20,2.5"
+                   CornerRadius="4">
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TipoVisita_Tapped" />
+                </Frame.GestureRecognizers>
+                <Grid>
+                    <Picker x:Name="SelectTiposVisitas"
+                            Title="{x:Null}"
+                            BackgroundColor="Transparent"
+                            FontAttributes="Bold"
+                            HeightRequest="45"
+                            FontSize="12"
+                            HorizontalOptions="Fill"
+                            ItemsSource="{Binding TiposVisitas}"
+                            SelectedIndexChanged="SelectTiposVisitas_SelectedIndexChanged"
+                            SelectedItem="{Binding TipoVisita, Mode=TwoWay}"
+                            TextColor="Black" />
+                    <Image HorizontalOptions="End">
+                        <Image.Source>
+                            <FontImageSource FontFamily="Icon"
+                                             Glyph="&#xE806;"
+                                             Size="20"
+                                             Color="{StaticResource Gray500}" />
+                        </Image.Source>
+                    </Image>
+                </Grid>
+            </Frame>
+            <Label Text="Seleccione un lugar de venta:"
+                   IsVisible="{Binding VisibilidadLugarVenta}" />
+            <Frame x:Name="frame_selectLugarVenta"
+                   BackgroundColor="White"
+                   IsVisible="{Binding VisibilidadLugarVenta}"
+                   BorderColor="{StaticResource Accent}"
+                   Padding="20,2.5"
+                   CornerRadius="4">
+                <!--<Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="" />
+                </Frame.GestureRecognizers>-->
+                <Grid>
+                    <Picker x:Name="SelectLugaresVenta"
+                            Title="{x:Null}"
+                            BackgroundColor="Transparent"
+                            FontAttributes="Bold"
+                            HeightRequest="45"
+                            FontSize="12"
+                            HorizontalOptions="Fill"
+                            ItemsSource="{Binding LugaresVenta}"
+                            SelectedIndexChanged="SelectLugaresVenta_SelectedIndexChanged"
+                            SelectedItem="{Binding LugarVenta, Mode=TwoWay}"
+                            TextColor="Black" />
+                    <Image HorizontalOptions="End">
+                        <Image.Source>
+                            <FontImageSource FontFamily="Icon"
+                                             Glyph="&#xE806;"
+                                             Size="20"
+                                             Color="{StaticResource Gray500}" />
+                        </Image.Source>
+                    </Image>
+                </Grid>
+            </Frame>
+            <Label Text="Seleccione una opción:"
+                   IsVisible="{Binding VisibilidadOpciones}" />
+            <HorizontalStackLayout Spacing="10"
+                                   IsVisible="{Binding VisibilidadOpciones}">
+                <RadioButton Content="Entrada"
+                             Value="A"
+                             GroupName="opcion1"
+                             IsChecked="{Binding EntradaOp}" />
+                <RadioButton Content="Salida"
+                             Value="B"
+                             GroupName="opcion1"
+                             IsChecked="{Binding SalidaOp}" />
+            </HorizontalStackLayout>
+            <Label Text="Seleccione un médico:"
+                   IsVisible="{Binding VisibilidadMedicos}" />
+            <Frame x:Name="frame_selectMedico"
+                   BackgroundColor="White"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding VisibilidadMedicos}"
+                   BorderColor="{StaticResource Accent}"
+                   Padding="20,5,17.5,5"
+                   CornerRadius="4">
+                <editors:SfComboBox x:Name="searchbox_medicos"
+                                    TextSearchMode="Contains"
+                                    IsEditable="True"
+                                    MaxDropDownHeight="300"
+                                    IsFilteringEnabled="True"
+                                    TextMemberPath="Medico"
+                                    DisplayMemberPath="Medico"
+                                    IsClearButtonVisible="False"
+                                    ItemsSource="{Binding Medicos}"
+                                    SelectedItem="{Binding Medico}"
+                                    Text="{Binding MedicoSeleciconado, Mode=TwoWay}">
+                    <editors:SfComboBox.DropDownButtonSettings>
+                        <editors:DropDownButtonSettings>
+                            <editors:DropDownButtonSettings.View>
+                                <Grid>
+                                    <Image Grid.Column="1"
+                                           HorizontalOptions="End">
+                                        <Image.Source>
+                                            <FontImageSource FontFamily="Icon"
+                                                             Glyph="&#xE806;"
+                                                             Size="20"
+                                                             Color="{StaticResource Gray500}" />
+                                        </Image.Source>
+                                    </Image>
+                                </Grid>
+                            </editors:DropDownButtonSettings.View>
+                        </editors:DropDownButtonSettings>
+                    </editors:SfComboBox.DropDownButtonSettings>
+                    <editors:SfComboBox.NoResultsFoundTemplate>
+                        <DataTemplate>
+                            <Label Text="No Encontrado"
+                                   FontSize="14"
+                                   VerticalOptions="Center"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                        </DataTemplate>
+                    </editors:SfComboBox.NoResultsFoundTemplate>
+                </editors:SfComboBox>
+            </Frame>
+            <Label Text="Seleccione un motivo:"
+                   IsVisible="{Binding VisibilidadMotivo}" />
+            <Frame x:Name="frame_selectMotivo"
+                   BackgroundColor="White"
+                   IsVisible="{Binding VisibilidadMotivo}"
+                   BorderColor="{StaticResource Accent}"
+                   Padding="20,2.5"
+                   CornerRadius="4">
+                <!--<Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="" />
+                </Frame.GestureRecognizers>-->
+                <Grid>
+                    <Picker x:Name="SelectMotivos"
+                            Title="{x:Null}"
+                            BackgroundColor="Transparent"
+                            FontAttributes="Bold"
+                            HeightRequest="45"
+                            FontSize="12"
+                            HorizontalOptions="Fill"
+                            ItemsSource="{Binding Motivos}"
+                            SelectedItem="{Binding Motivo, Mode=TwoWay}"
+                            TextColor="Black" />
+                    <Image HorizontalOptions="End">
+                        <Image.Source>
+                            <FontImageSource FontFamily="Icon"
+                                             Glyph="&#xE806;"
+                                             Size="20"
+                                             Color="{StaticResource Gray500}" />
+                        </Image.Source>
+                    </Image>
+                </Grid>
+            </Frame>
+            <Label Text="Comentarios:"
+                   IsVisible="{Binding VisibilidadComentarios}" />
+            <Entry Text="{Binding Comentarios}"
+                   IsVisible="{Binding VisibilidadComentarios}" />
+            <Button x:Name="btn_enviar"
+                    Text="{Binding TextoBoton}"
+                    Clicked="btn_enviar_Clicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

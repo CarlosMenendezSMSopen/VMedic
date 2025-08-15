@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VMedic.MVVM.Views.LoginView"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             Shell.BackgroundColor="{StaticResource Primary}"
+             Shell.TitleColor="White"
+             Title="VMedic">
+
+    <ScrollView>
+        <core:SfBusyIndicator x:Name="busyIndicator"
+                              Title="Iniciando sesión, por favor espere..."
+                              AnimationType="Cupertino"
+                              FontSize="14"
+                              HorizontalOptions="Fill"
+                              VerticalOptions="Fill"
+                              IndicatorColor="{StaticResource Accent}"
+                              IsRunning="{Binding Indicador}"
+                              OverlayFill="#fff"
+                              SizeFactor="1">
+            <Grid VerticalOptions="Center"
+                  Margin="15"
+                  RowSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Image Grid.ColumnSpan="2"
+                       Source="logo_app.png"
+                       HeightRequest="100" />
+                <Label Grid.Row="1"
+                       Grid.ColumnSpan="2"
+                       Text="{Binding Version}"
+                       HorizontalTextAlignment="Center"
+                       TextColor="{StaticResource Accent}" />
+                <ImageButton Grid.Row="2"
+                             Margin="0,0,10,0"
+                             Padding="5"
+                             HeightRequest="50">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="Icon"
+                                         Glyph="&#xE800;"
+                                         Size="25"
+                                         Color="{StaticResource Gray300}" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <core:SfTextInputLayout Grid.Row="2"
+                                        Grid.Column="1"
+                                        ContainerBackground="Transparent"
+                                        HeightRequest="75"
+                                        HorizontalOptions="Fill"
+                                        Hint="Usuario"
+                                        OutlineCornerRadius="2">
+                    <Entry FontSize="16"
+                           Text="{Binding UserName}" />
+                </core:SfTextInputLayout>
+                <ImageButton Grid.Row="3"
+                             Margin="0,0,10,0"
+                             Padding="5"
+                             HeightRequest="50">
+                    <ImageButton.Source>
+                        <FontImageSource FontFamily="Icon"
+                                         Glyph="&#xE801;"
+                                         Size="25"
+                                         Color="{StaticResource Gray300}" />
+                    </ImageButton.Source>
+                </ImageButton>
+                <core:SfTextInputLayout x:Name="caja_contraseña_android"
+                                        Grid.Row="3"
+                                        Grid.Column="1"
+                                        ContainerBackground="Transparent"
+                                        EnablePasswordVisibilityToggle="True"
+                                        HeightRequest="75"
+                                        Hint="Contraseña"
+                                        OutlineCornerRadius="2">
+                    <Entry FontSize="16"
+                           Text="{Binding Password}" />
+                </core:SfTextInputLayout>
+                <CheckBox Grid.Row="4"
+                          HorizontalOptions="End"
+                          IsChecked="{Binding Guardar, Mode=TwoWay}" />
+                <Label Grid.Row="4"
+                       Grid.Column="1"
+                       VerticalTextAlignment="Center"
+                       Text="Recordar Contraseña"
+                       FontSize="14"
+                       FontAttributes="Bold" />
+                <Grid Grid.Row="5"
+                      Grid.ColumnSpan="2"
+                      ColumnSpacing="15"
+                      ColumnDefinitions=".5*,.5*">
+                    <Button x:Name="btn_configuracion"
+                            Text="CONFIGURACIÓN"
+                            FontAttributes="Bold"
+                            FontSize="14"
+                            Clicked="btn_configuracion_Clicked"/>
+                    <Button x:Name="btn_login"
+                            Grid.Column="1"
+                            Text="INICIAR SESIÓN"
+                            FontAttributes="Bold"
+                            FontSize="14"
+                            Command="{Binding LoginCommand}"/>
+                </Grid>
+                <Grid Grid.Row="6"
+                      Grid.ColumnSpan="2"
+                      Margin="0,0,0,10"
+                      HorizontalOptions="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label FontSize="10"
+                           HorizontalTextAlignment="Center"
+                           Text="Powered by Software Mobile Solutions S.A. - Copyright (C) 2017" />
+                    <Label Grid.Row="1"
+                           FontSize="10"
+                           HorizontalTextAlignment="Center"
+                           Text="Email: info@sms-open.com" />
+                    <Label Grid.Row="2"
+                           FontSize="10"
+                           HorizontalTextAlignment="Center"
+                           Text="(503) 2246-9309" />
+                </Grid>
+            </Grid>
+        </core:SfBusyIndicator>
+    </ScrollView>
+</ContentPage>

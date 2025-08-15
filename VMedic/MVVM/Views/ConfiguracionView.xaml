@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+                  xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+                  x:Class="VMedic.MVVM.Views.ConfiguracionView"
+                  x:Name="Configura"
+                  Title="ConfiguracionView"
+                  Background="#50000000"
+                  CloseWhenBackgroundIsClicked="False"
+                  BackgroundClicked="Configuracion_BackgroundClicked">
+
+    <Grid VerticalOptions="Center">
+        <Frame Margin="15"
+               BorderColor="Black">
+            <VerticalStackLayout>
+                <Label Text="Licencia de Activación"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Center" />
+                <core:SfTextInputLayout Grid.Row="2"
+                                        Grid.Column="1"
+                                        ContainerBackground="Transparent"
+                                        HeightRequest="75"
+                                        HorizontalOptions="Fill"
+                                        Hint="Usuario"
+                                        OutlineCornerRadius="2">
+                    <Entry x:Name="txt_usuario"
+                           FontSize="16" />
+                </core:SfTextInputLayout>
+                <core:SfTextInputLayout Grid.Row="2"
+                                        Grid.Column="1"
+                                        ContainerBackground="Transparent"
+                                        HeightRequest="75"
+                                        HorizontalOptions="Fill"
+                                        Hint="Contraseña"
+                                        EnablePasswordVisibilityToggle="True"
+                                        OutlineCornerRadius="2">
+                    <Entry x:Name="txt_contraseña"
+                           FontSize="16" />
+                </core:SfTextInputLayout>
+                <HorizontalStackLayout HorizontalOptions="Center"
+                                       Spacing="15">
+                    <Button x:Name="btn_cancelarLicencia"
+                            Text="CANCELAR"
+                            Clicked="btn_cancelarLicencia_Clicked" />
+                    <Button x:Name="btn_aceptarLicencia"
+                            Text="ACEPTAR"
+                            Clicked="btn_aceptarLicencia_Clicked" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+    </Grid>
+</mopups:PopupPage>

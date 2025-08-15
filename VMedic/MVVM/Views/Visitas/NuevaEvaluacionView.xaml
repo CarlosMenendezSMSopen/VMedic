@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VMedic.MVVM.Views.Visitas.NuevaEvaluacionView"
+             xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             Shell.BackgroundColor="{StaticResource Primary}"
+             Shell.TitleColor="White"
+             Title="Nueva Evaluación">
+
+    <VerticalStackLayout Margin="15">
+        <Label x:Name="Medico_nombre"
+               Text="nombre cliente"
+               HorizontalOptions="Center"
+               FontSize="16"
+               FontAttributes="Bold"
+               TextColor="Blue" />
+        <Label Text="Producto:"
+               HorizontalOptions="Start"
+               Margin="0,10,0,0" />
+        <Grid>
+            <Frame x:Name="frame_selectProducto"
+                   BackgroundColor="White"
+                   VerticalOptions="Center"
+                   BorderColor="{StaticResource Accent}"
+                   Padding="20,5,17.5,5"
+                   CornerRadius="4">
+                <editors:SfComboBox x:Name="searchbox_productos"
+                                    TextSearchMode="Contains"
+                                    IsEditable="True"
+                                    MaxDropDownHeight="300"
+                                    IsFilteringEnabled="True"
+                                    TextMemberPath="Descripcion"
+                                    DisplayMemberPath="Descripcion"
+                                    IsClearButtonVisible="False"
+                                    SelectionChanged="searchbox_productos_SelectionChanged"
+                                    ItemsSource="{Binding Productos}"
+                                    SelectedItem="{Binding Producto}"
+                                    Text="{Binding ProductoSeleccionado, Mode=TwoWay}">
+                    <editors:SfComboBox.DropDownButtonSettings>
+                        <editors:DropDownButtonSettings>
+                            <editors:DropDownButtonSettings.View>
+                                <Grid>
+
+                                </Grid>
+                            </editors:DropDownButtonSettings.View>
+                        </editors:DropDownButtonSettings>
+                    </editors:SfComboBox.DropDownButtonSettings>
+                    <editors:SfComboBox.NoResultsFoundTemplate>
+                        <DataTemplate>
+                            <Label Text="No Encontrado"
+                                   FontSize="14"
+                                   VerticalOptions="Center"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                        </DataTemplate>
+                    </editors:SfComboBox.NoResultsFoundTemplate>
+                </editors:SfComboBox>
+            </Frame>
+            <Image HorizontalOptions="End" Margin="0,0,25,0">
+                <Image.Source>
+                    <FontImageSource FontFamily="Icon"
+                                     Glyph="&#xE806;"
+                                     Size="20"
+                                     Color="{StaticResource Gray500}" />
+                </Image.Source>
+            </Image>
+        </Grid>
+        <HorizontalStackLayout Margin="0,5,0,0">
+            <Label Text="SKU: " VerticalOptions="Center" />
+            <Frame x:Name="frame_selectSKU"
+                   BackgroundColor="White"
+                   BorderColor="{StaticResource Accent}"
+                   Padding="20,2.5"
+                   CornerRadius="4">
+                <Grid>
+                    <Picker x:Name="SelectSKUs"
+                            Title="{x:Null}"
+                            BackgroundColor="Transparent"
+                            FontAttributes="Bold"
+                            HeightRequest="45"
+                            FontSize="14"
+                            HorizontalOptions="Fill"
+                            ItemsSource="{Binding SKUs}"
+                            SelectedItem="{Binding SKU, Mode=TwoWay}"
+                            TextColor="Black" />
+                    <Image HorizontalOptions="End">
+                        <Image.Source>
+                            <FontImageSource FontFamily="Icon"
+                                             Glyph="&#xE806;"
+                                             Size="20"
+                                             Color="{StaticResource Gray500}" />
+                        </Image.Source>
+                    </Image>
+                </Grid>
+            </Frame>
+        </HorizontalStackLayout>
+        <Label Text="Cantidad:"
+               Margin="0,10,0,0" />
+        <Entry Keyboard="Numeric"
+               Text="{Binding Cantidad,Mode=TwoWay}" />
+        <Label Text="Observaciones:"
+               Margin="0,10,0,0" />
+        <Entry Text="{Binding Observaciones, Mode=TwoWay}" />
+        <HorizontalStackLayout HorizontalOptions="Center"
+                               Spacing="15">
+            <Button x:Name="btn_cancelar"
+                    Text="Volver"
+                    Clicked="btn_cancelar_Clicked" />
+            <Button x:Name="btn_guardar"
+                    Text="Guardar"
+                    Clicked="btn_guardar_Clicked" />
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>
