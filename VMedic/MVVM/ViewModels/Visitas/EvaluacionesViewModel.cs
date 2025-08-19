@@ -41,7 +41,14 @@ namespace VMedic.MVVM.ViewModels.Visitas
             NiveldePrecio = nivelPrecio;
             SincronizacionDataBase.ObtenerMuestras();
             MostrarEvaluaciones();
+            RefreshCommand = new Command(Refresh);
             PressedPreferences.EndPressed();
+        }
+
+        public void Refresh()
+        {
+            IsRefreshing = true;
+            MostrarEvaluaciones();
         }
 
         public async void MostrarEvaluaciones()

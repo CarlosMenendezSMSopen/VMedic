@@ -17,6 +17,7 @@ using VMedic.Services;
 using VMedic.MVVM.Views.Visitas;
 using VMedic.Behaviors;
 using VMedic.Utilities;
+using VMedic.Global;
 
 namespace VMedic.MVVM.ViewModels
 {
@@ -81,67 +82,76 @@ namespace VMedic.MVVM.ViewModels
         [ICommand]
         public async void Login()
         {
-            try
+            if (PressedPreferences.ValidatePressing())
             {
-                if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
+                PressedPreferences.Pressing(null);
+
+                try
                 {
-                    if (App.usuario is not null)
-                        if (!App.usuario.IsEmpty())
-                        {
-                            Indicador = true;
-                            var consulta = $"{nameof(VMedicA001)}/'{UserName}','{Password}'";
-                            var login = await servicio.ResultadoGET<VMedicA001>(consulta, null);
-                            if (login is not null)
+                    if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
+                    {
+                        if (App.usuario is not null)
+                            if (!App.usuario.IsEmpty())
                             {
-                                var Sesion = login.ToList().FirstOrDefault();
-                                if (Sesion is not null)
+                                Indicador = true;
+                                var consulta = $"{nameof(VMedicA001)}/'{UserName}','{Password}'";
+                                var login = await servicio.ResultadoGET<VMedicA001>(consulta, null);
+                                if (login is not null)
                                 {
-                                    if (Sesion.CODIGO_VENDEDOR is -1)
+                                    var Sesion = login.ToList().FirstOrDefault();
+                                    if (Sesion is not null)
                                     {
-                                        ToastMaker.Make("Usuario o contraseña incorrectas", App.Current?.MainPage);
-                                        Indicador = false;
-                                    }
-                                    else
-                                    {
-                                        var tablaUsuario = App.usuario.GetItem();
+                                        if (Sesion.CODIGO_VENDEDOR is -1)
+                                        {
+                                            ToastMaker.Make("Usuario o contraseña incorrectas", App.Current?.MainPage);
+                                            Indicador = false;
+                                        }
+                                        else
+                                        {
+                                            var tablaUsuario = App.usuario.GetItem();
 
-                                        tablaUsuario.CodVendedor = Sesion.CODIGO_VENDEDOR;
-                                        tablaUsuario.UsuarioName = UserName;
-                                        tablaUsuario.Contraseña = Password;
-                                        tablaUsuario.Remember = Guardar ? 1 : 0;
-                                        tablaUsuario.UbicacionRequerida = Sesion.UBICACION_REQUERIDA;
-                                        tablaUsuario.CodPortafolio = Sesion.CODIGO_PORTAFOLIO;
+                                            tablaUsuario.CodVendedor = Sesion.CODIGO_VENDEDOR;
+                                            tablaUsuario.UsuarioName = UserName;
+                                            tablaUsuario.Contraseña = Password;
+                                            tablaUsuario.Remember = Guardar ? 1 : 0;
+                                            tablaUsuario.UbicacionRequerida = Sesion.UBICACION_REQUERIDA;
+                                            tablaUsuario.CodPortafolio = Sesion.CODIGO_PORTAFOLIO;
 
+                                            if (DatosCompartidos.lbl_UsuarioNombre is not null)
+                                            {
+                                                DatosCompartidos.lbl_UsuarioNombre.Text = UserName;
+                                            }
 
-                                        App.usuario.UpdateITEM(tablaUsuario);
+                                            App.usuario.UpdateITEM(tablaUsuario);
 
-                                        SincronizacionDataBase.SincronizarTodo();
-                                        await Shell.Current.GoToAsync(new ShellNavigationState($"//{nameof(VisitasView)}"));
+                                            SincronizacionDataBase.SincronizarTodo();
+                                            await Shell.Current.GoToAsync(new ShellNavigationState($"//{nameof(VisitasView)}"));
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else
-                        {
-                            Indicador = false;
-                            ToastMaker.Make("No se ha configurado su activación de licencia", App.Current?.MainPage);
-                        }
+                            else
+                            {
+                                Indicador = false;
+                                ToastMaker.Make("No se ha configurado su activación de licencia", App.Current?.MainPage);
+                            }
+                    }
+                    else
+                    {
+                        Indicador = false;
+                        ToastMaker.Make("Los campos de usuario y contraseña no deben de estar vacíos", App.Current?.MainPage);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
                     Indicador = false;
-                    ToastMaker.Make("Los campos de usuario y contraseña no deben de estar vacíos", App.Current?.MainPage);
+                    PressedPreferences.EndPressed();
+                    ExceptionMessageMaker.Make("Error boton de Inicio de Sesión", ex.ToString(), ex.Message, App.Current?.MainPage);
                 }
-            }
-            catch (Exception ex)
-            {
-                Indicador = false;
-                PressedPreferences.EndPressed();
-                ExceptionMessageMaker.Make("Error boton de Inicio de Sesión", ex.ToString(), ex.Message, App.Current?.MainPage);
-            }
-            finally
-            {
-                Indicador = false;
+                finally
+                {
+                    Indicador = false;
+                }
             }
         }
     }

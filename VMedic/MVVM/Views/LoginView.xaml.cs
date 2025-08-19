@@ -1,6 +1,7 @@
 using CommunityToolkit.Maui.Behaviors;
 using Mopups.Services;
 using VMedic.MVVM.ViewModels;
+using VMedic.Utilities;
 
 namespace VMedic.MVVM.Views;
 
@@ -10,6 +11,7 @@ public partial class LoginView : ContentPage
     {
         InitializeComponent();
         BindingContext = new LoginViewModel();
+        PressedPreferences.EndPressed();
 
         IList<Behavior> behaviors = new List<Behavior>
         {

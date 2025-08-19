@@ -145,6 +145,23 @@ namespace VMedic.Services
             });
         }
 
+        public static void ObtenerEspecialidades()
+        {
+            Task.Run(async () =>
+            {
+                var data = await servicio.ResultadoGET<TablaClasesEspecializaciones>($"VMedicA040/'{UsuarioIniciado?.UsuarioName}'", null);
+                if (data is not null)
+                {
+                    Console.WriteLine("Insert especialidades");
+                    if (App.especialidades is not null)
+                    {
+                        App.especialidades.DeleteItems();
+                        App.especialidades?.InsertItems(data);
+                    }
+                }
+            });
+        }
+
         public static void ObtenerMateriales()
         {
             Task.Run(async () =>

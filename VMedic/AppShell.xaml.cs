@@ -10,6 +10,7 @@ using Android.OS;
 
 using VMedic.Utilities;
 using VMedic.MVVM.ViewModels;
+using VMedic.Global;
 
 namespace VMedic
 {
@@ -18,7 +19,8 @@ namespace VMedic
         public AppShell()
         {
             InitializeComponent();
-            lblUserName.Text = App.usuario?.GetItem().UsuarioName;
+            BindingContext = new AppShellViewModel();
+            DatosCompartidos.lbl_UsuarioNombre = lblUserName;
 #if IOS
             var versionName = NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"];
 

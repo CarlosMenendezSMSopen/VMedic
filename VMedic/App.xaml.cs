@@ -23,6 +23,7 @@ namespace VMedic
         public static BaseRepository<TablaSKUProducto>? skuproductos { get; private set; }
         public static BaseRepository<TablaEncabezadoEvaluacion>? evaluacionencabezado { get; private set; }
         public static BaseRepository<TablaSolicitudesNoEnviadas>? SolicitudesPendientes { get; private set; }
+        public static BaseRepository<TablaClasesEspecializaciones>? especialidades { get; private set; }
         public App(
             BaseRepository<TablaUsuario> repo,
             BaseRepository<TablaDoctores> repo3,
@@ -32,6 +33,7 @@ namespace VMedic
             BaseRepository<TablaTiposVisitas> repo18,
             BaseRepository<TablaVisitasMensuales> repo19,
             BaseRepository<TablaLugaresVenta> repo37,
+            BaseRepository<TablaClasesEspecializaciones> repo40,
             BaseRepository<TablaMateriales> repo44,
             BaseRepository<TablaMuestras> repo45,
             BaseRepository<TablaSKUProducto> repo53,
@@ -51,6 +53,7 @@ namespace VMedic
             tiposvisitas = repo18;
             visitasmensuales = repo19;
             lugaresventas = repo37;
+            especialidades = repo40;
             materiales = repo44;
             muestras = repo45;
             skuproductos = repo53;

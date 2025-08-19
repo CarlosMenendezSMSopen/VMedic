@@ -18,26 +18,33 @@ namespace VMedic.MVVM.ViewModels
 
         public void SignOut()
         {
-            if (App.Current is not null)
+            try
             {
-                Preferences.Default.Clear();
-                App.usuario?.DeleteItems();
-                App.doctores?.DeleteItems();
-                App.niveles?.DeleteItems();
-                App.categorias?.DeleteItems();
-                App.subcategorias?.DeleteItems();
-                App.tiposvisitas?.DeleteItems();
-                App.visitasmensuales?.DeleteItems();
-                App.lugaresventas?.DeleteItems();
-                App.materiales?.DeleteItems();
-                App.muestras?.DeleteItems();
-                App.skuproductos?.DeleteItems();
-                App.visitas?.DeleteItems();
-                App.evaluaciondetalles?.DeleteItems();
-                App.evaluacionencabezado?.DeleteItems();
-                App.SolicitudesPendientes?.DeleteItems();
+                if (App.Current is not null)
+                {
+                    Preferences.Default.Clear();
+                    App.usuario?.DeleteItems();
+                    App.doctores?.DeleteItems();
+                    App.niveles?.DeleteItems();
+                    App.categorias?.DeleteItems();
+                    App.subcategorias?.DeleteItems();
+                    App.tiposvisitas?.DeleteItems();
+                    App.visitasmensuales?.DeleteItems();
+                    App.lugaresventas?.DeleteItems();
+                    App.materiales?.DeleteItems();
+                    App.muestras?.DeleteItems();
+                    App.skuproductos?.DeleteItems();
+                    App.visitas?.DeleteItems();
+                    App.evaluaciondetalles?.DeleteItems();
+                    App.evaluacionencabezado?.DeleteItems();
+                    App.SolicitudesPendientes?.DeleteItems();
 
-                App.Current.MainPage = new AppShell();
+                    App.Current.MainPage = new AppShell();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
     }

@@ -2,11 +2,108 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="VMedic.MVVM.Views.MedicosView"
-             Title="MedicosView">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             Shell.BackgroundColor="{StaticResource Primary}"
+             Title="Médicos">
+
+    <Shell.TitleView>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Label x:Name="titulo"
+                   Text="Médicos"
+                   VerticalOptions="Center"
+                   TextColor="White"
+                   FontAttributes="Bold"
+                   FontSize="20" />
+            <ImageButton x:Name="btn_habilitarBuscar"
+                         Grid.Column="1"
+                         HeightRequest="50"
+                         WidthRequest="50"
+                         Padding="15"
+                         Source="ic_search.png"
+                         HorizontalOptions="End"
+                         VerticalOptions="Center"
+                         Clicked="btn_habilitarBuscar_Clicked">
+            </ImageButton>
+            <Grid x:Name="SearchMedico"
+                  IsVisible="False"
+                  Grid.ColumnSpan="2">
+                <Entry x:Name="searchBox_Medico"
+                       TextChanged="searchBox_Medico_TextChanged"
+                       HorizontalOptions="Fill"
+                       TextColor="White" />
+                <ImageButton x:Name="btn_cancel_text"
+                             HorizontalOptions="End"
+                             HeightRequest="50"
+                             WidthRequest="50"
+                             Padding="12"
+                             Source="close_blanc.png"
+                             Clicked="btn_cancel_text_Clicked" />
+            </Grid>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid>
+        <core:SfBusyIndicator x:Name="busyIndicator"
+                              Title="Cargando Médicos..."
+                              Grid.Row="1"
+                              Margin="0,5"
+                              AnimationType="Cupertino"
+                              CompressedLayout.IsHeadless="True"
+                              FontSize="12"
+                              HorizontalOptions="Fill"
+                              IndicatorColor="#2d3e50"
+                              IsRunning="{Binding Indicador, Mode=TwoWay}"
+                              OverlayFill="#fff"
+                              SizeFactor="1"
+                              VerticalOptions="Fill">
+            <RefreshView x:Name="refresh"
+                         Grid.Row="1"
+                         Command="{Binding RefreshCommand}"
+                         IsRefreshing="{Binding IsRefreshing}">
+                <ScrollView Grid.Row="1"
+                            x:Name="scroll_container"
+                            CompressedLayout.IsHeadless="True"
+                            Scrolled="scroll_container_Scrolled">
+                    <VerticalStackLayout x:Name="List_Medicos"
+                                         VerticalOptions="Fill"
+                                         HorizontalOptions="Fill" />
+                </ScrollView>
+            </RefreshView>
+        </core:SfBusyIndicator>
+        <ActivityIndicator x:Name="status"
+                           Grid.Row="1"
+                           HeightRequest="80"
+                           IsRunning="True"
+                           IsVisible="False"
+                           Opacity="0.5"
+                           WidthRequest="80"
+                           Color="Gray" />
+        <Label Text="No hay resultados"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               FontAttributes="Bold"
+               FontSize="18"
+               IsVisible="{Binding TextoAviso}" />
+        <Frame x:Name="containerbtn_agregaremedicos"
+               Grid.Row="1"
+               BackgroundColor="{StaticResource Primary}"
+               BorderColor="Transparent"
+               HorizontalOptions="End"
+               VerticalOptions="End"
+               Margin="0,0,15,0"
+               HeightRequest="50"
+               WidthRequest="50">
+            <Image x:Name="btn_agregarmedicos"
+                   HeightRequest="25"
+                   Source="add_blanc.png"
+                   WidthRequest="25" />
+            <Frame.GestureRecognizers>
+                <TapGestureRecognizer Tapped="AgregarMedicos_Tapped" />
+            </Frame.GestureRecognizers>
+        </Frame>
+    </Grid>
 </ContentPage>

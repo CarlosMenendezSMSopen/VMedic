@@ -68,6 +68,43 @@
         </Tab>
     </FlyoutItem>
 
+    <FlyoutItem Title="Mensajes"
+                StyleClass="mensajesItem"
+                FlyoutDisplayOptions="AsMultipleItems"
+                IsVisible="True"
+                Route="MensajesView"
+                Shell.FlyoutBehavior="Flyout">
+        <Tab Title="Mensajes"
+             Icon="messages.png">
+            <ShellContent Shell.FlyoutHeight="50"
+                          ContentTemplate="{DataTemplate local:MedicosView}" />
+        </Tab>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Inventario"
+                FlyoutDisplayOptions="AsMultipleItems"
+                IsVisible="True"
+                Route="InventarioView"
+                Shell.FlyoutBehavior="Flyout">
+        <Tab Title="Inventario"
+             Icon="inventory.png">
+            <ShellContent Shell.FlyoutHeight="50"
+                          ContentTemplate="{DataTemplate local:MedicosView}" />
+        </Tab>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Planificación"
+                FlyoutDisplayOptions="AsMultipleItems"
+                IsVisible="True"
+                Route="PlanificacionView"
+                Shell.FlyoutBehavior="Flyout">
+        <Tab Title="Planificación"
+             Icon="planning.png">
+            <ShellContent Shell.FlyoutHeight="50"
+                          ContentTemplate="{DataTemplate local:MedicosView}" />
+        </Tab>
+    </FlyoutItem>
+
     <Shell.FlyoutFooter>
         <VerticalStackLayout>
             <Grid ColumnDefinitions=".5*, .5*">
@@ -91,7 +128,7 @@
                 <HorizontalStackLayout>
                     <Image Margin="5,0,20,0"
                            HeightRequest="25"
-                           Source="logout_b.png"
+                           Source="logout.png"
                            WidthRequest="25" />
                     <Label x:Name="lbl_cerrar"
                            HeightRequest="40"

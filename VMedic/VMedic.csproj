@@ -82,10 +82,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Converters\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <MauiXaml Update="MVVM\Views\ConfiguracionView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

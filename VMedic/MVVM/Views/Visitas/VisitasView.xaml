@@ -7,6 +7,21 @@
              Shell.TitleColor="White"
              Title="Visitas">
 
+    <Shell.TitleView>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Label Text="Visitas"
+                   VerticalOptions="Center"
+                   TextColor="White"
+                   FontAttributes="Bold"
+                   FontSize="20" />
+        </Grid>
+    </Shell.TitleView>
+
     <ScrollView>
         <VerticalStackLayout Margin="15">
             <HorizontalStackLayout>

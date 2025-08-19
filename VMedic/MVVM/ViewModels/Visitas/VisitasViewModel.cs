@@ -117,6 +117,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             MostrarTiposVisitas();
             GeolocationsPermissions();
             MostrarMotivos();
+            PressedPreferences.EndPressed();
         }
 
         private async void MostrarLugaresdeVenta()
