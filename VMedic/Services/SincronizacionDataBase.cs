@@ -199,6 +199,40 @@ namespace VMedic.Services
             });
         }
 
+        public static void ObtenerCategoriasMedico()
+        {
+            Task.Run(async () =>
+            {
+                var data = await servicio.ResultadoGET<TablaCategoriasMedico>($"VMedicA050/'{UsuarioIniciado?.UsuarioName}'", null);
+                if (data is not null)
+                {
+                    Console.WriteLine("Insert categorias medico");
+                    if (App.categoriasmedico is not null)
+                    {
+                        App.categoriasmedico.DeleteItems();
+                        App.categoriasmedico?.InsertItems(data);
+                    }
+                }
+            });
+        }
+
+        public static void ObtenerProductosPreferencias()
+        {
+            Task.Run(async () =>
+            {
+                var data = await servicio.ResultadoGET<TablaProductoPreferencia>($"VMedicA051/'{UsuarioIniciado?.UsuarioName}'", null);
+                if (data is not null)
+                {
+                    Console.WriteLine("Insert productos preferencias");
+                    if (App.productospreferencias is not null)
+                    {
+                        App.productospreferencias.DeleteItems();
+                        App.productospreferencias?.InsertItems(data);
+                    }
+                }
+            });
+        }
+
         public static void ObtenerSKUProductos()
         {
             Task.Run(async () =>

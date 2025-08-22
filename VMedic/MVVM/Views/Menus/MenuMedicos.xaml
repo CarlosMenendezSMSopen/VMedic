@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  x:Class="VMedic.MVVM.Views.Menus.MenuMedicos"
+                  xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+                  xmlns:mopupsanim="clr-namespace:Mopups.Animations;assembly=Mopups"
+                  BackgroundColor="#20000000"
+                  Title="MenuMedicos">
+
+    <mopups:PopupPage.Animation>
+        <mopupsanim:ScaleAnimation x:Name="animation_status"
+                                   DurationIn="200"
+                                   PositionIn="Bottom"
+                                   PositionOut="Bottom"
+                                   ScaleIn="0.7"
+                                   ScaleOut="0.7" />
+    </mopups:PopupPage.Animation>
+
+    <Grid x:Name="Gridcontenedor"
+          BackgroundColor="White"
+          HorizontalOptions="End"
+          VerticalOptions="End"
+          Margin="0,0,10,60">
+        <VerticalStackLayout>
+            <Label Text="Agregar Nuevo Médico"
+                   Padding="20,10"
+                   VerticalTextAlignment="Center"
+                   FontSize="14"
+                   FontAttributes="Bold">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="NewMedico_Tapped" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Text="Enviar Médicos Pendientes"
+                   Padding="20,10"
+                   VerticalTextAlignment="Center"
+                   FontSize="14"
+                   FontAttributes="Bold">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="EnviarPendientes_Tapped" />
+                </Label.GestureRecognizers>
+            </Label>
+        </VerticalStackLayout>
+    </Grid>
+</mopups:PopupPage>

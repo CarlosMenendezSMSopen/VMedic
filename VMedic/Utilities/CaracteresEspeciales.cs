@@ -16,5 +16,6 @@ namespace VMedic.Utilities
         public static string RELOJ_ARENA { get; } = "⏳";
         public static string BARRA_VERTICAL_ROTA { get; } = "¦";
         public static string SECCION { get; } = "§";
+        public static string CUADRITO { get; } = "■";
     }
 }

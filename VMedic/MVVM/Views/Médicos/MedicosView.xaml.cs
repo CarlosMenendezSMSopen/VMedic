@@ -1,7 +1,9 @@
+using Mopups.Services;
 using System.Timers;
 using VMedic.Converters;
 using VMedic.Global;
 using VMedic.MVVM.ViewModels;
+using VMedic.MVVM.Views.Menus;
 using VMedic.Services;
 using Timer = System.Timers.Timer;
 
@@ -95,6 +97,6 @@ public partial class MedicosView : ContentPage
 
     private void AgregarMedicos_Tapped(object sender, TappedEventArgs e)
     {
-
+        MopupService.Instance.PushAsync(new MenuMedicos());
     }
 }
