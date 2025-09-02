@@ -28,7 +28,9 @@ namespace VMedic
                     fonts.AddFont("fontello2.ttf", "SecondIcon");
                     fonts.AddFont("fontello3.ttf", "ThirdIcon");
                 })
-                .ConfigureSyncfusionCore();
+                .ConfigureSyncfusionCore()
+                .ConfigureEssentials()
+                .UseMauiMaps();
 
             builder.Services.AddScoped(typeof(BaseRepository<>));
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Maui.Controls.Maps;
+using Map = Microsoft.Maui.Controls.Maps.Map;
 
 namespace VMedic.Global
 {
@@ -16,5 +18,6 @@ namespace VMedic.Global
         public static dynamic? EvaluacionEditar { get; set; } = null;
         public static VerticalStackLayout? ListaMedicos { get; set; }
         public static string? TextoBusquedaMedicos { get; set; } = "";
+        public static Map? MapaUbicaiconMedico { get; set; }
     }
 }

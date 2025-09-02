@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using VMedic.Global;
 using VMedic.MVVM.Models.DatabaseTables;
 using VMedic.MVVM.ViewModels.Médicos;
 using VMedic.Services;
@@ -7,14 +9,33 @@ namespace VMedic.MVVM.Views.Médicos;
 
 public partial class EditorMedicoView : ContentPage
 {
-    public EditorMedicoView(int ModoEditor)
+    public EditorMedicoView(int ModoEditor, string? cODIGO_DE_CLIENTE)
     {
-        InitializeComponent();
-        txt_fechaVisita.Text = DateTime.Today.AddDays(1).ToString("ddd dd MMM yyyy");
-        SincronizacionDataBase.ObtenerCategoriasMedico();
-        SincronizacionDataBase.ObtenerProductosPreferencias();
-        BindingContext = new EditorMedicoViewModel(ModoEditor);
-        PressedPreferences.EndPressed();
+        try
+        {
+            InitializeComponent();
+            SincronizacionDataBase.ObtenerCategoriasMedico();
+            SincronizacionDataBase.ObtenerProductosPreferencias();
+            BindingContext = new EditorMedicoViewModel(ModoEditor, cODIGO_DE_CLIENTE);
+            PressedPreferences.EndPressed();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            InsertarMapa();
+        }
+    }
+
+    private async void InsertarMapa()
+    {
+        await Task.Delay(1000);
+        Grid.SetRow(DatosCompartidos.MapaUbicaiconMedico, 8);
+        Grid.SetColumn(DatosCompartidos.MapaUbicaiconMedico, 0);
+        Grid.SetColumnSpan(DatosCompartidos.MapaUbicaiconMedico, 2);
+        ContenedorVerInfo.Children.Add(DatosCompartidos.MapaUbicaiconMedico);
     }
 
     private void Especialidad_Tapped(object sender, TappedEventArgs e)

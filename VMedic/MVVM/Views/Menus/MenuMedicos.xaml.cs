@@ -27,7 +27,7 @@ public partial class MenuMedicos : PopupPage
 			PressedPreferences.Pressing(sender);
 
             MopupService.Instance.PopAllAsync();
-            Shell.Current.Navigation.PushAsync(new EditorMedicoView(1));
+            Shell.Current.Navigation.PushAsync(new EditorMedicoView(1, null));
         }
     }
 

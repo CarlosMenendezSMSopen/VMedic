@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="VMedic.MVVM.Views.Médicos.EditorMedicoView"
+             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
              xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
              Shell.BackgroundColor="{StaticResource Primary}">
 
@@ -36,6 +37,7 @@
 
     <Grid>
         <Grid x:Name="ContenedorVerInfo"
+              Margin="0,15"
               IsVisible="{Binding VisibilidadInfo}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50" />
@@ -44,51 +46,110 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
             <Label Grid.ColumnSpan="2"
-                   Text="Nombre Medico"
+                   Text="{Binding MedicoName}"
                    FontSize="18"
+                   TextColor="Blue"
+                   HorizontalTextAlignment="Center"
                    FontAttributes="Bold" />
             <Label Grid.ColumnSpan="2"
                    Grid.Row="1"
-                   Text="Especialidad"
+                   Text="{Binding MedicoEspecialidad}"
                    HorizontalOptions="Center"
                    FontSize="12" />
+            <ImageButton Grid.Row="2"
+                         IsVisible="{Binding MedicoContactVisible}"
+                         Source="contacto.png"
+                         HeightRequest="50"
+                         Padding="{Binding PaddingImagen}" />
             <Label Grid.Column="1"
                    Grid.Row="2"
-                   Text="contacto de Médico"
-                   FontSize="14"
+                   Text="{Binding MedicoContact}"
+                   IsVisible="{Binding MedicoContactVisible}"
+                   FontSize="16"
+                   HeightRequest="50"
                    VerticalTextAlignment="Center" />
+            <ImageButton Grid.Row="3"
+                         Source="telefono.png"
+                         HeightRequest="50"
+                         IsVisible="{Binding MedicoTelefonoVisible}"
+                         Padding="{Binding PaddingImagen}" />
             <Label Grid.Column="1"
                    Grid.Row="3"
-                   Text="telefono Médico"
-                   FontSize="14"
+                   Text="{Binding MedicoTelefono}"
+                   IsVisible="{Binding MedicoTelefonoVisible}"
+                   FontSize="16"
+                   HeightRequest="50"
                    VerticalTextAlignment="Center" />
+            <ImageButton Grid.Row="4"
+                         Source="categoria.png"
+                         HeightRequest="50"
+                         IsVisible="{Binding MedicoCategoriaVisible}"
+                         Padding="{Binding PaddingImagen}" />
             <Label Grid.Column="1"
                    Grid.Row="4"
-                   Text="segmentacion"
-                   FontSize="14"
+                   Text="{Binding MedicoCategoria}"
+                   IsVisible="{Binding MedicoCategoriaVisible}"
+                   FontSize="16"
+                   HeightRequest="50"
                    VerticalTextAlignment="Center" />
+            <ImageButton Grid.Row="5"
+                         Source="adaptacion.png"
+                         HeightRequest="50"
+                         IsVisible="{Binding MedicoAdaptacionVisible}"
+                         Padding="{Binding PaddingImagen}" />
             <Label Grid.Column="1"
                    Grid.Row="5"
-                   Text="adopcion medico"
-                   FontSize="14"
+                   Text="{Binding MedicoAdaptacion}"
+                   IsVisible="{Binding MedicoAdaptacionVisible}"
+                   FontSize="16"
+                   HeightRequest="50"
                    VerticalTextAlignment="Center" />
-            <Frame Grid.Column="1"
-                   Grid.Row="6"
-                   BorderColor="Transparent"
-                   Margin="0,15,100,15" />
+            <ImageButton Grid.Row="6"
+                         Source="info_color.png"
+                         HeightRequest="50"
+                         IsVisible="{Binding MedicoColorVisible}"
+                         Padding="{Binding PaddingImagen}" />
+            <Grid Grid.Row="6"
+                  Grid.Column="1"
+                  HeightRequest="50"
+                  Margin="0,0,150,0"
+                  IsVisible="{Binding MedicoColorVisible}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Frame
+                       BorderColor="Transparent"
+                       BackgroundColor="{Binding MedicoColor}"
+                       Margin="5" />
+                <Label Grid.Row="1"
+                       Text="{Binding MedicoColorNombre}"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"
+                       FontAttributes="Bold"
+                       FontSize="12"
+                       Margin="0,0,0,5" />
+            </Grid>
+            <ImageButton Grid.Row="7"
+                         Source="direction.png"
+                         HeightRequest="50"
+                         IsVisible="{Binding MedicoDireccionVisible}"
+                         Padding="{Binding PaddingImagen}" />
             <Label Grid.Column="1"
                    Grid.Row="7"
-                   Text="Dirección Médico"
-                   FontSize="14"
+                   HeightRequest="50"
+                   Text="{Binding MedicoDireccion}"
+                   IsVisible="{Binding MedicoDireccionVisible}"
+                   FontSize="16"
                    VerticalTextAlignment="Center" />
         </Grid>
 
@@ -224,11 +285,14 @@
                                             TextSearchMode="Contains"
                                             IsEditable="False"
                                             IsFilteringEnabled="False"
+                                            MultiSelectionDisplayMode="Delimiter"
                                             TextMemberPath="DESCRIPCION_PROD_PREFERENCIA"
                                             DisplayMemberPath="DESCRIPCION_PROD_PREFERENCIA"
                                             IsClearButtonVisible="False"
+                                            Placeholder="No hay Selección"
+                                            PlaceholderColor="Gray"
                                             SelectionMode="Multiple"
-                                            DelimiterText=","
+                                            DelimiterText=", "
                                             ItemsSource="{Binding Preferencias}"
                                             DropDownClosed="searchbox_preferencias_DropDownClosed">
                             <editors:SfComboBox.DropDownButtonSettings>
@@ -372,8 +436,8 @@
                                     HeightRequest="45"
                                     FontSize="12"
                                     HorizontalOptions="Fill"
-                                    ItemsSource="{Binding EscalasAdopcion, Mode=TwoWay}"
-                                    SelectedItem="{Binding Adopcion, Mode=TwoWay}"
+                                    ItemsSource="{Binding EscalasAdaptacion, Mode=TwoWay}"
+                                    SelectedItem="{Binding Adaptacion, Mode=TwoWay}"
                                     TextColor="Black" />
                             <Image HorizontalOptions="End">
                                 <Image.Source>
@@ -391,7 +455,8 @@
                                VerticalTextAlignment="Center"
                                FontSize="16" />
                         <Entry x:Name="txt_fechaVisita"
-                               IsEnabled="False">
+                               IsEnabled="False"
+                               Text="{Binding FechaVisita, Mode=TwoWay}">
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroupList>
                                     <VisualStateGroup x:Name="CommonStates">
@@ -433,7 +498,6 @@
                                Grid.ColumnSpan="2"
                                Text="Semanas Visita:" />
                         <HorizontalStackLayout Grid.Row="2"
-                                               Grid.ColumnSpan="2"
                                                HorizontalOptions="Center">
                             <CheckBox IsEnabled="{Binding EnableRepetir}"
                                       IsChecked="{Binding CheckS1, Mode=TwoWay}" />
@@ -442,7 +506,6 @@
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Grid.Column="1"
                                                Grid.Row="2"
-                                               Grid.ColumnSpan="2"
                                                HorizontalOptions="Center">
                             <CheckBox IsEnabled="{Binding EnableRepetir}"
                                       IsChecked="{Binding CheckS2, Mode=TwoWay}" />
@@ -451,24 +514,21 @@
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Grid.Column="2"
                                                Grid.Row="2"
-                                               Grid.ColumnSpan="2"
                                                HorizontalOptions="Center">
                             <CheckBox IsEnabled="{Binding EnableRepetir}"
                                       IsChecked="{Binding CheckS3, Mode=TwoWay}" />
                             <Label Text="S3"
                                    VerticalTextAlignment="Center" />
                         </HorizontalStackLayout>
-                        <HorizontalStackLayout Grid.Row="3"
-                                               Grid.ColumnSpan="3"
+                        <HorizontalStackLayout Grid.Row="2"
+                                               Grid.Column="3"
                                                HorizontalOptions="Center">
                             <CheckBox IsEnabled="{Binding EnableRepetir}"
                                       IsChecked="{Binding CheckS4, Mode=TwoWay}" />
                             <Label Text="S4"
                                    VerticalTextAlignment="Center" />
                         </HorizontalStackLayout>
-                        <HorizontalStackLayout Grid.Column="1"
-                                               Grid.Row="3"
-                                               Grid.ColumnSpan="3"
+                        <HorizontalStackLayout Grid.Row="3"
                                                HorizontalOptions="Center">
                             <CheckBox IsEnabled="{Binding EnableRepetir}"
                                       IsChecked="{Binding CheckS5, Mode=TwoWay}" />
@@ -509,7 +569,6 @@
                                    VerticalTextAlignment="Center" />
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Grid.Row="6"
-                                               Grid.ColumnSpan="2"
                                                HorizontalOptions="Center">
                             <CheckBox IsEnabled="{Binding EnableRepetir}"
                                       IsChecked="{Binding CheckV, Mode=TwoWay}" />
@@ -518,7 +577,6 @@
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Grid.Column="1"
                                                Grid.Row="6"
-                                               Grid.ColumnSpan="2"
                                                HorizontalOptions="Center">
                             <CheckBox IsEnabled="{Binding EnableRepetir}"
                                       IsChecked="{Binding CheckS, Mode=TwoWay}" />
@@ -527,7 +585,6 @@
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Grid.Column="2"
                                                Grid.Row="6"
-                                               Grid.ColumnSpan="2"
                                                HorizontalOptions="Center">
                             <CheckBox IsEnabled="{Binding EnableRepetir}"
                                       IsChecked="{Binding CheckD, Mode=TwoWay}" />

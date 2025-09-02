@@ -1,7 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		  xmlns:tools="http://schemas.android.com/tools">
-	<application android:allowBackup="true" android:icon="@mipmap/ic_launcher_icon" android:roundIcon="@mipmap/ic_launcher_icon" android:supportsRtl="true"></application>
+	<application
+		android:allowBackup="true"
+		android:icon="@mipmap/ic_launcher_icon"
+		android:roundIcon="@mipmap/ic_launcher_icon"
+		android:supportsRtl="true" >
+		<uses-library android:name="org.apache.http.legacy" android:required="false" />
+		<meta-data android:name="com.google.android.geo.API_KEY"
+				   android:value="AIzaSyCwcepDaswOKCfhynYjrkbkuRh8NwnKTJs" />
+		<meta-data android:name="com.google.android.gms.version"
+				   android:value="@integer/google_play_services_version" />
+	</application>
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

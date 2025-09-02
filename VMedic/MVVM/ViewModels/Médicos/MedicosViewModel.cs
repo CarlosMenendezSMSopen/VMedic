@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mopups.Services;
 using PropertyChanged;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using VMedic.Behaviors;
 using VMedic.Global;
+using VMedic.MVVM.Views.Médicos;
+using VMedic.Services;
 using VMedic.Utilities;
 
 namespace VMedic.MVVM.ViewModels
@@ -42,6 +45,7 @@ namespace VMedic.MVVM.ViewModels
             Indicador = true;
             TextoAviso = false;
             DatosCompartidos.ListaMedicos?.Children.Clear();
+            SincronizacionDataBase.ObtenerDoctores();
             await Task.Delay(1000);
             await Task.Run(() =>
             {
@@ -54,12 +58,12 @@ namespace VMedic.MVVM.ViewModels
                         var ListaMedicos = (from c in ListaClientes
                                             join e in ListaEspecialidad on c.CODIGO_DE_CLASE equals e.CODIGO_DE_CLASE
                                             orderby c.NOMBRE_COMERCIAL
-                                            where DatosCompartidos.TextoBusquedaMedicos != "" 
-                                                ? c.NOMBRE_COMERCIAL is not null 
-                                                    ? c.NOMBRE_COMERCIAL.Contains(DatosCompartidos.TextoBusquedaMedicos, StringComparison.OrdinalIgnoreCase) 
+                                            where DatosCompartidos.TextoBusquedaMedicos != ""
+                                                ? c.NOMBRE_COMERCIAL is not null
+                                                    ? c.NOMBRE_COMERCIAL.Contains(DatosCompartidos.TextoBusquedaMedicos, StringComparison.OrdinalIgnoreCase)
                                                     : false
                                                 ||
-                                                    e.DESCRIPCION_CLASE is not null 
+                                                    e.DESCRIPCION_CLASE is not null
                                                     ? e.DESCRIPCION_CLASE.Contains(DatosCompartidos.TextoBusquedaMedicos, StringComparison.OrdinalIgnoreCase)
                                                     : false
                                                 : true
@@ -111,7 +115,8 @@ namespace VMedic.MVVM.ViewModels
                     {
                         var container = new Grid
                         {
-                            Margin = new Thickness(15, 0)
+                            Margin = new Thickness(15, 0),
+                            BindingContext = medico,
                         };
                         container.ColumnDefinitions.Add(new ColumnDefinition());
 
@@ -177,7 +182,21 @@ namespace VMedic.MVVM.ViewModels
 
                         container.Children.Add(lbl_NombreMedico);
                         container.Children.Add(lbl_especialidad);
-                        
+
+                        var tapGestureRecognizer = new TapGestureRecognizer();
+                        tapGestureRecognizer.Tapped += (s, e) =>
+                        {
+                            if (PressedPreferences.ValidatePressing())
+                            {
+                                PressedPreferences.Pressing(null);
+
+                                dynamic? medicoContext = ((Grid?)s)?.BindingContext;
+
+                                MopupService.Instance.PopAllAsync();
+                                Shell.Current.Navigation.PushAsync(new EditorMedicoView(2, medicoContext?.CODIGO_DE_CLIENTE));
+                            }
+                        };
+                        container.GestureRecognizers.Add(tapGestureRecognizer);
 
                         App.Current?.Dispatcher.Dispatch(() =>
                         {

@@ -99,4 +99,16 @@ public partial class MedicosView : ContentPage
     {
         MopupService.Instance.PushAsync(new MenuMedicos());
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (DatosCompartidos.StatusVolver == 1)
+        {
+            var vm = (MedicosViewModel)BindingContext;
+            vm.MostrarMedicos();
+            DatosCompartidos.StatusVolver = 0;
+        }
+    }
 }

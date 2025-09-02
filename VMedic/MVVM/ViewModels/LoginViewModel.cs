@@ -151,6 +151,7 @@ namespace VMedic.MVVM.ViewModels
                 finally
                 {
                     Indicador = false;
+                    PressedPreferences.EndPressed();
                 }
             }
         }
