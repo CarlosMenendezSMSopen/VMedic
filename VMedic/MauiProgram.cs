@@ -41,6 +41,13 @@ namespace VMedic
             builder.Services.AddTransient<VisitasViewModel>();
             builder.Services.AddTransient<MedicosView>();
 
+            builder.ConfigureMauiHandlers(handlers =>
+            {
+#if ANDROID || IOS
+                handlers.AddHandler<Microsoft.Maui.Controls.Maps.Map, CustomMapHandler>();
+#endif
+            });
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

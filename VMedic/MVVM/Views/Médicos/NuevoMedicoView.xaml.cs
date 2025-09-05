@@ -7,35 +7,22 @@ using VMedic.Utilities;
 
 namespace VMedic.MVVM.Views.Médicos;
 
-public partial class EditorMedicoView : ContentPage
+public partial class NuevoMedicoView : ContentPage
 {
-    public EditorMedicoView(int ModoEditor, string? cODIGO_DE_CLIENTE)
+    public NuevoMedicoView()
     {
         try
         {
             InitializeComponent();
             SincronizacionDataBase.ObtenerCategoriasMedico();
             SincronizacionDataBase.ObtenerProductosPreferencias();
-            BindingContext = new EditorMedicoViewModel(ModoEditor, cODIGO_DE_CLIENTE);
+            BindingContext = new NuevoMedicoViewModel();
             PressedPreferences.EndPressed();
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
         }
-        finally
-        {
-            InsertarMapa();
-        }
-    }
-
-    private async void InsertarMapa()
-    {
-        await Task.Delay(1000);
-        Grid.SetRow(DatosCompartidos.MapaUbicaiconMedico, 8);
-        Grid.SetColumn(DatosCompartidos.MapaUbicaiconMedico, 0);
-        Grid.SetColumnSpan(DatosCompartidos.MapaUbicaiconMedico, 2);
-        ContenedorVerInfo.Children.Add(DatosCompartidos.MapaUbicaiconMedico);
     }
 
     private void Especialidad_Tapped(object sender, TappedEventArgs e)
@@ -64,14 +51,14 @@ public partial class EditorMedicoView : ContentPage
 
     private void swt_repetirVisita_Toggled(object sender, ToggledEventArgs e)
     {
-        var vm = (EditorMedicoViewModel)BindingContext;
+        var vm = (NuevoMedicoViewModel)BindingContext;
         vm.EnableRepetir = e.Value;
     }
 
     private void Rojo_Tapped(object sender, TappedEventArgs e)
     {
         ColorSeleccionado.IsVisible = true;
-        var vm = (EditorMedicoViewModel)BindingContext;
+        var vm = (NuevoMedicoViewModel)BindingContext;
         vm.Position = 0;
         vm.ColorSeleccionado = "Rojo";
     }
@@ -79,7 +66,7 @@ public partial class EditorMedicoView : ContentPage
     private void Azul_Tapped(object sender, TappedEventArgs e)
     {
         ColorSeleccionado.IsVisible = true;
-        var vm = (EditorMedicoViewModel)BindingContext;
+        var vm = (NuevoMedicoViewModel)BindingContext;
         vm.Position = 1;
         vm.ColorSeleccionado = "Azul";
     }
@@ -87,7 +74,7 @@ public partial class EditorMedicoView : ContentPage
     private void Amarillo_Tapped(object sender, TappedEventArgs e)
     {
         ColorSeleccionado.IsVisible = true;
-        var vm = (EditorMedicoViewModel)BindingContext;
+        var vm = (NuevoMedicoViewModel)BindingContext;
         vm.Position = 2;
         vm.ColorSeleccionado = "Amarillo";
     }
@@ -95,7 +82,7 @@ public partial class EditorMedicoView : ContentPage
     private void Verde_Tapped(object sender, TappedEventArgs e)
     {
         ColorSeleccionado.IsVisible = true;
-        var vm = (EditorMedicoViewModel)BindingContext;
+        var vm = (NuevoMedicoViewModel)BindingContext;
         vm.Position = 3;
         vm.ColorSeleccionado = "Verde";
     }
@@ -107,13 +94,13 @@ public partial class EditorMedicoView : ContentPage
 
     private void Guardar_Clicked(object sender, EventArgs e)
     {
-        var vm = (EditorMedicoViewModel)BindingContext;
+        var vm = (NuevoMedicoViewModel)BindingContext;
         vm.GuardarNuevoMedico();
     }
 
     private void searchbox_preferencias_DropDownClosed(object sender, EventArgs e)
     {
-        var vm = (EditorMedicoViewModel)BindingContext;
+        var vm = (NuevoMedicoViewModel)BindingContext;
         var seleccionados = searchbox_preferencias.SelectedItems?
                                   .Cast<TablaProductoPreferencia>()
                                   .Select(e => e.ID_PRODUCTO_PREFERENCIA)

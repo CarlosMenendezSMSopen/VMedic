@@ -16,5 +16,6 @@ namespace VMedic.MVVM.Models.DatabaseTables
         public int ClavesVacias { get; set; } //0 == NO \\ 1 == SI
         public int TipoRestService { get; set; }
         public string? CodigoCliente { get; set; }
+        public Dictionary<int, string?>? SolicitudPadre { get; set; }
     }
 }

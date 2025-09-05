@@ -188,12 +188,12 @@ namespace VMedic.MVVM.ViewModels
                         {
                             if (PressedPreferences.ValidatePressing())
                             {
-                                PressedPreferences.Pressing(null);
+                                PressedPreferences.Pressing(s);
 
                                 dynamic? medicoContext = ((Grid?)s)?.BindingContext;
 
                                 MopupService.Instance.PopAllAsync();
-                                Shell.Current.Navigation.PushAsync(new EditorMedicoView(2, medicoContext?.CODIGO_DE_CLIENTE));
+                                Shell.Current.Navigation.PushAsync(new InformacionMedicoView(medicoContext?.CODIGO_DE_CLIENTE));
                             }
                         };
                         container.GestureRecognizers.Add(tapGestureRecognizer);

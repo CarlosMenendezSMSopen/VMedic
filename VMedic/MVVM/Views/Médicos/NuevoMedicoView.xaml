@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VMedic.MVVM.Views.Médicos.NuevoMedicoView"
+             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+             xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             Shell.BackgroundColor="{StaticResource Primary}">
+
+    <Shell.TitleView>
+        <Grid ColumnDefinitions=".6*,.4*">
+            <Label Text="Agregar Médico"
+                   VerticalTextAlignment="Center"
+                   TextColor="White"
+                   FontSize="20"
+                   FontAttributes="Bold" />
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid>
+        <ScrollView Padding="15">
+            <VerticalStackLayout VerticalOptions="Start"
+                                 Spacing="10">
+                <Grid ColumnDefinitions=".25*,.75*">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label Text="Nombre:"
+                           VerticalTextAlignment="Center" />
+                    <Entry Grid.Column="1"
+                           TextColor="Black"
+                           Text="{Binding MedicoName, Mode=TwoWay}" />
+                    <Label Grid.Row="1"
+                           Text="Contacto:"
+                           VerticalTextAlignment="Center" />
+                    <Entry Grid.Column="1"
+                           Grid.Row="1"
+                           TextColor="Black"
+                           Text="{Binding MedicoContact, Mode=TwoWay}" />
+                    <Label Grid.Row="2"
+                           Text="Dirección:"
+                           VerticalTextAlignment="Center" />
+                    <Entry Grid.Column="1"
+                           Grid.Row="2"
+                           TextColor="Black"
+                           Text="{Binding MedicoDireccion, Mode=TwoWay}" />
+                    <Label Grid.Row="3"
+                           Text="Teléfono:"
+                           VerticalTextAlignment="Center" />
+                    <Entry Grid.Column="1"
+                           Grid.Row="3"
+                           TextColor="Black"
+                           Text="{Binding MedicoTelefono, Mode=TwoWay}" />
+                    <Label Grid.Row="4"
+                           Text="E-mail:"
+                           VerticalTextAlignment="Center" />
+                    <Entry Grid.Column="1"
+                           Grid.Row="4"
+                           TextColor="Black"
+                           Text="{Binding MedicoMail, Mode=TwoWay}" />
+                    <Label Grid.Row="5"
+                           Text="JVPM:"
+                           VerticalTextAlignment="Center" />
+                    <Entry Grid.Column="1"
+                           Grid.Row="5"
+                           TextColor="Black"
+                           Text="{Binding MedicoJVPM, Mode=TwoWay}" />
+                </Grid>
+                <Label Text="Seleccione la Especialidad:" />
+                <Frame x:Name="frame_selectEspecialidad"
+                       BackgroundColor="White"
+                       BorderColor="{StaticResource Accent}"
+                       Padding="20,2.5"
+                       CornerRadius="4">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Especialidad_Tapped" />
+                    </Frame.GestureRecognizers>
+                    <Grid>
+                        <Picker x:Name="SelectEspecialidades"
+                                Title="{x:Null}"
+                                BackgroundColor="Transparent"
+                                FontAttributes="Bold"
+                                HeightRequest="45"
+                                FontSize="12"
+                                HorizontalOptions="Fill"
+                                ItemDisplayBinding="{Binding DESCRIPCION_CLASE}"
+                                ItemsSource="{Binding Especialidades, Mode=TwoWay}"
+                                SelectedItem="{Binding Especialidad, Mode=TwoWay}"
+                                TextColor="Black" />
+                        <Image HorizontalOptions="End">
+                            <Image.Source>
+                                <FontImageSource FontFamily="Icon"
+                                                 Glyph="&#xE806;"
+                                                 Size="20"
+                                                 Color="{StaticResource Gray500}" />
+                            </Image.Source>
+                        </Image>
+                    </Grid>
+                </Frame>
+                <Label Text="Selecicone la Categoría" />
+                <Frame x:Name="frame_selectCategoria"
+                       BackgroundColor="White"
+                       BorderColor="{StaticResource Accent}"
+                       Padding="20,2.5"
+                       CornerRadius="4">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Categoria_Tapped" />
+                    </Frame.GestureRecognizers>
+                    <Grid>
+                        <Picker x:Name="SelectCategorias"
+                                Title="{x:Null}"
+                                BackgroundColor="Transparent"
+                                FontAttributes="Bold"
+                                HeightRequest="45"
+                                FontSize="12"
+                                HorizontalOptions="Fill"
+                                ItemDisplayBinding="{Binding CATEGORIA}"
+                                ItemsSource="{Binding Categorias, Mode=TwoWay}"
+                                SelectedItem="{Binding Categoria, Mode=TwoWay}"
+                                TextColor="Black" />
+                        <Image HorizontalOptions="End">
+                            <Image.Source>
+                                <FontImageSource FontFamily="Icon"
+                                                 Glyph="&#xE806;"
+                                                 Size="20"
+                                                 Color="{StaticResource Gray500}" />
+                            </Image.Source>
+                        </Image>
+                    </Grid>
+                </Frame>
+                <Label Text="Seleccione la Preferencia de Producto:" />
+                <Frame x:Name="frame_selectPreferencias"
+                       BackgroundColor="White"
+                       VerticalOptions="Center"
+                       BorderColor="{StaticResource Accent}"
+                       Padding="20,5,17.5,5"
+                       CornerRadius="4">
+                    <editors:SfComboBox x:Name="searchbox_preferencias"
+                                        TextSearchMode="Contains"
+                                        IsEditable="False"
+                                        IsFilteringEnabled="False"
+                                        MultiSelectionDisplayMode="Delimiter"
+                                        TextMemberPath="DESCRIPCION_PROD_PREFERENCIA"
+                                        DisplayMemberPath="DESCRIPCION_PROD_PREFERENCIA"
+                                        IsClearButtonVisible="False"
+                                        Placeholder="No hay Selección"
+                                        PlaceholderColor="Gray"
+                                        SelectionMode="Multiple"
+                                        DelimiterText=", "
+                                        ItemsSource="{Binding Preferencias}"
+                                        DropDownClosed="searchbox_preferencias_DropDownClosed">
+                        <editors:SfComboBox.DropDownButtonSettings>
+                            <editors:DropDownButtonSettings>
+                                <editors:DropDownButtonSettings.View>
+                                    <Grid>
+                                        <Image Grid.Column="1"
+                                               HorizontalOptions="End">
+                                            <Image.Source>
+                                                <FontImageSource FontFamily="Icon"
+                                                                 Glyph="&#xE806;"
+                                                                 Size="20"
+                                                                 Color="{StaticResource Gray500}" />
+                                            </Image.Source>
+                                        </Image>
+                                    </Grid>
+                                </editors:DropDownButtonSettings.View>
+                            </editors:DropDownButtonSettings>
+                        </editors:SfComboBox.DropDownButtonSettings>
+                        <editors:SfComboBox.NoResultsFoundTemplate>
+                            <DataTemplate>
+                                <Label Text="No Encontrado"
+                                       FontSize="14"
+                                       VerticalOptions="Center"
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center" />
+                            </DataTemplate>
+                        </editors:SfComboBox.NoResultsFoundTemplate>
+                    </editors:SfComboBox>
+                </Frame>
+                <Label Text="Seleccione el Color:" />
+                <Grid ColumnDefinitions=".25*, .25*,.25*,.25*"
+                      ColumnSpacing="15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Frame x:Name="ColorSeleccionado"
+                           Grid.Column="{Binding Position}"
+                           Grid.RowSpan="2"
+                           BorderColor="Blue"
+                           BackgroundColor="#5000EEFF"
+                           IsVisible="False" />
+                    <Frame x:Name="seleccion_rojo"
+                           BackgroundColor="Red"
+                           BorderColor="Transparent"
+                           Margin="5">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Rojo_Tapped" />
+                        </Frame.GestureRecognizers>
+                    </Frame>
+                    <Frame x:Name="seleccion_azul"
+                           Grid.Column="1"
+                           BackgroundColor="Blue"
+                           BorderColor="Transparent"
+                           Margin="5">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Azul_Tapped" />
+                        </Frame.GestureRecognizers>
+                    </Frame>
+                    <Frame x:Name="seleccion_amarillo"
+                           Grid.Column="2"
+                           BackgroundColor="Yellow"
+                           BorderColor="Transparent"
+                           Margin="5">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Amarillo_Tapped" />
+                        </Frame.GestureRecognizers>
+                    </Frame>
+                    <Frame x:Name="seleccion_verde"
+                           Grid.Column="3"
+                           BackgroundColor="Green"
+                           BorderColor="Transparent"
+                           Margin="5">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Verde_Tapped" />
+                        </Frame.GestureRecognizers>
+                    </Frame>
+                    <Label Grid.Row="1"
+                           Text="Rojo"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           Margin="0,0,0,5">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Rojo_Tapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label Grid.Column="1"
+                           Grid.Row="1"
+                           Text="Azul"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           Margin="0,0,0,5">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Azul_Tapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label Grid.Column="2"
+                           Grid.Row="1"
+                           Text="Amarillo"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           Margin="0,0,0,5">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Amarillo_Tapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label Grid.Column="3"
+                           Grid.Row="1"
+                           Text="Verde"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           Margin="0,0,0,5">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Verde_Tapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+                <Label Text="Seleccione la Escala de Adaptación" />
+                <Frame x:Name="frame_selectAdopcion"
+                       BackgroundColor="White"
+                       BorderColor="{StaticResource Accent}"
+                       Padding="20,2.5"
+                       CornerRadius="4">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Adopcion_Tapped" />
+                    </Frame.GestureRecognizers>
+                    <Grid>
+                        <Picker x:Name="SelectEscalaAdopcion"
+                                Title="{x:Null}"
+                                BackgroundColor="Transparent"
+                                FontAttributes="Bold"
+                                HeightRequest="45"
+                                FontSize="12"
+                                HorizontalOptions="Fill"
+                                ItemsSource="{Binding EscalasAdaptacion, Mode=TwoWay}"
+                                SelectedItem="{Binding Adaptacion, Mode=TwoWay}"
+                                TextColor="Black" />
+                        <Image HorizontalOptions="End">
+                            <Image.Source>
+                                <FontImageSource FontFamily="Icon"
+                                                 Glyph="&#xE806;"
+                                                 Size="20"
+                                                 Color="{StaticResource Gray500}" />
+                            </Image.Source>
+                        </Image>
+                    </Grid>
+                </Frame>
+                <HorizontalStackLayout Spacing="15">
+                    <Label Text="Fecha de Visita"
+                           FontAttributes="Bold"
+                           VerticalTextAlignment="Center"
+                           FontSize="16" />
+                    <Entry x:Name="txt_fechaVisita"
+                           IsEnabled="False"
+                           Text="{Binding FechaVisita, Mode=TwoWay}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="Disabled">
+                                        <VisualState.Setters>
+                                            <Setter Property="TextColor"
+                                                    Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray600}}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+                    </Entry>
+                </HorizontalStackLayout>
+                <Grid ColumnDefinitions=".25*,.25*,.25*,.25*">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <HorizontalStackLayout IsVisible="{Binding VisibilidadNuevo}"
+                                           HeightRequest="50"
+                                           Spacing="10">
+                        <Switch x:Name="swt_repetirVisita"
+                                VerticalOptions="Center"
+                                IsToggled="True"
+                                Toggled="swt_repetirVisita_Toggled" />
+                        <Label FontAttributes="Bold"
+                               FontSize="16"
+                               VerticalTextAlignment="Center"
+                               Text="Repetir Visita" />
+                    </HorizontalStackLayout>
+                    <Label Grid.Row="1"
+                           Grid.ColumnSpan="2"
+                           Text="Semanas Visita:" />
+                    <HorizontalStackLayout Grid.Row="2"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckS1, Mode=TwoWay}" />
+                        <Label Text="S1"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Column="1"
+                                           Grid.Row="2"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckS2, Mode=TwoWay}" />
+                        <Label Text="S2"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Column="2"
+                                           Grid.Row="2"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckS3, Mode=TwoWay}" />
+                        <Label Text="S3"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Row="2"
+                                           Grid.Column="3"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckS4, Mode=TwoWay}" />
+                        <Label Text="S4"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Row="3"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckS5, Mode=TwoWay}" />
+                        <Label Text="S5"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <Label Grid.Row="4"
+                           Text="Días Visita:" />
+                    <HorizontalStackLayout Grid.Row="5"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckL, Mode=TwoWay}" />
+                        <Label Text="L"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Column="1"
+                                           Grid.Row="5"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckM, Mode=TwoWay}" />
+                        <Label Text="M"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Column="2"
+                                           Grid.Row="5"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckMi, Mode=TwoWay}" />
+                        <Label Text="Mi"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Column="3"
+                                           Grid.Row="5"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckJ, Mode=TwoWay}" />
+                        <Label Text="J"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Row="6"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckV, Mode=TwoWay}" />
+                        <Label Text="V"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Column="1"
+                                           Grid.Row="6"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckS, Mode=TwoWay}" />
+                        <Label Text="S"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Grid.Column="2"
+                                           Grid.Row="6"
+                                           HorizontalOptions="Center">
+                        <CheckBox IsEnabled="{Binding EnableRepetir}"
+                                  IsChecked="{Binding CheckD, Mode=TwoWay}" />
+                        <Label Text="D"
+                               VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                </Grid>
+                <Grid ColumnDefinitions=".5*,.5*"
+                      ColumnSpacing="15">
+                    <Button Text="CANCELAR"
+                            Clicked="Cancelar_Clicked" />
+                    <Button Text="GUARDAAR"
+                            Grid.Column="1"
+                            Clicked="Guardar_Clicked" />
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

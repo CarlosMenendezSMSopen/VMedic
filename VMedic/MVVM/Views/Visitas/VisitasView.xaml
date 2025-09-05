@@ -19,6 +19,7 @@
                    TextColor="White"
                    FontAttributes="Bold"
                    FontSize="20" />
+            
         </Grid>
     </Shell.TitleView>
 

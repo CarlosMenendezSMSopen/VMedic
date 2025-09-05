@@ -36,7 +36,7 @@ namespace VMedic.Utilities
             if (sender != null)
             {
                 DatosCompartidos.sender = sender;
-                await ButtonEffect.PressedEffectsON(sender);
+                ButtonEffect.PressedEffectsON(sender);
             }
             await Task.Delay(1000);
         }

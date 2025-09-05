@@ -233,6 +233,23 @@ namespace VMedic.Services
             });
         }
 
+        public static void ObtenerMedicosProductosPreferencias()
+        {
+            Task.Run(async () =>
+            {
+                var data = await servicio.ResultadoGET<TablaMedicoProductoPreferencia>($"VMedicA052/'{UsuarioIniciado?.UsuarioName}'", null);
+                if (data is not null)
+                {
+                    Console.WriteLine("Insert productos preferencias de medico");
+                    if (App.medicoprodpreferencias is not null)
+                    {
+                        App.medicoprodpreferencias.DeleteItems();
+                        App.medicoprodpreferencias?.InsertItems(data);
+                    }
+                }
+            });
+        }
+
         public static void ObtenerSKUProductos()
         {
             Task.Run(async () =>

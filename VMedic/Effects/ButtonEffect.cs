@@ -9,7 +9,7 @@ namespace VMedic.Effects
     public static class ButtonEffect
     {
         //metodo tarea que, dependiendo el tipo de objeto, este actua como un boton cuando se presiona
-        public static async Task PressedEffectsON(object? sender)
+        public static async void PressedEffectsON(object? sender)
         {
             await Task.Run(async () =>
             {
@@ -32,6 +32,11 @@ namespace VMedic.Effects
                 {
                     var btn = (Button)sender;
                     await btn.ScaleTo(0.80, 50, Easing.CubicInOut);
+                }
+                else if (sender is Grid)
+                {
+                    var btn = (Grid)sender;
+                    await btn.ScaleTo(0.90, 50, Easing.CubicInOut);
                 }
                 else if (sender is Frame)
                 {
@@ -74,6 +79,11 @@ namespace VMedic.Effects
                 else if (sender is Button)
                 {
                     var btn = (Button)sender;
+                    await btn.ScaleTo(1, 50, Easing.CubicInOut);
+                }
+                else if (sender is Grid)
+                {
+                    var btn = (Grid)sender;
                     await btn.ScaleTo(1, 50, Easing.CubicInOut);
                 }
                 else if (sender is Frame)

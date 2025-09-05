@@ -26,6 +26,7 @@ namespace VMedic
         public static BaseRepository<TablaClasesEspecializaciones>? especialidades { get; private set; }
         public static BaseRepository<TablaCategoriasMedico>? categoriasmedico { get; private set; }
         public static BaseRepository<TablaProductoPreferencia>? productospreferencias { get; private set; }
+        public static BaseRepository<TablaMedicoProductoPreferencia>? medicoprodpreferencias { get; private set; }
         public App(
             BaseRepository<TablaUsuario> repo,
             BaseRepository<TablaDoctores> repo3,
@@ -40,6 +41,7 @@ namespace VMedic
             BaseRepository<TablaMuestras> repo45,
             BaseRepository<TablaCategoriasMedico> repo50,
             BaseRepository<TablaProductoPreferencia> repo51,
+            BaseRepository<TablaMedicoProductoPreferencia> repo52,
             BaseRepository<TablaSKUProducto> repo53,
             BaseRepository<TablaVisitasPendientes> repoL1,
             BaseRepository<TablaDetallesEvaluacion> repoL2,
@@ -62,6 +64,7 @@ namespace VMedic
             muestras = repo45;
             categoriasmedico = repo50;
             productospreferencias = repo51;
+            medicoprodpreferencias = repo52;
             skuproductos = repo53;
             visitas = repoL1;
             evaluaciondetalles = repoL2;
@@ -80,7 +83,7 @@ namespace VMedic
         {
             var access = e.NetworkAccess;
             var profiles = e.ConnectionProfiles;
-            RestService servicio = new RestService();
+            RestService servicio = new();
 
             try
             {
@@ -90,133 +93,131 @@ namespace VMedic
                     tRequest.Method = "GET";
                     tRequest.Timeout = 120000;
                     tRequest.ContentType = "application/json";
-                    using (HttpWebResponse response = (HttpWebResponse)tRequest.GetResponse())
+                    using HttpWebResponse response = (HttpWebResponse)tRequest.GetResponse();
+                    if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        if (response.StatusCode == HttpStatusCode.OK)
+                        ToastMaker.Make("Se reestableció la conexión a Internet", App.Current?.MainPage);
+                        Task.Run(async () =>
                         {
-                            ToastMaker.Make("Se reestableció la conexión a Internet", App.Current?.MainPage);
-                            Task.Run(async () =>
-                            {
-                                if (SolicitudesPendientes is not null)
-                                    if (!SolicitudesPendientes.IsEmpty())
-                                    {
-                                        var listadeSolicitudes = SolicitudesPendientes.GetItems();
-                                        if (listadeSolicitudes is not null)
-                                            foreach (var solicitud in listadeSolicitudes)
+                            if (SolicitudesPendientes is not null)
+                                if (!SolicitudesPendientes.IsEmpty())
+                                {
+                                    var listadeSolicitudes = SolicitudesPendientes.GetItems();
+                                    if (listadeSolicitudes is not null)
+                                        foreach (var solicitud in listadeSolicitudes)
+                                        {
+                                            if (solicitud.TipoRestService is 1)
                                             {
-                                                if (solicitud.TipoRestService is 1)
-                                                {
-                                                    var datos = solicitud.ClavesVacias == 0
-                                                        ? (await servicio.ResultadoGET<Resultado>($"{solicitud.OperacionID}/{solicitud.Parametros}", null))?.FirstOrDefault()
-                                                        : (await servicio.ResultadoGET($"{solicitud.OperacionID}/{solicitud.Parametros}", valores => new Resultado
-                                                        {
-                                                            Id = valores[0],
-                                                            MSG = valores[1],
-                                                            Codigo = valores[2]
-                                                        }))?.FirstOrDefault();
-
-                                                    if (datos is not null)
+                                                var datos = solicitud.ClavesVacias == 0
+                                                    ? (await servicio.ResultadoGET<Resultado>($"{solicitud.OperacionID}/{solicitud.Parametros}", null))?.FirstOrDefault()
+                                                    : (await servicio.ResultadoGET($"{solicitud.OperacionID}/{solicitud.Parametros}", valores => new Resultado
                                                     {
-                                                        switch (datos.MSG)
-                                                        {
-                                                            case "1":
-                                                                switch (solicitud.OperacionID)
-                                                                {
-                                                                    case "VMedicA017" or "VMedicA038" or "VMedicA043":
-                                                                        var DoctorSeleciconado = App.doctores?.GetItems()?.Where(D => D.CODIGO_DE_CLIENTE == solicitud.CodigoCliente).FirstOrDefault();
-                                                                        if (DoctorSeleciconado is not null)
-                                                                        {
-                                                                            DoctorSeleciconado.Visitas = 1;
-                                                                            App.doctores?.UpdateITEM(DoctorSeleciconado);
-                                                                        }
-                                                                        break;
-                                                                    default:
-                                                                        break;
-                                                                }
-                                                                break;
-                                                            case "2":
+                                                        Id = valores[0],
+                                                        MSG = valores[1],
+                                                        Codigo = valores[2]
+                                                    }))?.FirstOrDefault();
 
-                                                                break;
-                                                            case "3":
-
-                                                                break;
-                                                            default:
-
-                                                                break;
-                                                        }
-                                                    }
-                                                }
-                                                else
+                                                if (datos is not null)
                                                 {
-                                                    var datos = solicitud.ClavesVacias == 0
-                                                        ? (await servicio.ResultadoPOST<Resultado>(solicitud.OperacionID, solicitud.Parametros, null))?.FirstOrDefault()
-                                                        : (await servicio.ResultadoPOST(solicitud.OperacionID, solicitud.Parametros, valores => new Resultado
-                                                        {
-                                                            Id = valores[0],
-                                                            MSG = valores[1],
-                                                            Codigo = valores[2]
-                                                        }))?.FirstOrDefault();
-
-                                                    if (datos is not null)
+                                                    switch (datos.MSG)
                                                     {
-                                                        switch (datos.MSG)
-                                                        {
-                                                            case "1":
-                                                                switch (solicitud.OperacionID)
-                                                                {
-                                                                    case "VMedicA046":
-                                                                        var Codigos = datos.Codigo?.Split(CaracteresEspeciales.SECCION);
-                                                                        if (Codigos is not null)
-                                                                        {
-                                                                            foreach (var codigo in Codigos)
-                                                                            {
-                                                                                var muestraActualizar = App.muestras?.GetItems()?.FirstOrDefault(M => M.CODIGO_MUESTRA == codigo.Split(CaracteresEspeciales.BARRA_VERTICAL_ROTA)[0]);
-                                                                                var clienteActualizar = App.doctores?.GetItems()?.FirstOrDefault(D => D.CODIGO_DE_CLIENTE == solicitud.CodigoCliente);
+                                                        case "1":
+                                                            switch (solicitud.OperacionID)
+                                                            {
+                                                                case "VMedicA017" or "VMedicA038" or "VMedicA043":
+                                                                    var DoctorSeleciconado = App.doctores?.GetItems()?.Where(D => D.CODIGO_DE_CLIENTE == solicitud.CodigoCliente).FirstOrDefault();
+                                                                    if (DoctorSeleciconado is not null)
+                                                                    {
+                                                                        DoctorSeleciconado.Visitas = 1;
+                                                                        App.doctores?.UpdateITEM(DoctorSeleciconado);
+                                                                    }
+                                                                    break;
+                                                                default:
+                                                                    break;
+                                                            }
+                                                            break;
+                                                        case "2":
 
-                                                                                if (muestraActualizar is not null && clienteActualizar is not null)
-                                                                                {
-                                                                                    muestraActualizar.CANT_DISPONIBLE = int.Parse(codigo.Split(CaracteresEspeciales.BARRA_VERTICAL_ROTA)[1]);
-                                                                                    clienteActualizar.Visitas = 1;
+                                                            break;
+                                                        case "3":
 
-                                                                                    App.muestras?.UpdateITEM(muestraActualizar);
-                                                                                    App.doctores?.UpdateITEM(clienteActualizar);
+                                                            break;
+                                                        default:
 
-                                                                                    var detallesEliminar = App.evaluaciondetalles?.GetItems()?.Where(Edet => Edet.IdCliente == solicitud.CodigoCliente).ToList();
-                                                                                    var encabezadoEliminar = App.evaluacionencabezado?.GetItems()?.Where(Eenc => Eenc.IdCliente == solicitud.CodigoCliente).ToList();
-
-                                                                                    if (detallesEliminar is not null && encabezadoEliminar is not null)
-                                                                                    {
-                                                                                        App.evaluaciondetalles?.DeleteItems(detallesEliminar);
-                                                                                        App.evaluacionencabezado?.DeleteItems(encabezadoEliminar);
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        break;
-                                                                    default:
-                                                                        break;
-                                                                }
-                                                                break;
-                                                            case "2":
-
-                                                                break;
-                                                            case "3":
-
-                                                                break;
-                                                            default:
-
-                                                                break;
-                                                        }
+                                                            break;
                                                     }
                                                 }
                                             }
-                                    }
-                            });
-                        }
-                        else
-                        {
-                            Console.WriteLine("⚠️ Se ha perdido la conexión a Internet.");
-                        }
+                                            else
+                                            {
+                                                var datos = solicitud.ClavesVacias == 0
+                                                    ? (await servicio.ResultadoPOST<Resultado>(solicitud.OperacionID, solicitud.Parametros, null))?.FirstOrDefault()
+                                                    : (await servicio.ResultadoPOST(solicitud.OperacionID, solicitud.Parametros, valores => new Resultado
+                                                    {
+                                                        Id = valores[0],
+                                                        MSG = valores[1],
+                                                        Codigo = valores[2]
+                                                    }))?.FirstOrDefault();
+
+                                                if (datos is not null)
+                                                {
+                                                    switch (datos.MSG)
+                                                    {
+                                                        case "1":
+                                                            switch (solicitud.OperacionID)
+                                                            {
+                                                                case "VMedicA046":
+                                                                    var Codigos = datos.Codigo?.Split(CaracteresEspeciales.SECCION);
+                                                                    if (Codigos is not null)
+                                                                    {
+                                                                        foreach (var codigo in Codigos)
+                                                                        {
+                                                                            var muestraActualizar = App.muestras?.GetItems()?.FirstOrDefault(M => M.CODIGO_MUESTRA == codigo.Split(CaracteresEspeciales.BARRA_VERTICAL_ROTA)[0]);
+                                                                            var clienteActualizar = App.doctores?.GetItems()?.FirstOrDefault(D => D.CODIGO_DE_CLIENTE == solicitud.CodigoCliente);
+
+                                                                            if (muestraActualizar is not null && clienteActualizar is not null)
+                                                                            {
+                                                                                muestraActualizar.CANT_DISPONIBLE = int.Parse(codigo.Split(CaracteresEspeciales.BARRA_VERTICAL_ROTA)[1]);
+                                                                                clienteActualizar.Visitas = 1;
+
+                                                                                App.muestras?.UpdateITEM(muestraActualizar);
+                                                                                App.doctores?.UpdateITEM(clienteActualizar);
+
+                                                                                var detallesEliminar = App.evaluaciondetalles?.GetItems()?.Where(Edet => Edet.IdCliente == solicitud.CodigoCliente).ToList();
+                                                                                var encabezadoEliminar = App.evaluacionencabezado?.GetItems()?.Where(Eenc => Eenc.IdCliente == solicitud.CodigoCliente).ToList();
+
+                                                                                if (detallesEliminar is not null && encabezadoEliminar is not null)
+                                                                                {
+                                                                                    App.evaluaciondetalles?.DeleteItems(detallesEliminar);
+                                                                                    App.evaluacionencabezado?.DeleteItems(encabezadoEliminar);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    break;
+                                                                default:
+                                                                    break;
+                                                            }
+                                                            break;
+                                                        case "2":
+
+                                                            break;
+                                                        case "3":
+
+                                                            break;
+                                                        default:
+
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                }
+                        });
+                    }
+                    else
+                    {
+                        Console.WriteLine("⚠️ Se ha perdido la conexión a Internet.");
                     }
                 }
                 else
