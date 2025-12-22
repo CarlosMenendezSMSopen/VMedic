@@ -1,0 +1,17 @@
+﻿using SQLite;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using VMedic.MVVM.Models.Data;
+
+namespace VMedic.MVVM.Models.DataBase
+{
+    [Table("nivelesprecio")]
+    public class TablaNivelesPrecio : TableData
+    {
+        public string? NIVEL_PRECIO { get; set; }
+        public string? DESCRIPCION { get; set; }
+    }
+}

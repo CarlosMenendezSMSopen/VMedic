@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VMedic.MVVM.Views.Médicos.InformacionMedicoView"
+             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+             xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             Shell.BackgroundColor="{StaticResource Primary}"
+             Title="InformacionMedicoView">
+
+    <Shell.TitleView>
+        <Grid ColumnDefinitions=".6*,.4*">
+            <Label Text="Información de Médico"
+                   VerticalTextAlignment="Center"
+                   TextColor="White"
+                   FontSize="20"
+                   FontAttributes="Bold" />
+            <Grid Grid.Column="1"
+                  x:Name="OpcionesVerInfo"
+                  IsVisible="{Binding VisibilidadInfo}"
+                  ColumnDefinitions=".33*,.33*,.33*">
+                <ImageButton x:Name="btn_editarMedico"
+                             Source="pencil.png"
+                             HeightRequest="50"
+                             WidthRequest="50"
+                             Padding="15"
+                             Clicked="btn_editarMedico_Clicked" />
+                <ImageButton x:Name="btn_compartirUbicacion"
+                             Grid.Column="1"
+                             Source="share.png"
+                             HeightRequest="50"
+                             WidthRequest="50"
+                             Padding="15"
+                             Clicked="btn_compartirUbicacion_Clicked" />
+                <ImageButton Grid.Column="2"
+                             Source="waze.png"
+                             HeightRequest="50"
+                             WidthRequest="50"
+                             Padding="15" />
+            </Grid>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid x:Name="ContenedorInfo"
+          Margin="0,15">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Label Grid.ColumnSpan="2"
+               Text="{Binding MedicoName}"
+               FontSize="18"
+               TextColor="Blue"
+               HorizontalTextAlignment="Center"
+               FontAttributes="Bold" />
+        <Label Grid.ColumnSpan="2"
+               Grid.Row="1"
+               Text="{Binding MedicoEspecialidad}"
+               HorizontalOptions="Center"
+               FontSize="12" />
+        <ImageButton Grid.Row="2"
+                     IsVisible="{Binding MedicoContactVisible}"
+                     Source="contacto.png"
+                     HeightRequest="50"
+                     Padding="{Binding PaddingImagen}" />
+        <Label Grid.Column="1"
+               Grid.Row="2"
+               Text="{Binding MedicoContact}"
+               IsVisible="{Binding MedicoContactVisible}"
+               FontSize="16"
+               HeightRequest="50"
+               VerticalTextAlignment="Center" />
+        <ImageButton Grid.Row="3"
+                     Source="telefono.png"
+                     HeightRequest="50"
+                     IsVisible="{Binding MedicoTelefonoVisible}"
+                     Padding="{Binding PaddingImagen}" />
+        <Label Grid.Column="1"
+               Grid.Row="3"
+               Text="{Binding MedicoTelefono}"
+               IsVisible="{Binding MedicoTelefonoVisible}"
+               FontSize="16"
+               HeightRequest="50"
+               VerticalTextAlignment="Center" />
+        <ImageButton Grid.Row="4"
+                     Source="categoria.png"
+                     HeightRequest="50"
+                     IsVisible="{Binding MedicoCategoriaVisible}"
+                     Padding="{Binding PaddingImagen}" />
+        <Label Grid.Column="1"
+               Grid.Row="4"
+               Text="{Binding MedicoCategoria}"
+               IsVisible="{Binding MedicoCategoriaVisible}"
+               FontSize="16"
+               HeightRequest="50"
+               VerticalTextAlignment="Center" />
+        <ImageButton Grid.Row="5"
+                     Source="adaptacion.png"
+                     HeightRequest="50"
+                     IsVisible="{Binding MedicoAdaptacionVisible}"
+                     Padding="{Binding PaddingImagen}" />
+        <Label Grid.Column="1"
+               Grid.Row="5"
+               Text="{Binding MedicoAdaptacion}"
+               IsVisible="{Binding MedicoAdaptacionVisible}"
+               FontSize="16"
+               HeightRequest="50"
+               VerticalTextAlignment="Center" />
+        <ImageButton Grid.Row="6"
+                     Source="info_color.png"
+                     HeightRequest="50"
+                     IsVisible="{Binding MedicoColorVisible}"
+                     Padding="{Binding PaddingImagen}" />
+        <Grid Grid.Row="6"
+              Grid.Column="1"
+              HeightRequest="50"
+              Margin="0,0,150,0"
+              IsVisible="{Binding MedicoColorVisible}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Frame BorderColor="Transparent"
+                   BackgroundColor="{Binding MedicoColor}"
+                   Margin="5" />
+            <Label Grid.Row="1"
+                   Text="{Binding MedicoColorNombre}"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center"
+                   FontAttributes="Bold"
+                   FontSize="12"
+                   Margin="0,0,0,5" />
+        </Grid>
+        <ImageButton Grid.Row="7"
+                     Source="direction.png"
+                     HeightRequest="50"
+                     IsVisible="{Binding MedicoDireccionVisible}"
+                     Padding="{Binding PaddingImagen}" />
+        <Label Grid.Column="1"
+               Grid.Row="7"
+               HeightRequest="50"
+               Text="{Binding MedicoDireccion}"
+               IsVisible="{Binding MedicoDireccionVisible}"
+               FontSize="16"
+               VerticalTextAlignment="Center" />
+    </Grid>
+</ContentPage>

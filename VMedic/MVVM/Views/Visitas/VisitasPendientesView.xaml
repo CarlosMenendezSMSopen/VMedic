@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VMedic.MVVM.Views.Visitas.VisitasPendientesView"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             Shell.BackgroundColor="{StaticResource Primary}"
+             Shell.TitleColor="White"
+             Title="VisitasPendientesView">
+
+    <Shell.TitleView>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="50" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Label Text="Sincronización"
+                   VerticalTextAlignment="Center"
+                   TextColor="White"
+                   FontAttributes="Bold"
+                   FontSize="20" />
+            <Label Grid.Row="1"
+                   Text="Envío de visitas pendientes"
+                   TextColor="White"
+                   VerticalTextAlignment="Start" />
+            <ImageButton x:Name="btn_enviarPendientes"
+                         Grid.Column="1"
+                         Grid.RowSpan="2"
+                         Padding="10"
+                         Source="cloud_send.png"
+                         HeightRequest="50"
+                         WidthRequest="50"
+                         Clicked="btn_enviarPendientes_Clicked" />
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid>
+        <core:SfBusyIndicator x:Name="busyIndicator"
+                              Title="Cargando Visitas Pendientes..."
+                              Grid.Row="1"
+                              Margin="0,5"
+                              AnimationType="Cupertino"
+                              CompressedLayout.IsHeadless="True"
+                              FontSize="12"
+                              HorizontalOptions="Fill"
+                              IndicatorColor="#2d3e50"
+                              IsRunning="{Binding Indicador, Mode=TwoWay}"
+                              OverlayFill="#fff"
+                              SizeFactor="1"
+                              VerticalOptions="Fill">
+            <RefreshView x:Name="refresh"
+                         Grid.Row="1"
+                         Refreshing="refresh_Refreshing"
+                         IsRefreshing="{Binding IsRefreshing}">
+                <ScrollView Grid.Row="1"
+                            x:Name="scroll_container"
+                            CompressedLayout.IsHeadless="True"
+                            Scrolled="Scroll_container_Scrolled">
+                    <VerticalStackLayout x:Name="List_VisitasPendientes"
+                                         VerticalOptions="Fill"
+                                         HorizontalOptions="Fill" />
+                </ScrollView>
+            </RefreshView>
+        </core:SfBusyIndicator>
+        <ActivityIndicator x:Name="status"
+                           HeightRequest="80"
+                           IsRunning="True"
+                           IsVisible="False"
+                           Opacity="0.5"
+                           WidthRequest="80"
+                           Color="Gray" />
+    </Grid>
+</ContentPage>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+                  xmlns:mopupsanim="clr-namespace:Mopups.Animations;assembly=Mopups"
+                  xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+                  x:Class="VMedic.MVVM.Views.Planificacion.NuevaVisitaPlanificacionView"
+                  Background="#40000000">
+
+    <Grid VerticalOptions="Center">
+        <Border Margin="15"
+                Padding="15"
+                Background="White"
+                StrokeShape="RoundRectangle 10">
+            <VerticalStackLayout>
+                <Label Text="Agregar Nueva Visita"
+                       HorizontalOptions="Center"
+                       FontSize="20"
+                       FontAttributes="Bold" />
+                <Label Text="Seleccione un médico:" />
+                <Border x:Name="frame_selectMedico"
+                        BackgroundColor="White"
+                        VerticalOptions="Center"
+                        Stroke="{StaticResource Accent}"
+                        Padding="20,5,17.5,5"
+                        StrokeShape="RoundRectangle 4">
+                    <editors:SfComboBox x:Name="searchbox_medicos"
+                                        TextSearchMode="Contains"
+                                        IsEditable="True"
+                                        MaxDropDownHeight="300"
+                                        IsFilteringEnabled="True"
+                                        TextMemberPath="Medico"
+                                        DisplayMemberPath="Medico"
+                                        IsClearButtonVisible="False">
+                        <editors:SfComboBox.DropDownButtonSettings>
+                            <editors:DropDownButtonSettings>
+                                <editors:DropDownButtonSettings.View>
+                                    <Grid>
+                                        <Image Grid.Column="1"
+                                               HorizontalOptions="End">
+                                            <Image.Source>
+                                                <FontImageSource FontFamily="Icon"
+                                                                 Glyph="&#xE806;"
+                                                                 Size="20"
+                                                                 Color="{StaticResource Gray500}" />
+                                            </Image.Source>
+                                        </Image>
+                                    </Grid>
+                                </editors:DropDownButtonSettings.View>
+                            </editors:DropDownButtonSettings>
+                        </editors:SfComboBox.DropDownButtonSettings>
+                        <editors:SfComboBox.NoResultsFoundTemplate>
+                            <DataTemplate>
+                                <Label Text="No Encontrado"
+                                       FontSize="14"
+                                       VerticalOptions="Center"
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center" />
+                            </DataTemplate>
+                        </editors:SfComboBox.NoResultsFoundTemplate>
+                    </editors:SfComboBox>
+                </Border>
+                <HorizontalStackLayout>
+                    <Label Text="Todo el día: "
+                           VerticalTextAlignment="Center" />
+                    <Switch x:Name="switch_TodoDia">
+                        <Switch.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="switch_TodoDia_Tapped" />
+                        </Switch.GestureRecognizers>
+                    </Switch>
+                </HorizontalStackLayout>
+                <Grid ColumnSpacing="10"
+                      RowSpacing="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label Text="Inicio:"
+                           VerticalTextAlignment="Center" />
+                    <Border Grid.Column="1"
+                            StrokeShape="RoundRectangle 5"
+                            Background="#10000000">
+                        <TimePicker x:Name="timer_FechaInicial"
+                                    Margin="10,0"
+                                    Format="ddd, dd MMM yyyy HH:mm"
+                                    Time="08:00:00"
+                                    FontAttributes="Bold"
+                                    TimeSelected="timer_FechaInicial_TimeSelected" />
+                    </Border>
+                    <Label Grid.Row="1"
+                           Text="Final:"
+                           VerticalTextAlignment="Center" />
+                    <Border Grid.Column="1"
+                            Grid.Row="1"
+                            StrokeShape="RoundRectangle 5"
+                            Background="#10000000">
+                        <TimePicker x:Name="timer_FechaFinal"
+                                    Format="ddd, dd MMM yyyy HH:mm"
+                                    Time="09:00:00"
+                                    Margin="10,0"
+                                    FontAttributes="Bold"
+                                    TimeSelected="timer_FechaFinal_TimeSelected" />
+                    </Border>
+
+                </Grid>
+                <HorizontalStackLayout>
+                    <Label Text="Repetir: "
+                           VerticalTextAlignment="Center" />
+                    <Switch x:Name="swicth_repetir"
+                            Toggled="swicth_repetir_Toggled" />
+                </HorizontalStackLayout>
+                <Border x:Name="frame_selectPreferencias"
+                        BackgroundColor="White"
+                        VerticalOptions="Center"
+                        Stroke="{StaticResource Accent}"
+                        Padding="20,5,17.5,5"
+                        Margin="0,0,0,15"
+                        StrokeShape="RoundRectangle 4">
+                    <editors:SfComboBox x:Name="searchbox_repetir"
+                                        TextSearchMode="Contains"
+                                        IsEditable="False"
+                                        IsEnabled="False"
+                                        IsFilteringEnabled="False"
+                                        MultiSelectionDisplayMode="Delimiter"
+                                        TextMemberPath="DESCRIPCION_PROD_PREFERENCIA"
+                                        DisplayMemberPath="DESCRIPCION_PROD_PREFERENCIA"
+                                        IsClearButtonVisible="False"
+                                        Placeholder="No hay Selección"
+                                        PlaceholderColor="Gray"
+                                        SelectionMode="Single">
+                        <editors:SfComboBox.DropDownButtonSettings>
+                            <editors:DropDownButtonSettings>
+                                <editors:DropDownButtonSettings.View>
+                                    <Grid>
+                                        <Image Grid.Column="1"
+                                               HorizontalOptions="End">
+                                            <Image.Source>
+                                                <FontImageSource FontFamily="Icon"
+                                                                 Glyph="&#xE806;"
+                                                                 Size="20"
+                                                                 Color="{StaticResource Gray500}" />
+                                            </Image.Source>
+                                        </Image>
+                                    </Grid>
+                                </editors:DropDownButtonSettings.View>
+                            </editors:DropDownButtonSettings>
+                        </editors:SfComboBox.DropDownButtonSettings>
+                        <editors:SfComboBox.NoResultsFoundTemplate>
+                            <DataTemplate>
+                                <Label Text="No Encontrado"
+                                       FontSize="14"
+                                       VerticalOptions="Center"
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center" />
+                            </DataTemplate>
+                        </editors:SfComboBox.NoResultsFoundTemplate>
+                    </editors:SfComboBox>
+                </Border>
+                <Grid ColumnDefinitions=".5*,.5*"
+                      ColumnSpacing="15">
+                    <Button x:Name="btn_Cancelar"
+                            Text="Cancelar"
+                            Clicked="btn_Cancelar_Clicked" />
+                    <Button x:Name="btn_AgregarVisita"
+                            Text="Guardar"
+                            Grid.Column="1"
+                            Clicked="btn_AgregarVisita_Clicked" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</mopups:PopupPage>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+                  x:Class="VMedic.MVVM.Views.Visitas.CapturarFirmaView"
+                  BackgroundColor="#50000000"
+                  Title="CapturarFirmaView">
+    <Grid Margin="15">
+        <Border BackgroundColor="White" Padding="15">
+            <Grid ColumnDefinitions=".5*,.5*"
+                  ColumnSpacing="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="50" />
+                </Grid.RowDefinitions>
+                <GraphicsView x:Name="dibujoFirma"
+                              Grid.ColumnSpan="2"
+                              IsEnabled="True"
+                              Margin="10,20,10,20"
+                              InputTransparent="False"
+                              StartInteraction="DibujoFirma_StartInteraction"
+                              DragInteraction="DibujoFirma_DragInteraction"
+                              EndInteraction="DibujoFirma_EndInteraction" />
+                <Button x:Name="btn_limpiar"
+                        Grid.Row="1"
+                        Text="Limpiar"
+                        Clicked="Btn_limpiar_Clicked" />
+                <Button x:Name="btn_firmar"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Text="Firmar"
+                        IsEnabled="False"
+                        Clicked="Btn_firmar_Clicked" />
+            </Grid>
+        </Border>
+        <ImageButton Source="close.png"
+                     HeightRequest="50"
+                     WidthRequest="50"
+                     HorizontalOptions="End"
+                     VerticalOptions="Start"
+                     Padding="15"
+                     Clicked="Close_Clicked" />
+    </Grid>
+</mopups:PopupPage>

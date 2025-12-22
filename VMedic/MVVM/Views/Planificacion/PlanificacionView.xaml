@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VMedic.MVVM.Views.Planificacion.PlanificacionView"
+             Shell.BackgroundColor="{StaticResource Primary}"
+             Title="PlanificacionView"
+             xmlns:calendar="clr-namespace:Syncfusion.Maui.Scheduler;assembly=Syncfusion.Maui.Scheduler">
+
+    <Shell.TitleView>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="50" />
+            </Grid.ColumnDefinitions>
+            <Label Text="Agenda"
+                   FontSize="20"
+                   TextColor="White"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+            <ImageButton x:Name="btn_actualizar"
+                         Grid.Column="1"
+                         HeightRequest="50"
+                         Padding="12"
+                         Source="refresh.png"
+                         Clicked="btn_actualizar_Clicked" />
+            <Grid x:Name="container_cuenta"
+                  Grid.Column="1"
+                  HorizontalOptions="Start"
+                  VerticalOptions="Start">
+                <Image Source="circle.png"
+                       HeightRequest="20"
+                       Margin="5" />
+                <Label x:Name="lbl_PlanificacionesPendientes"
+                       TextColor="White"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Grid>
+
+            <ImageButton x:Name="btn_agregarVisita"
+                         Grid.Column="2"
+                         HeightRequest="50"
+                         Padding="12"
+                         Source="add_blanc.png"
+                         Clicked="btn_agregarVisita_Clicked" />
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid RowDefinitions=".5*, .5*">
+        <ScrollView Grid.RowSpan="{Binding RowSpan}">
+            <calendar:SfScheduler x:Name="calendario"
+                                  View="Month"
+                                  VerticalOptions="Fill"
+                                  ShowBusyIndicator="False"
+                                  AllowViewNavigation="True"
+                                  ShowNavigationArrows="True"
+                                  AbsoluteLayout.LayoutBounds="0,0,1,1"
+                                  AbsoluteLayout.LayoutFlags="All"
+                                  ViewChanged="calendario_ViewChanged"
+                                  SelectionChanged="calendario_SelectionChanged"
+                                  QueryAppointments="calendario_QueryAppointments">
+                <calendar:SfScheduler.MonthView>
+                    <calendar:SchedulerMonthView x:Name="VistaMes"
+                                                 AppointmentDisplayMode="Indicator"
+                                                 AppointmentIndicatorCount="5"
+                                                 AppointmentIndicatorSize="5"
+                                                 NumberOfVisibleWeeks="{Binding SemanasVisibles}"
+                                                 ShowLeadingAndTrailingDates="True" />
+                </calendar:SfScheduler.MonthView>
+                <calendar:SfScheduler.CellSelectionView>
+                    <calendar:SchedulerCellSelectionView  Stroke="{StaticResource PrimaryDark}"
+                                                          StrokeWidth="2.5"
+                                                          CornerRadius="4" />
+                </calendar:SfScheduler.CellSelectionView>
+            </calendar:SfScheduler>
+        </ScrollView>
+        <ActivityIndicator x:Name="status"
+                           Grid.RowSpan="{Binding RowSpan}"
+                           IsVisible="True"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"
+                           HeightRequest="75"
+                           WidthRequest="75" />
+        <calendar:SfScheduler x:Name="AgendaTareas"
+                              IsVisible="{Binding VisibilidadAdenda}"
+                              Grid.Row="1"
+                              ShowTodayButton="False"
+                              View="Day"
+                              Tapped="AgendaTareas_Tapped"
+                              SelectedAppointmentBackground="Red"
+                              QueryAppointments="AgendaTareas_QueryAppointments">
+            <calendar:SfScheduler.HeaderView>
+                <calendar:SchedulerHeaderView Height="50" />
+
+
+            </calendar:SfScheduler.HeaderView>
+        </calendar:SfScheduler>
+        <ImageButton x:Name="btn_closeAgenda"
+                     Grid.Row="1"
+                     HeightRequest="50"
+                     IsVisible="{Binding VisibilidadAdenda}"
+                     WidthRequest="55"
+                     Padding="18"
+                     HorizontalOptions="End"
+                     VerticalOptions="Start"
+                     Source="close_black.png"
+                     Clicked="btn_closeAgenda_Clicked" />
+    </Grid>
+</ContentPage>

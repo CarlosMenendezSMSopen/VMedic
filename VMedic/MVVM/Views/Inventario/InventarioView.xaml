@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             x:Class="VMedic.MVVM.Views.Inventario.InventarioView"
+             Shell.BackgroundColor="{StaticResource Primary}"
+             Title="InventarioView">
+
+    <Shell.TitleView>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="50" />
+            </Grid.ColumnDefinitions>
+            <Label x:Name="titulo" FontAttributes="Bold"
+                   FontSize="20"
+                   HorizontalOptions="Fill"
+                   HorizontalTextAlignment="Start"
+                   Text="Inventario"
+                   TextColor="White"
+                   VerticalOptions="Center" />
+            <ImageButton x:Name="btn_habilitarBusqueda"
+                         Grid.Column="1"
+                         Padding="12"
+                         HeightRequest="50"
+                         Clicked="btn_habilitarBusqueda_Clicked"
+                         Source="ic_search.png" />
+            <Grid x:Name="SearchProducto"
+                  IsVisible="False"
+                  Grid.ColumnSpan="2">
+                <Entry x:Name="searchBox_Producto"
+                       TextChanged="searchBox_Producto_TextChanged"
+                       HorizontalOptions="Fill"
+                       TextColor="White" />
+                <ImageButton x:Name="btn_cancel_text"
+                             HorizontalOptions="End"
+                             HeightRequest="50"
+                             WidthRequest="50"
+                             Padding="15"
+                             Source="close_blanc.png"
+                             Clicked="btn_cancel_text_Clicked" />
+            </Grid>
+        </Grid >
+    </Shell.TitleView>
+
+    <Grid>
+        <core:SfBusyIndicator x:Name="busyIndicator"
+                              Title="Cargando Productos..."
+                              Grid.Row="1"
+                              AnimationType="Cupertino"
+                              FontSize="14"
+                              FontFamily="Dosis"
+                              HorizontalOptions="Fill"
+                              IndicatorColor="#2d3e50"
+                              IsRunning="{Binding Indicador, Mode=TwoWay}"
+                              OverlayFill="#90ffffff"
+                              SizeFactor="1"
+                              VerticalOptions="Fill">
+            <Border Grid.Row="1"
+                    BackgroundColor="White"
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 0"
+                    CompressedLayout.IsHeadless="True">
+                <Grid>
+                    <Label x:Name="lbl_results_productos"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           IsVisible="{Binding VisibilidadAviso}"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Gray600}"
+                           Text="No hay resultados" />
+                    <RefreshView x:Name="refreshvie"
+                                 Refreshing="refreshvie_Refreshing"
+                                 IsRefreshing="{Binding Refreshing}">
+                        <ScrollView CompressedLayout.IsHeadless="True"
+                                    Scrolled="ScrollView_Scrolled"
+                                    VerticalOptions="Fill">
+                            <VerticalStackLayout x:Name="List_Productos"
+                                                 HorizontalOptions="Fill"
+                                                 VerticalOptions="Fill"
+                                                 CompressedLayout.IsHeadless="True" />
+                        </ScrollView>
+                    </RefreshView>
+                </Grid>
+            </Border>
+        </core:SfBusyIndicator>
+    </Grid>
+</ContentPage>
