@@ -14,6 +14,7 @@ public partial class InformacionMedicoView : ContentPage
         PressedPreferences.EndPressed();
     }
 
+    //metodo para insertar el mapa de forma asincrona en orden sin interrupciones
     private async void InsertarMapa()
     { 
         await Task.Delay(1000);
@@ -23,12 +24,14 @@ public partial class InformacionMedicoView : ContentPage
         ContenedorInfo.Children.Add(DatosCompartidos.MapaUbicaiconMedico);
     }
 
+    //metodo evento que navega la aplicación a la pantalla para editar la información de médico seleciconado
     private void btn_editarMedico_Clicked(object sender, EventArgs e)
     {
         var vm = (InformacionMedicoViewModel)BindingContext;
         Shell.Current.Navigation.PushAsync(new EditarMedicoView(vm.CodigoCliente));
     }
 
+    //metodo evento que ejecuta el metodo para compartir la ubicación del usuario
     private void btn_compartirUbicacion_Clicked(object sender, EventArgs e)
     {
         var vm = (InformacionMedicoViewModel)BindingContext;

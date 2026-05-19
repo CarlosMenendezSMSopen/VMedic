@@ -33,6 +33,7 @@ namespace VMedic.MVVM.ViewModels.Inventario
             MostrarProductos();
         }
 
+        //metodo para general la lista de los productos fusionando los registros de 3 bases de datos
         public async void MostrarProductos()
         {
             try
@@ -97,6 +98,7 @@ namespace VMedic.MVVM.ViewModels.Inventario
             }
         }
 
+        //metodo para general la vista de la lista de productos
         public void GenerarCustomLista(int v)
         {
             var ListaProductos = DeviceInfo.Platform == DevicePlatform.Android ? Productos?.Skip(v).Take(30).ToList() : Productos;

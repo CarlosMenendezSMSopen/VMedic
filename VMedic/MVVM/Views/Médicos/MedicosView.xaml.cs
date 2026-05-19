@@ -35,6 +35,7 @@ public partial class MedicosView : ContentPage
         SearchMedicosTimer.Elapsed += SearchMedicosElapsed;
     }
 
+    //metodo que ejecuta la visualización de registros de medico
     private void SearchMedicosElapsed(object? sender, ElapsedEventArgs e)
     {
         SearchMedicosTimer?.Stop();
@@ -45,6 +46,7 @@ public partial class MedicosView : ContentPage
         });
     }
 
+    //metodo evento que asina una variable en base a lo que se ingresa en la caja de busqueda de los medicos
     private void searchBox_Medico_TextChanged(object sender, TextChangedEventArgs e)
     {
         DatosCompartidos.TextoBusquedaMedicos = e.NewTextValue?.Trim() ?? "";
@@ -52,6 +54,7 @@ public partial class MedicosView : ContentPage
         SearchMedicosTimer?.Start();
     }
 
+    //metodo evento que oculta la caja de texto de busqueda|
     private void btn_cancel_text_Clicked(object sender, EventArgs e)
     {
         titulo.IsVisible = true;

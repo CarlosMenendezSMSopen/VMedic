@@ -64,6 +64,7 @@ namespace VMedic.MVVM.ViewModels.Planificacion
             ValidarSolicitudesPendientes();
         }
 
+        //metodo para verificar registro de solicitudes no enviadas para hacer visible un texto que muestre la cantidad de dichos registros
         public void ValidarSolicitudesPendientes()
         {
             if (DatosCompartidos.ContenedorCuentaPlanificacion is not null && DatosCompartidos.LabelContarPendientesPlanificacion is not null)
@@ -73,6 +74,7 @@ namespace VMedic.MVVM.ViewModels.Planificacion
             }
         }
 
+        //metodo que cambia la visibilidad de la vista de agenda por día
         public void ShowAgendaDia(bool show)
         {
             RowSpan = show ? 1 : 2;
@@ -80,6 +82,7 @@ namespace VMedic.MVVM.ViewModels.Planificacion
             VisibilidadAdenda = show;
         }
 
+        //funcion tarea para obtener los registros de las fechas de visita de los médicos y asignarlos en los recursos de la agenda principal
         public async Task ObtenerPlanificaciones(SfScheduler calendario, ActivityIndicator status)
         {
             try
@@ -133,6 +136,7 @@ namespace VMedic.MVVM.ViewModels.Planificacion
             }
         }
 
+        //funcion Color que asigna un color a la vista de visita en las 2 agendas
         private Color ColorOrden(string? Fecha, int TableID)
         {
             if (App.Agenda is not null && Fecha is not null)
@@ -153,6 +157,7 @@ namespace VMedic.MVVM.ViewModels.Planificacion
             return Colors.Black;
         }
 
+        //metodo que asigna las visitas en la agenda de vista de día
         public void VisualizarTareas(SfScheduler calendario, SfScheduler agendaTareas, DateTime newValue, ActivityIndicator status)
         {
             ShowAgendaDia(true);
@@ -190,6 +195,7 @@ namespace VMedic.MVVM.ViewModels.Planificacion
             }
         }
 
+        //metodo que vuelve invisible la vista de agenda por día
         public async void CerrarVistaAgenda(SfScheduler calendario, SfScheduler agendaTareas, ActivityIndicator status)
         {
             ShowAgendaDia(false);
@@ -200,6 +206,7 @@ namespace VMedic.MVVM.ViewModels.Planificacion
             PressedPreferences.EndPressed();
         }
 
+        //metodo que elimina una programnación de visita, solicitando a la vez cual es la que se desea eliminar
         public async void EliminarVisitaAgenda(SchedulerAppointment? SelectedAppointment)
         {
             if (SelectedAppointment is not null)
@@ -369,6 +376,7 @@ namespace VMedic.MVVM.ViewModels.Planificacion
             }
         }
 
+        //funcion string que obtiene el nombre del día en base al numero de dia seleciconado de la agenda
         private string ObtenerPlanificaciones(int? diaSeleccionado)
         {
             if (diaSeleccionado is not null)
@@ -378,6 +386,7 @@ namespace VMedic.MVVM.ViewModels.Planificacion
             return "";
         }
 
+        //metodo que envía las solicitudes pendientes cuando se hace clic en el botón de actualizar
         public async void EnviarSolicitudesPendientes()
         {
             var EstadoMensaje = 0;

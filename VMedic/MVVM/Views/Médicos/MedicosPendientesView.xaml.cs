@@ -15,6 +15,7 @@ public partial class MedicosPendientesView : ContentPage
         PressedPreferences.EndPressed();
 	}
 
+    //metodo evento que ejecuta enviar los médicos pendientes
     private void btn_enviarPendientes_Clicked(object sender, EventArgs e)
     {
         var vm = (MedicosPendientesViewModel)BindingContext;
@@ -26,6 +27,7 @@ public partial class MedicosPendientesView : ContentPage
 
     }
 
+    //metodo evento que refresque la lista de medicos pendientes
     private void refresh_Refreshing(object sender, EventArgs e)
     {
         var vm = (MedicosPendientesViewModel)BindingContext;

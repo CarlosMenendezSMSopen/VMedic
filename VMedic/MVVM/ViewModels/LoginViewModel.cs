@@ -83,6 +83,7 @@ namespace VMedic.MVVM.ViewModels
                 }
         }
 
+        //metodo para consultar el registro de autenticación de registro
         public async void Login()
         {
             if (PressedPreferences.ValidatePressing())

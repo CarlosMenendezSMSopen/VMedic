@@ -21,9 +21,9 @@
 
 		<!-- Display name -->
 		<ApplicationTitle>VMedic</ApplicationTitle>
-
+	
 		<!-- App Identifier -->
-		<ApplicationId>com.smsvmedic.vmedic</ApplicationId>
+		<ApplicationId>com.softwaremobilesolutions.vmedic</ApplicationId>
 
 		<!-- Versions -->
 		<!-- Published Versions === Android 0 (0.0.0) || iOS 0 (0.0.0) -->
@@ -40,11 +40,68 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+		<AndroidSigningKeyStore />
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
+		<RuntimeIdentifiers>android-arm64;android-arm;android-x64</RuntimeIdentifiers>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
+		<ApplicationVersion>1</ApplicationVersion> <!--VERSION DE COMPILACION DE IOS-->
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
+		<ApplicationVersion>2</ApplicationVersion> <!--VERSION DE COMPILACION DE ANDROID-->
+		<usemaui>true</usemaui>
+		<targetandroidversion>35</targetandroidversion>
+		<targetsdkversion>35</targetsdkversion>
+		<supportedosplatformversion>23</supportedosplatformversion>
+	</PropertyGroup>
+
+	<!--Publicar en IOS-->
+	<!--dotnet publish -f:net9.0-ios -c:Release /p:RuntimeIdentifier=ios-arm64 /p:PlatformTarget=arm64 /p:CodesignKey="Apple Distribution: Guillermo Amaya (WP4G78EVWV)" /p:CodesingProvision=VMedicIOS /p:ServerAddress=192.168.1.145 /p:ServerUser=softwaremobilesolutions /p:TcpPort=58181 /p:ArchiveOnBuild=true /p:_DotNetRootRemoteDirectory='/Users/softwaremobilesolutions/Library/Caches/maui/PairToMac/SDKs/dotnet/' /p:EnableAssemblyILStripping=false /p:ServerPassword=Coreuser2025.-->
+	<!--Cambiar el numero de application Version o número de compilación-->
+	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		<PlatformTarget>arm64</PlatformTarget>
+		<EnablePushNotifications>true</EnablePushNotifications>
+		<CodesignKey>Apple Distribution: Guillermo Amaya (WP4G78EVWV)</CodesignKey>
+		<CodesingProvision>VMedicIOS</CodesingProvision>
+		<ServerAddress>192.168.1.145</ServerAddress>
+		<ServerUser>softwaremobilesolutions</ServerUser>
+		<TcpPort>58181</TcpPort>
+		<ArchiveOnBuild>true</ArchiveOnBuild>
+		<_DotNetRootRemoteDirectory>/Users/softwaremobilesolutions/Library/Caches/maui/PairToMac/SDKs/dotnet/</_DotNetRootRemoteDirectory>
+		<EnableAssemblyILStripping>false</EnableAssemblyILStripping>
+	</PropertyGroup>
+
+	<!--Publicar en Android-->
+	<!--dotnet publish -f:net9.0-android -c Release /p:RuntimeIdentifier=android-arm64 /p:PlatformTarget=arm64 /p:SignAndroidPackage=true /p:AndroidKeyStore=true /p:AndroidSigningKeyAlias=vmedic /p:AndroidSigningKeyPass=123456789 /p:AndroidSigningStorePass=123456789 /p:AndroidSigningKeyStore="C:\Users\Desarrollador\AppData\Local\Xamarin\Mono for Android\Keystore\vmedic\vmedic.keystore"-->
+	<!--D:\Shared\apps\BackUpProyectosMoviles\VisualStudio\Vmedic\Vmedic\bin\Release\net9.0-android\publish-->
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
+		<RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>
+		<PlatformTarget>arm64</PlatformTarget>
+		<AndroidUseAapt2>True</AndroidUseAapt2>
+		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+		<!--<AndroidPackageFormat>apk</AndroidPackageFormat>-->
+		<!--<AndroidPackageFormat>aab</AndroidPackageFormat>-->
+		<AndroidPackageFormat>aab</AndroidPackageFormat>
+		<AndroidKeyStore>true</AndroidKeyStore>
+		<AndroidSigningKeyAlias></AndroidSigningKeyAlias>
+		<AndroidSigningKeyPass></AndroidSigningKeyPass>
+		<AndroidSigningStorePass></AndroidSigningStorePass>
+		<AndroidSigningKeyStore>C:\Users\Desarrollador\AppData\Local\Xamarin\Mono for Android\Keystore\vmedic\vmedic.keystore</AndroidSigningKeyStore>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\ic_launcher_icon.svg" />
+		<MauiIcon Include="Resources\AppIcon\ic_launcher.png" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />

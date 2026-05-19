@@ -41,6 +41,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             MostrarVisitasPendientes();
         }
 
+        //metodo que genera la lista de las visitas pendientes de enviar desde la tabla de solicitudes pendientes
         public async void MostrarVisitasPendientes()
         {
             Indicador = true;
@@ -74,6 +75,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             });
         }
 
+        //Metodo para personalizar la vista de los registros de la lista
         public void GenerateListaCustom(int i)
         {
             if (VisitasPendientes is not null)
@@ -288,6 +290,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo para enviar en orden y clasificadamente las solicitudes pendientes dependiendo de a que ID de procedimiento pertenece
         public async void EnviarSolicitudes()
         {
             var Mensaje = "";
@@ -481,6 +484,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //Metodo para cambiar el texto de mensaje en el registro depsues de enviar los datos
         private void MostrarMensaje(int i, string mensaje)
         {
             var Registro = ((DatosCompartidos.ListaVisitasPendientes?.Children as IEnumerable<object>)?.OfType<Grid>().ToList()[i])?.Children.FirstOrDefault(LVP => !(LVP as Label).IsVisible) as Label;

@@ -38,6 +38,8 @@ namespace VMedic.MVVM.ViewModels.Medicos
             MostrarMedicos();
         }
 
+
+        //metodo para formar la lista de los medicos desde 2 registros de la base de datos local
         public async void MostrarMedicos()
         {
             Indicador = true;
@@ -94,6 +96,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             });
         }
 
+        //metodo para personalizar la vista de los registros de medico
         public void GenerarListaCustom(int i)
         {
             if (Medicos is not null)
@@ -181,6 +184,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //funcion tarea para cargar el siguiente lote de medicos en caso de que en Android la cantidad de registros supere el limite de vista por lote
         public async Task CargarMasMedicos(int itemcount)
         {
             Indicador = true;

@@ -86,7 +86,7 @@ namespace VMedic.Servicios
                     using (var client = new HttpClient())
                     {
                         Debug.WriteLine($"URL Request {(await URL.GetDomain())}{DomainExtension}{operacionID}/{parametros}");
-                        string strConsulta = (await URL.GetDomain()) + "/wapiidc/query/consultav5";
+                        string strConsulta = (await URL.GetDomain()) + "wapiidc/query/consultav5";
 
                         var jsonData = new
                         {

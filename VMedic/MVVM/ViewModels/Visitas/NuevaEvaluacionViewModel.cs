@@ -46,6 +46,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             ValidarEditar();
         }
 
+        //metodo para llenar la lista desplegable de los productos
         private async void MostrarProductos()
         {
             var ListaMuestras = App.Muestras?.GetItems();
@@ -62,6 +63,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo para llenar la lista desplegable de las presentaciones SKU
         public async void MostrarPresentaciones()
         {
             var ListaPresentaciones = App.Skuproductos?.GetItems()?.Where(SKU => SKU.PRODUCTO == Producto?.ID).Select(SKU => SKU.CODIGO_UNIDAD_VENTA).ToList();
@@ -73,6 +75,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo que valida si se puede editar
         private async void ValidarEditar()
         {
             await Task.Delay(1000);
@@ -85,6 +88,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo para enviar los datos de registros de evaluacion de muestras al servidor
         public async void GuardarEvaluacion()
         {
             if (Cantidad is not null)
@@ -141,6 +145,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
                 }
         }
 
+        //metodo para cambiar los registros de evaluaciones de muestras
         public async void EditarEvaluacion()
         {
             if (Cantidad is not null)

@@ -133,6 +133,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             MostrarVisitaMensualMedico();
         }
 
+        //metodo para chequear los dias y semanas programados para las visitas al medico
         private void MostrarVisitaMensualMedico()
         {
             var VisitaMensualMedico = App.Visitasmensuales?.GetItems()?.Where(VM => VM.CODIGO_DE_CLIENTE.ToString() == Medico?.CODIGO_DE_CLIENTE).ToList();
@@ -205,6 +206,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo para llenar la lista desplegable de seleccion multiple con las preferencias de la programación
         public void MostrarPreferenciasdeProducto()
         {
             var listaMedicoProdPref = App.Medicoprodpreferencias?.GetItems()?.Where(MPP => MPP.CODIGO_DE_CLIENTE.ToString() == Medico?.CODIGO_DE_CLIENTE).ToList();
@@ -227,6 +229,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo que llena la lista desplegable de las categorías del médico
         private async void MostrarCategoriasMedico()
         {
             await Task.Delay(1000);
@@ -248,6 +251,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo que llena la lista desplegable de las especialidades
         private async void MostrarEspecialidad()
         {
             await Task.Delay(1000);
@@ -290,6 +294,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo que consume api rest para actualizar la información del medico seleccionado
         public async void ActualizarMedico()
         {
             if (MedicoName != "")

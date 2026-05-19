@@ -52,12 +52,14 @@ namespace VMedic.MVVM.ViewModels.Visitas
             PressedPreferences.EndPressed();
         }
 
+        //metodo para refrescar la lista
         public void Refresh()
         {
             IsRefreshing = true;
             MostrarEvaluaciones();
         }
 
+        //metodo que genera la lista de las evaluaciones de muestras
         public async void MostrarEvaluaciones()
         {
             IsStatus = true;
@@ -115,6 +117,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             });
         }
 
+        //metodo para personalizar la vista de los registros
         public void GenerarListaCustom(int i)
         {
             if (Evaluaciones is not null)
@@ -286,6 +289,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo para enviar las evaluaciones
         public async void EnviarEvaluaciones(Border containerbtn_agregarevaluacion, ImageButton btn_sign)
         {
             try

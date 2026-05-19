@@ -49,7 +49,6 @@
                               Grid.Row="1"
                               AnimationType="Cupertino"
                               FontSize="14"
-                              FontFamily="Dosis"
                               HorizontalOptions="Fill"
                               IndicatorColor="#2d3e50"
                               IsRunning="{Binding Indicador, Mode=TwoWay}"

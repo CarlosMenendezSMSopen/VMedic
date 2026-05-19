@@ -115,6 +115,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             MostrarDetallesMedico();
         }
 
+        //función double que obtiene distintos diametros para formar multiples criculos desde el más pequeño hasta el más grande
         private static double TransformarRadio(int v)
         {
             double PrimerRadio = 15;
@@ -122,6 +123,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             return PrimerRadio + (((UltimoRadio - PrimerRadio) / 27) * (v - 1));
         }
 
+        //metodo para llenar los apartados con la información del medico seleccionado
         private async void MostrarDetallesMedico()
         {
             await Task.Delay(1000);
@@ -154,6 +156,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             InsertarUbicacion();
         }
 
+        //metodo para mostrar la ubicación registrada de la visita del medico en el mapa
         private void InsertarUbicacion()
         {
             if (Medico is not null)
@@ -233,6 +236,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo para mostrar un mensaje de aviso de compartir la ubicación de la visita del medico
         public async void CompartirUbicacionMedico()
         {
             try

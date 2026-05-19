@@ -34,12 +34,14 @@ namespace VMedic.MVVM.ViewModels.Medicos
             MostrarMedicosPendientes();
         }
 
+        //metodo para reiniciar la carga de registros
         public void Refresh()
         {
             IsRefreshing = true;
             MostrarMedicosPendientes();
         }
 
+        //metodo que genera la lista de las solicitudes de consumo Api rest que no pudieron enviar datos de un nuevo médico
         public async void MostrarMedicosPendientes()
         {
             Indicador = true;
@@ -73,6 +75,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             });
         }
 
+        //metodo para generar una vista personalizada de la lista de registros
         private void GenerateListaCustom(int i)
         {
             if (MedicosPendientes is not null)
@@ -343,6 +346,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //función para concatenar los nombres de uno o más dias por comas y/o 'y'
         private string MostrarDias(string? dias)
         {
             if (dias is not null)
@@ -377,6 +381,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             return "";
         }
 
+        //función para concatenar los nombres de uno o más semanas por comas y/o 'y'
         private string MostrarSemanas(string? semanas)
         {
             if (semanas is not null)
@@ -411,6 +416,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             return "";
         }
 
+        //metodo que envia las solicitudes de consumo api rest pendientes
         public async void EnviarMedicosPendientes()
         {
             if (MedicosPendientes is not null)
@@ -566,6 +572,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo que muestra una configuración donde los registros se muestren como las principales
         private void MostrarMensajePendientesPadre(int i, string mensaje)
         {
             var Registro = ((DatosCompartidos.ListaMedicosPendientes?.Children as IEnumerable<object>)?.OfType<Grid>().ToList()[i])?.Children.FirstOrDefault(LVP => !(LVP as Label).IsVisible) as Label;
@@ -576,6 +583,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo que muestra una configuración donde los registros se muestren como las dependientes
         private void MostrarMensajePendientesHijo(int i, string mensaje)
         {
             var Registro = (((DatosCompartidos.ListaMedicosPendientes?.Children as IEnumerable<object>)?.OfType<Grid>().ToList()[i])?.Children as IEnumerable<object>)?.OfType<Grid>().FirstOrDefault()?.Children.FirstOrDefault(LVP => !(LVP as Label).IsVisible) as Label;

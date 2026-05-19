@@ -29,6 +29,7 @@ public partial class InventarioView : ContentPage
         }
     }
 
+    //metodo evento que ejecuta la muestra de procudtos depues de una busqueda
     private void SearchMedicosElapsed(object? sender, ElapsedEventArgs e)
     {
         SearcProductosTimer?.Stop();
@@ -39,6 +40,7 @@ public partial class InventarioView : ContentPage
         });
     }
 
+    //metodo evento que obtiene un siguiente lote de registros que no aparecen en la lista
     private async void ScrollView_Scrolled(object sender, ScrolledEventArgs e)
     {
         var vm = (InventarioViewModel)BindingContext;
@@ -65,12 +67,14 @@ public partial class InventarioView : ContentPage
         }
     }
 
+    //metodo evento para ejecutar el refrescado de la lista
     private void refreshvie_Refreshing(object sender, EventArgs e)
     {
         var vm = (InventarioViewModel)BindingContext;
         vm.Refresh();
     }
 
+    //metodo evento que ejecuta un tiempo de espera despues de que se haya cambiado el texto de un searchbox
     private void searchBox_Producto_TextChanged(object sender, TextChangedEventArgs e)
     {
         DatosCompartidos.TextoBusquedaProductos = e.NewTextValue?.Trim() ?? "";
@@ -78,6 +82,7 @@ public partial class InventarioView : ContentPage
         SearcProductosTimer?.Start();
     }
 
+    //metodo evento que cierra la caja de texto de busqueda
     private void btn_cancel_text_Clicked(object sender, EventArgs e)
     {
         titulo.IsVisible = true;
@@ -87,6 +92,7 @@ public partial class InventarioView : ContentPage
         searchBox_Producto.Unfocus();
     }
 
+    //metodo evento que habilita la caja de texto de busqueda
     private void btn_habilitarBusqueda_Clicked(object sender, EventArgs e)
     {
         titulo.IsVisible = false;

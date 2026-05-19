@@ -163,6 +163,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo que llena la lista desplegable de preferencias
         private async void MostrarPreferenciasdeProducto()
         {
             var listaProdPref = App.Productospreferencias?.GetItems()?.Select(PP =>
@@ -188,6 +189,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo que llenaa la lista desplegable de categorías de medico
         private async void MostrarCategoriasMedico()
         {
             SincronizacionDataBase.ObtenerCategoriasMedico();
@@ -210,6 +212,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo que llena la lista desplegable de las especialidades para desginar el nuevo medico
         private async void MostrarEspecialidad()
         {
             SincronizacionDataBase.ObtenerEspecialidades();
@@ -232,6 +235,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo que obtiene los permisos de localización
         private async void GeolocationsPermissions()
         {
             var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
@@ -247,6 +251,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
 
         }
 
+        //metodo que envía los datos de medico a registrar
         public async void GuardarNuevoMedico()
         {
             if (MedicoName != "")
@@ -394,6 +399,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             }
         }
 
+        //metodo que asigna a un array los numeros segun los checkbox seleccionados para los días de visita
         private void ObtenerDiasSeleccionados()
         {
             Dias = [];
@@ -436,6 +442,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
             DiasSeleccionados = !EnableRepetir ? "0" : string.Join(",", Dias);
         }
 
+        //metodo que asigna a un array los numeros segun los checkbox seleccionados para las semanas de visita
         private void ObtenerSemanasSeleciconadas()
         {
             Semanas = [];

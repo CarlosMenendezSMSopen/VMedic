@@ -138,6 +138,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             
         }
 
+        //metodo que llena la lista desplegable con los lugares de venta en la visita de tipo Lugar
         private async void MostrarLugaresdeVenta()
         {
             await Task.Delay(500);
@@ -150,11 +151,13 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo para obtener el id del lugar de evento seleccionado
         public void SeleccionarLugarID()
         {
             IDLugaresEventos = App.Lugaresventas?.GetItems()?.Where(LVE => LVE.DESCRIPCION == LugarVenta).FirstOrDefault()?.CODIGO_LUGAR;
         }
 
+        //metodo que llena la lista desplegable con motivos por defecto cuando se selecciona el tipo de visita de lugar
         private async void MostrarMotivos()
         {
             Motivos =
@@ -167,6 +170,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             Motivo = Motivos.FirstOrDefault();
         }
 
+        //metodo para llenar la lista desplegable con los nombres y ids de los medicos
         public async void MostrarMedicos()
         {
             SincronizacionDataBase.ObtenerVisitasMensuales();
@@ -208,6 +212,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo paraa solicitar permisos de localización del usuario
         private async void GeolocationsPermissions()
         {
             var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
@@ -240,6 +245,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo que llena la lista desplegable de los tipos de visita
         private async void MostrarTiposVisitas()
         {
             SincronizacionDataBase.ObtenerTiposVisitas();
@@ -253,6 +259,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo que llena la lista desplegable del día de semana correspondiente a la fecha actual
         private async void ConsultarDiaSemana()
         {
             DiasSemana = [];
@@ -277,6 +284,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             NombreDia = DiasSemana?[indexSeleccionado];
         }
 
+        //metodo que llena la lista desplegable de la semana correspondiente a la fecha actual
         private async void ConsultarSemanadeMes()
         {
             Semanas = [];
@@ -317,6 +325,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo que cambia la visibilidad de los apartados del formulario de visitas segun el tipo de visita
         public async void ChangeTipoVisitas()
         {
             IDTiposVisitas = App.Tiposvisitas?.GetItems()?.Where(tv => tv.DESCRIPCION == TipoVisita).FirstOrDefault()?.CODIGO_TIPO_VISITA;
@@ -388,6 +397,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo para enviar las visitas, y segun su tipo, enviara una solicitud de api rest o navegara hacia otra pantalla
         public async void EnviarVisitas()
         {
             try
@@ -522,6 +532,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
         }
 
+        //metodo para enviar datos por api rest si el tipo de visita corresponde al ID de 
         private async void EnviarDatos(TablaVisitasPendientes visitas)
         {
             var SolicitudEnviar = new TablaSolicitudesNoEnviadas

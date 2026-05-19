@@ -29,6 +29,6 @@
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Al activar los servicios de ubicación, la aplicación accederá a la ubicación precisa del dispositivo</string>
 		<key>XSAppIconAssets</key>
-		<string>Assets.xcassets/ic_launcher_icon.appiconset</string>
+		<string>Assets.xcassets/ic_launcher.appiconset</string>
 	</dict>
 </plist>

@@ -11,7 +11,7 @@ namespace VMedic.Utilidades
     {
         private static string DomainCOM { get; } = "https://bluefenyx.com/";
         private static string DomainNET { get; } = "https://bluefenyx.net/";
-        private static string DomainExtension { get; } = "wapiidc/query/smsdadaadmin/4811a970b1ee42edc719c9675e757313/";
+        private static string DomainExtension { get; } = "wapiidc/query/smsdadaadmin/4811a970b1ee42edc719c9675e757313/VMedicA001";
         private static bool Val { get; set; }
 
         public static async Task<string> GetDomain()
