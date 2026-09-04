@@ -4,7 +4,10 @@
                   xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
                   xmlns:mopupsanim="clr-namespace:Mopups.Animations;assembly=Mopups"
                   xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+                  xmlns:cal="clr-namespace:Syncfusion.Maui.Calendar;assembly=Syncfusion.Maui.Calendar"
+                  xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
                   x:Class="VMedic.MVVM.Views.Planificacion.NuevaVisitaPlanificacionView"
+                  x:Name="NuevaVisitaPlanificacion"
                   Background="#40000000">
 
     <Grid VerticalOptions="Center">
@@ -13,17 +16,19 @@
                 Background="White"
                 StrokeShape="RoundRectangle 10">
             <VerticalStackLayout>
-                <Label Text="Agregar Nueva Visita"
+                <Label Text="PLANIFICACIÓN DE VISITA"
                        HorizontalOptions="Center"
                        FontSize="20"
-                       FontAttributes="Bold" />
+                       FontAttributes="Bold"
+                       Margin="0,0,0,15" />
                 <Label Text="Seleccione un médico:" />
                 <Border x:Name="frame_selectMedico"
                         BackgroundColor="White"
                         VerticalOptions="Center"
                         Stroke="{StaticResource Accent}"
                         Padding="20,5,17.5,5"
-                        StrokeShape="RoundRectangle 4">
+                        Margin="0,0,0,15"
+                        StrokeShape="RoundRectangle 10">
                     <editors:SfComboBox x:Name="searchbox_medicos"
                                         TextSearchMode="Contains"
                                         IsEditable="True"
@@ -31,7 +36,8 @@
                                         IsFilteringEnabled="True"
                                         TextMemberPath="Medico"
                                         DisplayMemberPath="Medico"
-                                        IsClearButtonVisible="False">
+                                        IsClearButtonVisible="True"
+                                        SelectionChanged="Searchbox_medicos_SelectionChanged">
                         <editors:SfComboBox.DropDownButtonSettings>
                             <editors:DropDownButtonSettings>
                                 <editors:DropDownButtonSettings.View>
@@ -60,70 +66,86 @@
                         </editors:SfComboBox.NoResultsFoundTemplate>
                     </editors:SfComboBox>
                 </Border>
-                <HorizontalStackLayout>
-                    <Label Text="Todo el día: "
-                           VerticalTextAlignment="Center" />
-                    <Switch x:Name="switch_TodoDia">
-                        <Switch.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="switch_TodoDia_Tapped" />
-                        </Switch.GestureRecognizers>
-                    </Switch>
-                </HorizontalStackLayout>
-                <Grid ColumnSpacing="10"
-                      RowSpacing="5">
+
+                <Grid ColumnSpacing="5"
+                      RowSpacing="5"
+                      Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
+
                     <Label Text="Inicio:"
                            VerticalTextAlignment="Center" />
                     <Border Grid.Column="1"
-                            StrokeShape="RoundRectangle 5"
+                            StrokeShape="RoundRectangle 10"
                             Background="#10000000">
-                        <TimePicker x:Name="timer_FechaInicial"
+                        <DatePicker x:Name="date_FechaInicial"
+                                    ClassId="Inicial"
                                     Margin="10,0"
-                                    Format="ddd, dd MMM yyyy HH:mm"
-                                    Time="08:00:00"
+                                    Format="yyyy-MM-dd"
+                                    IsEnabled="True"
                                     FontAttributes="Bold"
-                                    TimeSelected="timer_FechaInicial_TimeSelected" />
+                                    DateSelected="Date_FechaInicial_DateSelected" />
                     </Border>
-                    <Label Grid.Row="1"
-                           Text="Final:"
-                           VerticalTextAlignment="Center" />
-                    <Border Grid.Column="1"
-                            Grid.Row="1"
-                            StrokeShape="RoundRectangle 5"
+                    <Border Grid.Column="2"
+                            StrokeShape="RoundRectangle 10"
                             Background="#10000000">
-                        <TimePicker x:Name="timer_FechaFinal"
-                                    Format="ddd, dd MMM yyyy HH:mm"
-                                    Time="09:00:00"
+                        <TimePicker x:Name="time_fechaInicial"
+                                    ClassId="Inicial"
                                     Margin="10,0"
+                                    Format="HH:mm tt"
+                                    IsEnabled="True"
                                     FontAttributes="Bold"
-                                    TimeSelected="timer_FechaFinal_TimeSelected" />
+                                    TimeSelected="Time_fechaInicial_TimeSelected" />
                     </Border>
 
-                </Grid>
-                <HorizontalStackLayout>
-                    <Label Text="Repetir: "
+                    <Label x:Name="lbl1"
+                           Grid.Row="1"
+                           Text="Final:"
                            VerticalTextAlignment="Center" />
-                    <Switch x:Name="swicth_repetir"
-                            Toggled="swicth_repetir_Toggled" />
-                </HorizontalStackLayout>
+                    <Border x:Name="FechafinalContainer"
+                            Grid.Column="1"
+                            Grid.Row="1"
+                            StrokeShape="RoundRectangle 10"
+                            Background="#10000000">
+                        <DatePicker x:Name="date_FechaFinal"
+                                    ClassId="Final"
+                                    Format="yyyy-MM-dd"
+                                    Margin="10,0"
+                                    FontAttributes="Bold"
+                                    DateSelected="Date_FechaFinal_DateSelected" />
+                    </Border>
+                    <Border Grid.Column="2"
+                            Grid.Row="1"
+                            StrokeShape="RoundRectangle 10"
+                            Background="#10000000">
+                        <TimePicker x:Name="time_fechaFinal"
+                                    ClassId="Inicial"
+                                    Margin="10,0"
+                                    Format="HH:mm tt"
+                                    IsEnabled="True"
+                                    FontAttributes="Bold"
+                                    TimeSelected="Rime_fechaFinal_TimeSelected" />
+                    </Border>
+                </Grid>
+
+                <Label Text="Repetir:" />
                 <Border x:Name="frame_selectPreferencias"
                         BackgroundColor="White"
                         VerticalOptions="Center"
                         Stroke="{StaticResource Accent}"
                         Padding="20,5,17.5,5"
                         Margin="0,0,0,15"
-                        StrokeShape="RoundRectangle 4">
+                        StrokeShape="RoundRectangle 10">
                     <editors:SfComboBox x:Name="searchbox_repetir"
                                         TextSearchMode="Contains"
                                         IsEditable="False"
-                                        IsEnabled="False"
                                         IsFilteringEnabled="False"
                                         MultiSelectionDisplayMode="Delimiter"
                                         TextMemberPath="DESCRIPCION_PROD_PREFERENCIA"
@@ -131,7 +153,8 @@
                                         IsClearButtonVisible="False"
                                         Placeholder="No hay Selección"
                                         PlaceholderColor="Gray"
-                                        SelectionMode="Single">
+                                        SelectionMode="Single"
+                                        SelectionChanged="Searchbox_repetir_SelectionChanged">
                         <editors:SfComboBox.DropDownButtonSettings>
                             <editors:DropDownButtonSettings>
                                 <editors:DropDownButtonSettings.View>
@@ -163,12 +186,12 @@
                 <Grid ColumnDefinitions=".5*,.5*"
                       ColumnSpacing="15">
                     <Button x:Name="btn_Cancelar"
+                            Grid.Column="1"
                             Text="Cancelar"
-                            Clicked="btn_Cancelar_Clicked" />
+                            Clicked="Btn_Cancelar_Clicked" />
                     <Button x:Name="btn_AgregarVisita"
                             Text="Guardar"
-                            Grid.Column="1"
-                            Clicked="btn_AgregarVisita_Clicked" />
+                            Clicked="Btn_AgregarVisita_Clicked" />
                 </Grid>
             </VerticalStackLayout>
         </Border>

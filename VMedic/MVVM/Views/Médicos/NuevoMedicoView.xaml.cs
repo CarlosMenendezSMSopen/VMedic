@@ -15,9 +15,8 @@ public partial class NuevoMedicoView : ContentPage
         try
         {
             InitializeComponent();
-            SincronizacionDataBase.ObtenerCategoriasMedico();
-            SincronizacionDataBase.ObtenerProductosPreferencias();
-            BindingContext = new NuevoMedicoViewModel();
+            BindingContext = new NuevoMedicoViewModel(List_FormularioNuevoMedico);
+
             PressedPreferences.EndPressed();
         }
         catch (Exception ex)
@@ -26,66 +25,10 @@ public partial class NuevoMedicoView : ContentPage
         }
     }
 
-    private void Especialidad_Tapped(object sender, TappedEventArgs e)
-    {
-        SelectEspecialidades.Unfocus();
-        SelectEspecialidades.Focus();
-    }
-
-    private void Categoria_Tapped(object sender, TappedEventArgs e)
-    {
-        SelectCategorias.Unfocus();
-        SelectCategorias.Focus();
-    }
-
     private void Preferencia_Tapped(object sender, TappedEventArgs e)
     {
-        /*SelectPreferencias.Unfocus();
-        SelectPreferencias.Focus();*/
-    }
-
-    private void Adopcion_Tapped(object sender, TappedEventArgs e)
-    {
-        SelectEscalaAdopcion.Unfocus();
-        SelectEscalaAdopcion.Focus();
-    }
-
-    private void swt_repetirVisita_Toggled(object sender, ToggledEventArgs e)
-    {
-        var vm = (NuevoMedicoViewModel)BindingContext;
-        vm.EnableRepetir = e.Value;
-    }
-
-    private void Rojo_Tapped(object sender, TappedEventArgs e)
-    {
-        ColorSeleccionado.IsVisible = true;
-        var vm = (NuevoMedicoViewModel)BindingContext;
-        vm.Position = 0;
-        vm.ColorSeleccionado = "Rojo";
-    }
-
-    private void Azul_Tapped(object sender, TappedEventArgs e)
-    {
-        ColorSeleccionado.IsVisible = true;
-        var vm = (NuevoMedicoViewModel)BindingContext;
-        vm.Position = 1;
-        vm.ColorSeleccionado = "Azul";
-    }
-
-    private void Amarillo_Tapped(object sender, TappedEventArgs e)
-    {
-        ColorSeleccionado.IsVisible = true;
-        var vm = (NuevoMedicoViewModel)BindingContext;
-        vm.Position = 2;
-        vm.ColorSeleccionado = "Amarillo";
-    }
-
-    private void Verde_Tapped(object sender, TappedEventArgs e)
-    {
-        ColorSeleccionado.IsVisible = true;
-        var vm = (NuevoMedicoViewModel)BindingContext;
-        vm.Position = 3;
-        vm.ColorSeleccionado = "Verde";
+        //SelectPreferencias.Unfocus();
+        //SelectPreferencias.Focus();
     }
 
     private void Cancelar_Clicked(object sender, EventArgs e)
@@ -110,5 +53,62 @@ public partial class NuevoMedicoView : ContentPage
         {
             vm.IdsPreferencias = string.Join(",", seleccionados);
         }
+    }
+
+    private void searchbox_especialidad_DropDownClosed(object sender, EventArgs e)
+    {
+
+    }
+
+    private void searchbox_categoria_DropDownClosed(object sender, EventArgs e)
+    {
+
+    }
+
+    private void searchbox_adaptacion_DropDownClosed(object sender, EventArgs e)
+    {
+
+    }
+
+    private void searchbox_pais_SelectionChanged(object sender, Syncfusion.Maui.Inputs.SelectionChangedEventArgs e)
+    {
+        frame_selectDepartamento.Opacity = 1;
+        searchbox_departamento.IsEnabled = true;
+
+        var vm = (NuevoMedicoViewModel)BindingContext;
+        vm.MostrarDatosDepartamentos();
+    }
+
+    private void searchbox_departamento_SelectionChanged(object sender, Syncfusion.Maui.Inputs.SelectionChangedEventArgs e)
+    {
+        frame_selectMunicipio.Opacity = 1;
+        searchbox_municipio.IsEnabled = true;
+
+        var vm = (NuevoMedicoViewModel)BindingContext;
+        vm.MostrarDatosMunicipios();
+    }
+
+    private void date_FechaInicial_DateSelected(object sender, DateChangedEventArgs e)
+    {
+
+    }
+
+    private void sw_repetir_StateChanged(object sender, Syncfusion.Maui.Buttons.SwitchStateChangedEventArgs e)
+    {
+        if (e.NewValue is not null)
+        {
+            date_FechaInicial.IsEnabled = !(bool)e.NewValue;
+            var vm = (NuevoMedicoViewModel)BindingContext;
+            vm.EnableRepetir = (bool)e.NewValue;
+        }
+    }
+
+    protected async override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        await Task.Yield();
+
+        formulario.IsVisible = true;
     }
 }

@@ -14,35 +14,67 @@
         <Border Margin="15"
                 Padding="15"
                 BackgroundColor="White"
-                Stroke="Black"
-                StrokeShape="RoundRectangle 5">
-            <VerticalStackLayout>
+                StrokeShape="RoundRectangle 10">
+            <VerticalStackLayout Spacing="15">
                 <Label Text="Licencia de Activación"
                        FontSize="18"
                        FontAttributes="Bold"
                        VerticalOptions="Center"
                        HorizontalOptions="Center" />
-                <core:SfTextInputLayout Grid.Row="2"
-                                        Grid.Column="1"
-                                        ContainerBackground="Transparent"
-                                        HeightRequest="75"
+                <core:SfTextInputLayout Grid.Row="4"
+                                        Grid.ColumnSpan="2"
+                                        ContainerBackground="White"
+                                        HeightRequest="65"
+                                        ReserveSpaceForAssistiveLabels="False"
                                         HorizontalOptions="Fill"
                                         Hint="Usuario"
-                                        OutlineCornerRadius="2">
+                                        ContainerType="Outlined"
+                                        Stroke="Gray"
+                                        FocusedStrokeThickness="1.2"
+                                        OutlineCornerRadius="10">
                     <Entry x:Name="txt_usuario"
                            FontSize="16" />
+                    <core:SfTextInputLayout.LeadingView>
+                        <ImageButton Padding="2.5"
+                                     HeightRequest="25">
+                            <ImageButton.Source>
+                                <FontImageSource FontFamily="Icon"
+                                                 Glyph="&#xE800;"
+                                                 Size="25"
+                                                 Color="#65a1b5" />
+                            </ImageButton.Source>
+                        </ImageButton>
+                    </core:SfTextInputLayout.LeadingView>
                 </core:SfTextInputLayout>
-                <core:SfTextInputLayout Grid.Row="2"
-                                        Grid.Column="1"
-                                        ContainerBackground="Transparent"
-                                        HeightRequest="75"
-                                        HorizontalOptions="Fill"
-                                        Hint="Contraseña"
+
+                <core:SfTextInputLayout x:Name="caja_contraseña_android"
+                                        Grid.Row="5"
+                                        Grid.ColumnSpan="2"
+                                        Margin="0,-10,0,0"
+                                        ContainerBackground="White"
+                                        ContainerType="Outlined"
+                                        ReserveSpaceForAssistiveLabels="False"
                                         EnablePasswordVisibilityToggle="True"
-                                        OutlineCornerRadius="2">
+                                        HeightRequest="65"
+                                        Stroke="Gray"
+                                        FocusedStrokeThickness="1.25"
+                                        Hint="Contraseña"
+                                        OutlineCornerRadius="10">
                     <Entry x:Name="txt_contraseña"
                            FontSize="16" />
+                    <core:SfTextInputLayout.LeadingView>
+                        <ImageButton Padding="2.5"
+                                     HeightRequest="25">
+                            <ImageButton.Source>
+                                <FontImageSource FontFamily="Icon"
+                                                 Glyph="&#xE801;"
+                                                 Size="25"
+                                                 Color="#65a1b5" />
+                            </ImageButton.Source>
+                        </ImageButton>
+                    </core:SfTextInputLayout.LeadingView>
                 </core:SfTextInputLayout>
+
                 <HorizontalStackLayout HorizontalOptions="Center"
                                        Spacing="15">
                     <Button x:Name="btn_cancelarLicencia"

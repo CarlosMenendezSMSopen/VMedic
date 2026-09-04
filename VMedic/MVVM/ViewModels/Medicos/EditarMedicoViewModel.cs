@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MvvmHelpers;
 using PropertyChanged;
+using System.Diagnostics;
 using VMedic.Global;
 using VMedic.MVVM.Models;
 using VMedic.MVVM.Models.DataBase;
@@ -15,6 +16,9 @@ namespace VMedic.MVVM.ViewModels.Medicos
     {
         [ObservableProperty]
         private bool _checkedUbicacion;
+
+        [ObservableProperty]
+        private bool _enableRepetir;
 
         [ObservableProperty]
         private string? _medicoName = "";
@@ -35,6 +39,9 @@ namespace VMedic.MVVM.ViewModels.Medicos
         private string? _medicoJVPM = "";
 
         [ObservableProperty]
+        private string? _medicoDUI = "";
+
+        [ObservableProperty]
         private string? _fechaVisita = "";
 
         [ObservableProperty]
@@ -53,69 +60,109 @@ namespace VMedic.MVVM.ViewModels.Medicos
         private ObservableRangeCollection<TablaProductoPreferencia>? _preferencias;
 
         [ObservableProperty]
+        private string? _preferencia;
+
+        [ObservableProperty]
+        private ObservableRangeCollection<TablaDatosPais>? _paises;
+
+        [ObservableProperty]
+        private TablaDatosPais? _pais;
+
+        [ObservableProperty]
+        private ObservableRangeCollection<TablaDatosPais>? _departamentos;
+
+        [ObservableProperty]
+        private TablaDatosPais? _departamento;
+
+        [ObservableProperty]
+        private ObservableRangeCollection<TablaDatosPais>? _municipios;
+
+        [ObservableProperty]
+        private TablaDatosPais? _municipio;
+
+        [ObservableProperty]
         private ObservableRangeCollection<string>? _escalasAdaptacion = ["Dogmático", "Pragmático"];
 
         [ObservableProperty]
         private string? _adaptacion;
 
         [ObservableProperty]
-        private bool _checkS1 = false;
-
-        [ObservableProperty]
-        private bool _checkS2 = false;
-
-        [ObservableProperty]
-        private bool _checkS3 = false;
-
-        [ObservableProperty]
-        private bool _checkS4 = false;
-
-        [ObservableProperty]
-        private bool _checkS5 = false;
-        
-        [ObservableProperty]
-        private bool _checkS6 = false;
-
-        [ObservableProperty]
-        private bool _checkL = false;
-
-        [ObservableProperty]
-        private bool _checkM = false;
-
-        [ObservableProperty]
-        private bool _checkMi = false;
-
-        [ObservableProperty]
-        private bool _checkJ = false;
-
-        [ObservableProperty]
-        private bool _checkV = false;
-
-        [ObservableProperty]
-        private bool _checkS = false;
-
-        [ObservableProperty]
-        private bool _checkD = false;
+        private List<TablaProductoPreferencia>? _preferenciasSeleccionadas;
 
         [ObservableProperty]
         private bool _positionVisibilidad;
 
         [ObservableProperty]
-        private int _position;
+        private ObservableRangeCollection<string> _repetir = ["Una Sola Visita", "Días Hábiles", "Una Vez a la Semana", "Una Vez al Mes"];
 
+        [ObservableProperty]
+        private int? _selectedRepetir;
+
+        [ObservableProperty]
+        private string? _numberEnables;
+
+        [ObservableProperty]
+        private DateTime? _fechaInicial;
+
+        [ObservableProperty]
+        private DateTime? _fechaFinal;
+
+        [ObservableProperty]
+        private ObservableRangeCollection<string> _colores = ["Rojo", "Azul", "Amarillo", "Verde"];
+
+        [ObservableProperty]
+        private string? _selectedColor;
+
+        [ObservableProperty]
+        private bool _checkS1;
+
+        [ObservableProperty]
+        private bool _checkS2;
+
+        [ObservableProperty]
+        private bool _checkS3;
+
+        [ObservableProperty]
+        private bool _checkS4;
+
+        [ObservableProperty]
+        private bool _checkS5;
+
+        [ObservableProperty]
+        private bool _checkS6;
+
+        [ObservableProperty]
+        private bool _checkD;
+
+        [ObservableProperty]
+        private bool _checkL;
+
+        [ObservableProperty]
+        private bool _checkM;
+
+        [ObservableProperty]
+        private bool _checkMi;
+
+        [ObservableProperty]
+        private bool _checkJ;
+
+        [ObservableProperty]
+        private bool _checkV;
+
+        [ObservableProperty]
+        private bool _checkS;
         private readonly RestService servicio = new();
         public string? CodigoCliente { get; set; } = "";
-        public string? ColorSeleccionado { get; set; } = "";
         public string? IdsPreferencias { get; set; } = "";
         private TablaDoctores? Medico { get; set; }
         private Location? LocalizacionUsuario { get; set; }
-        public List<TablaProductoPreferencia>? PreferenciasSeleccionadas { get; set; }
         private List<string>? Dias { get; set; }
         private string? DiasSeleccionados { get; set; }
         private List<string>? Semanas { get; set; }
         private string? SemanasSeleccionadas { get; set; }
         public EditarMedicoViewModel(string? cODIGO_DE_CLIENTE)
         {
+            _enableRepetir = true;
             CodigoCliente = cODIGO_DE_CLIENTE;
             Medico = App.Doctores?.GetItems()?.FirstOrDefault(D => D.CODIGO_DE_CLIENTE == CodigoCliente);
             _medicoName = Medico?.NOMBRE_COMERCIAL;
@@ -124,106 +171,139 @@ namespace VMedic.MVVM.ViewModels.Medicos
             _medicoTelefono = Medico?.TELEFONO_CLIENTE;
             _medicoMail = Medico?.DIRECCION_EMAIL;
             _medicoJVPM = Medico?.JVPM;
+            _medicoDUI = Medico?.DUI_CLIENTE;
             MostrarEspecialidad();
             MostrarCategoriasMedico();
-            _positionVisibilidad = Medico?.COLOR != "";
-            _position = Medico?.COLOR switch { "Rojo" => 0, "Azul" => 1, "Amarillo" => 2, "Verde" => 3, "" => 0, _ => -1 };
-            ColorSeleccionado = Medico?.COLOR;
-            _adaptacion = Medico?.ESCALA_ADAPTACION;
+            MostrarPreferenciasdeProducto();
             MostrarVisitaMensualMedico();
+            MostrarDatosPais();
+            _positionVisibilidad = Medico?.COLOR != "";
+            _selectedColor = Medico?.COLOR switch { "Rojo" => _colores[0], "Azul" => _colores[1], "Amarillo" => _colores[2], "Verde" => _colores[3], "" => "", _ => "" };
+            _adaptacion = Medico?.ESCALA_ADAPTACION;
+        }
+
+        private async void MostrarDatosPais()
+        {
+            Paises = new ObservableRangeCollection<TablaDatosPais>(await SincronizacionDataBase.ObtenerDatosPaises(1, null));
+            Pais = Paises.FirstOrDefault(P => P.Id == Medico?.CODIGO_DE_PAIS);
+        }
+
+        public async void MostrarDatosDepartamentos()
+        {
+            Departamentos = new ObservableRangeCollection<TablaDatosPais>(await SincronizacionDataBase.ObtenerDatosPaises(2, Pais?.Id));
+            Departamento = Departamentos.FirstOrDefault(P => P.Id == Medico?.CODIGO_DEPARTAMENTO);
+        }
+
+        public async void MostrarDatosMunicipios()
+        {
+            Municipios = new ObservableRangeCollection<TablaDatosPais>(await SincronizacionDataBase.ObtenerDatosPaises(3, Departamento?.Id));
+            Municipio = Municipios.FirstOrDefault(P => P.Id == Medico?.CODIGO_MUNICIPIO);
         }
 
         //metodo para chequear los dias y semanas programados para las visitas al medico
-        private void MostrarVisitaMensualMedico()
+        private async void MostrarVisitaMensualMedico()
         {
-            var VisitaMensualMedico = App.Visitasmensuales?.GetItems()?.Where(VM => VM.CODIGO_DE_CLIENTE.ToString() == Medico?.CODIGO_DE_CLIENTE).ToList();
-            if (VisitaMensualMedico is not null)
+            var VisitasMensualMedico = await SincronizacionDataBase.ObtenerVisitasMensuales(Medico?.CODIGO_DE_CLIENTE);
+            if (VisitasMensualMedico is not null)
             {
-                var SemanasVisita = VisitaMensualMedico.Select(VM => VM.SEMANA).ToList();
-                var DiasVisita = VisitaMensualMedico.Select(VM => VM.DIA).ToList();
-                if (SemanasVisita is not null)
+                if (VisitasMensualMedico.FirstOrDefault()?.TIPO_CONTROL == 1)
                 {
-                    foreach (var semana in SemanasVisita)
-                    {
-                        switch (semana)
-                        {
-                            case 1:
-                                CheckS1 = true;
-                                break;
-                            case 2:
-                                CheckS2 = true;
-                                break;
-                            case 3:
-                                CheckS3 = true;
-                                break;
-                            case 4:
-                                CheckS4 = true;
-                                break;
-                            case 5:
-                                CheckS5 = true;
-                                break;
-                            case 6:
-                                CheckS6 = true;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                    EnableRepetir = false;
+                    var fecha = VisitasMensualMedico.FirstOrDefault()?.FECHA?.Replace("T", " ");
+                    if (fecha is not null)
+                        FechaInicial = DateTime.Parse(fecha);
                 }
+                else
+                {
+                    EnableRepetir = true;
 
-                if (DiasVisita is not null)
-                {
-                    foreach (var dia in DiasVisita)
+                    FechaInicial = DateTime.Today;
+
+                    foreach (var visita in VisitasMensualMedico)
                     {
-                        switch (dia)
-                        {
-                            case 1:
-                                CheckL = true;
-                                break;
-                            case 2:
-                                CheckM = true;
-                                break;
-                            case 3:
-                                CheckMi = true;
-                                break;
-                            case 4:
-                                CheckJ = true;
-                                break;
-                            case 5:
-                                CheckV = true;
-                                break;
-                            case 6:
-                                CheckS = true;
-                                break;
-                            case 7:
-                                CheckD = true;
-                                break;
-                            default:
-                                break;
-                        }
+                        if (visita.SEMANA == 1)
+                            CheckS1 = true;
+
+                        if (visita.SEMANA == 2)
+                            CheckS2 = true;
+
+                        if (visita.SEMANA == 3)
+                            CheckS3 = true;
+
+                        if (visita.SEMANA == 4)
+                            CheckS4 = true;
+
+                        if (visita.SEMANA == 5)
+                            CheckS5 = true;
+
+                        if (visita.SEMANA == 6)
+                            CheckS6 = true;
+
+                        if (visita.DIA == 1)
+                            CheckD = true;
+
+                        if (visita.DIA == 2)
+                            CheckL = true;
+
+                        if (visita.DIA == 3)
+                            CheckM = true;
+
+                        if (visita.DIA == 4)
+                            CheckMi = true;
+
+                        if (visita.DIA == 5)
+                            CheckJ = true;
+
+                        if (visita.DIA == 6)
+                            CheckV = true;
+
+                        if (visita.DIA == 7)
+                            CheckS = true;
                     }
                 }
+                //SelectedRepetir = VisitaMensualMedico.TIPO_CONTROL - 1;
+                //if (VisitaMensualMedico.FECHA is not null && VisitaMensualMedico.FECHAFINAL is not null)
+                //{
+                //    FechaInicial = DateTime.Parse(VisitaMensualMedico.FECHA.Replace("T", " "));
+                //    FechaFinal = DateTime.Parse(VisitaMensualMedico.FECHAFINAL.Replace("T", " "));
+                //    if (VisitaMensualMedico.TIPO_CONTROL == 3)
+                //    {
+                //        NumberEnables = ((DateTime.Parse(VisitaMensualMedico.FECHAFINAL.Replace("T", " ")) - DateTime.Parse(VisitaMensualMedico.FECHA.Replace("T", " "))).Days / 7)  + "";
+                //    }
+                //    else if (VisitaMensualMedico.TIPO_CONTROL == 4)
+                //    {
+                //        NumberEnables = (DateTime.Parse(VisitaMensualMedico.FECHAFINAL.Replace("T", " ")).Month - DateTime.Parse(VisitaMensualMedico.FECHA.Replace("T", " ")).Month) + "";
+                //    }
+                //}
             }
         }
 
         //metodo para llenar la lista desplegable de seleccion multiple con las preferencias de la programación
-        public void MostrarPreferenciasdeProducto()
+        public async void MostrarPreferenciasdeProducto()
         {
-            var listaMedicoProdPref = App.Medicoprodpreferencias?.GetItems()?.Where(MPP => MPP.CODIGO_DE_CLIENTE.ToString() == Medico?.CODIGO_DE_CLIENTE).ToList();
+            var listaMedicoProdPref = (await SincronizacionDataBase.ObtenerMedicosProductosPreferencias())?.Where(MPP => MPP.CODIGO_DE_CLIENTE.ToString() == Medico?.CODIGO_DE_CLIENTE).ToList();
+
             if (listaMedicoProdPref is not null)
             {
-                var listaProdPref = App.Productospreferencias?.GetItems()?.Select(PP =>
+                var listaProdPref = (await SincronizacionDataBase.ObtenerProductosPreferencias())?.Select(PP =>
                 {
                     PP.DESCRIPCION_PROD_PREFERENCIA = PP.DESCRIPCION_PROD_PREFERENCIA?.Trim();
 
                     return PP;
                 }).ToList();
+
+                await Task.Delay(50);
+
                 if (listaProdPref is not null)
                 {
                     if (listaProdPref.Count > 0)
                     {
                         Preferencias = new ObservableRangeCollection<TablaProductoPreferencia>(listaProdPref);
                         PreferenciasSeleccionadas = [.. listaProdPref.Where(LPP => listaMedicoProdPref.Any(LMPP => LMPP.ID_PRODUCTO_PREFERENCIA == LPP.ID_PRODUCTO_PREFERENCIA))];
+                    }
+                    else
+                    {
+                        Preferencia = "No hay Categorías disponibles";
                     }
                 }
             }
@@ -232,8 +312,8 @@ namespace VMedic.MVVM.ViewModels.Medicos
         //metodo que llena la lista desplegable de las categorías del médico
         private async void MostrarCategoriasMedico()
         {
-            await Task.Delay(1000);
-            var listaCategorias = App.Categoriasmedico?.GetItems();
+            var listaCategorias = await SincronizacionDataBase.ObtenerCategoriasMedico();
+            await Task.Delay(50);
             if (listaCategorias is not null)
             {
                 if (listaCategorias.Count > 0)
@@ -255,13 +335,14 @@ namespace VMedic.MVVM.ViewModels.Medicos
         private async void MostrarEspecialidad()
         {
             await Task.Delay(1000);
-            var listaEspecialidades = App.Especialidades?.GetItems();
+            var listaEspecialidades = await SincronizacionDataBase.ObtenerEspecialidades();
+            await Task.Delay(50);
             if (listaEspecialidades is not null)
             {
                 if (listaEspecialidades.Count > 0)
                 {
                     Especialidades = new ObservableRangeCollection<TablaClasesEspecializaciones>(listaEspecialidades);
-                    Especialidad = Especialidades.FirstOrDefault(E => E.CODIGO_DE_CLASE == Medico?.CODIGO_DE_CLASE);
+                    Especialidad = Especialidades.FirstOrDefault(E => E.CODIGO_DE_CLASE == Medico?.CODIGO_DE_CLASE?.Trim());
                 }
                 else
                 {
@@ -297,70 +378,57 @@ namespace VMedic.MVVM.ViewModels.Medicos
         //metodo que consume api rest para actualizar la información del medico seleccionado
         public async void ActualizarMedico()
         {
-            if (MedicoName != "")
+            try
             {
-                if (MedicoDireccion != "")
+                if (MedicoName != "")
                 {
-                    ObtenerSemanasSeleciconadas();
-                    if (SemanasSeleccionadas != "")
+                    if (MedicoDireccion != "")
                     {
-                        ObtenerDiasSeleccionados();
-                        if (DiasSeleccionados != "")
+                        if (MedicoTelefono != "")
                         {
-                            GeolocationsPermissions();
-
-                            await Task.Delay(1000);
-
-                            var SolicitudEnviar = new TablaSolicitudesNoEnviadas
+                            if (MedicoMail != "")
                             {
-                                OperacionID = "VMedicA042",
-                                Parametros = $"'{App.Usuario?.GetItem().UsuarioName}','{Medico?.CODIGO_DE_CLIENTE}','{MedicoName}','{MedicoContact}','{MedicoDireccion}','{MedicoTelefono}','{MedicoMail}','{MedicoJVPM}','{LocalizacionUsuario?.Latitude.ToString().Replace(",", ".")}','{LocalizacionUsuario?.Longitude.ToString().Replace(",", ".")}','{ColorSeleccionado}','','{Adaptacion}','{Especialidad?.CODIGO_DE_CLASE}',{Categoria?.CATEGORIAID},'{IdsPreferencias}'",
-                                ClavesVacias = 0,
-                                CodigoCliente = Medico?.CODIGO_DE_CLIENTE,
-                                TipoRestService = 1,
-                            };
-
-                            var SolicitudEnviarAEliminar = new TablaSolicitudesNoEnviadas
-                            {
-                                OperacionID = "VMedicA041",
-                                Parametros = $"'{Medico?.CODIGO_DE_CLIENTE}','{App.Usuario?.GetItem().UsuarioName}'",
-                                ClavesVacias = 0,
-                                TipoRestService = 1,
-                                CodigoCliente = Medico?.CODIGO_DE_CLIENTE,
-                                IDSolicitudPadre = Medico?.CODIGO_DE_CLIENTE,
-                                OperacionIdPadre = SolicitudEnviar.OperacionID,
-                            };
-
-                            var SolicitudEnviarControlVisita = new TablaSolicitudesNoEnviadas
-                            {
-                                OperacionID = "VMedicA021",
-                                Parametros = $"'{App.Usuario?.GetItem().UsuarioName}','{Medico?.CODIGO_DE_CLIENTE}','{SemanasSeleccionadas}','{DiasSeleccionados}','10'",
-                                ClavesVacias = 0,
-                                TipoRestService = 1,
-                                CodigoCliente = Medico?.CODIGO_DE_CLIENTE,
-                                IDSolicitudPadre = Medico?.CODIGO_DE_CLIENTE,
-                                OperacionIdPadre = SolicitudEnviar.OperacionID,
-                            };
-
-                            if (IsInternet.Avilable())
-                            {
-                                //var eliminar = (await servicio.ResultadoGET<Resultado>(SolicitudEnviarAEliminar.OperacionID + "/" + SolicitudEnviarAEliminar.Parametros, null))?.FirstOrDefault();
-                                var datos = (await servicio.ResultadoGET<Resultado>(SolicitudEnviar.OperacionID + "/" + SolicitudEnviar.Parametros, null))?.FirstOrDefault();
-                                if (datos is not null)
+                                if (Especialidad is not null)
                                 {
-                                    switch (datos.MSG)
+                                    GeolocationsPermissions();
+
+                                    await Task.Delay(1000);
+
+                                    var SolicitudEnviar = new TablaSolicitudesNoEnviadas
                                     {
-                                        case "1":
-                                            if (IsInternet.Avilable())
-                                            {
-                                                var resultados = (await servicio.ResultadoGET<Resultado>(SolicitudEnviarControlVisita.OperacionID + "/" + SolicitudEnviarControlVisita.Parametros, null))?.FirstOrDefault();
+                                        IDSolicitud = App.SolicitudesPendientes?.GetItems()?.Where(S => S.OperacionID == "VMedicA042").ToList().Count,
+                                        OperacionID = "VMedicA042",
+                                        Parametros = $"'{App.Usuario?.GetItem().UsuarioName}','{Medico?.CODIGO_DE_CLIENTE}','{MedicoName}','{MedicoContact}','{MedicoDireccion}','{MedicoTelefono}','{MedicoDUI}','{Pais?.Id}','{Departamento?.Id}','{Municipio?.Id}','{Especialidad?.CODIGO_DE_CLASE}','{MedicoMail}','{LocalizacionUsuario?.Latitude.ToString().Replace(",", ".")}','{LocalizacionUsuario?.Longitude.ToString().Replace(",", ".")}','{SelectedColor}','{Adaptacion}','{MedicoJVPM}','{Categoria?.CATEGORIAID}','{IdsPreferencias}'",
+                                        ClavesVacias = 0,
+                                        TipoRestService = 1,
+                                        ModuloSolicitud = 2
+                                    };
+
+                                    var SolicitudActualizarControlVisita = new TablaSolicitudesNoEnviadas
+                                    {
+                                        IDSolicitud = App.SolicitudesPendientes?.GetItems()?.Where(S => S.OperacionID == "VMedicA048").ToList().Count,
+                                        OperacionID = "VMedicA048",
+                                        Parametros = $"'{App.Usuario?.GetItem().UsuarioName}',{Medico?.CODIGO_DE_CLIENTE},{(EnableRepetir ? "NULL" : FechaInicial is not null ? $"'{FechaInicial.Value.ToString("yyyyMMdd")} {DateTime.Now.TimeOfDay.ToString(@"hh\:mm\:ss")}'" : "NULL")},'{ObtenerCadenaSemDia(1)}','{ObtenerCadenaSemDia(2)}'",
+                                        ClavesVacias = 0,
+                                        TipoRestService = 1,
+                                        IDSolicitudPadre = SolicitudEnviar.IDSolicitud,
+                                        ModuloSolicitud = 2
+                                    };
+
+                                    var datos = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, SolicitudEnviar.OperacionID + "/" + SolicitudEnviar.Parametros, null))?.FirstOrDefault();
+                                    if (datos is not null)
+                                    {
+                                        switch (datos.MSG)
+                                        {
+                                            case "1":
+                                                var resultados = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, SolicitudActualizarControlVisita.OperacionID + "/" + SolicitudActualizarControlVisita.Parametros, null))?.FirstOrDefault();
                                                 if (resultados is not null)
                                                 {
                                                     switch (resultados.MSG)
                                                     {
                                                         case "1":
                                                             ToastMaker.Make("El médico fue actualizado con éxito", App.Current?.Windows[0].Page);
-                                                            DatosCompartidos.StatusVolver = 1;
+
                                                             await Shell.Current.Navigation.PopAsync();
                                                             await Shell.Current.Navigation.PopAsync();
                                                             break;
@@ -377,128 +445,178 @@ namespace VMedic.MVVM.ViewModels.Medicos
                                                             break;
                                                     }
                                                 }
-                                            }
-                                            else
-                                            {
-                                                ToastMaker.Make("No hay conexión a Internet, verifique su plan de datos para guardar el control de visita automáticamente", App.Current?.Windows[0].Page);
-                                                SolicitudEnviarControlVisita.OperacionIdPadre = null;
-                                                App.SolicitudesPendientes?.InsertItem(SolicitudEnviarControlVisita);
-                                            }
-                                            break;
-                                        case "2":
-                                            ToastMaker.Make("El usuario no tiene permisos para agregar médicos", App.Current?.Windows[0].Page);
-                                            break;
-                                        case "3":
-                                            ToastMaker.Make("Ha ocurrido un error inesperado al guardar el médico", App.Current?.Windows[0].Page);
-                                            break;
-                                        default:
-                                            break;
+                                                else if (DatosCompartidos.ErrorResponseValue is not null)
+                                                {
+                                                    DatosCompartidos.CantidadIntentos++;
+
+                                                    if (DatosCompartidos.CantidadIntentos == 4)
+                                                    {
+                                                        var MainPage = App.Current?.Windows[0].Page;
+
+                                                        if (MainPage is not null)
+                                                            await MainPage.DisplayAlert("No fue posible completar el envío", "Después de 3 intentos, el registro se ha almacenado de forma local en el módulo de sincronización, ubicación en la que se podrá enviar nuevamente más tarde", "OK");
+
+                                                        App.SolicitudesPendientes?.InsertItem(SolicitudActualizarControlVisita);
+                                                        DatosCompartidos.CantidadIntentos = 0;
+
+                                                        await Shell.Current.Navigation.PopAsync();
+                                                        await Shell.Current.Navigation.PopAsync();
+                                                    }
+                                                    else
+                                                    {
+                                                        ToastMaker.Make(DatosCompartidos.ErrorResponseValue.FirstOrDefault().Value, App.Current?.Windows[0].Page);
+                                                    }
+                                                }
+
+                                                break;
+                                            case "2":
+                                                ToastMaker.Make("El usuario no tiene permisos para modificar médicos", App.Current?.Windows[0].Page);
+                                                break;
+                                            case "3":
+                                                ToastMaker.Make("Ha ocurrido un error inesperado al guardar el médico", App.Current?.Windows[0].Page);
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                    else if (DatosCompartidos.ErrorResponseValue is not null)
+                                    {
+                                        DatosCompartidos.CantidadIntentos++;
+
+                                        if (DatosCompartidos.CantidadIntentos == 4)
+                                        {
+                                            var MainPage = App.Current?.Windows[0].Page;
+
+                                            if (MainPage is not null)
+                                                await MainPage.DisplayAlert("No fue posible completar el envío", "Después de 3 intentos, el registro se ha almacenado de forma local en el módulo de sincronización, ubicación en la que se podrá enviar nuevamente más tarde", "OK");
+
+                                            App.SolicitudesPendientes?.InsertItem(SolicitudEnviar);
+                                            App.SolicitudesPendientes?.InsertItem(SolicitudActualizarControlVisita);
+
+                                            await Shell.Current.Navigation.PopAsync();
+                                            await Shell.Current.Navigation.PopAsync();
+
+                                            DatosCompartidos.CantidadIntentos = 0;
+                                        }
+                                        else
+                                        {
+                                            ToastMaker.Make(DatosCompartidos.ErrorResponseValue.FirstOrDefault().Value, App.Current?.Windows[0].Page);
+                                        }
                                     }
                                 }
                             }
                             else
                             {
-                                ToastMaker.Make("No hay conexión a Internet, verifique su plan de datos para guardar el médico automáticamente", App.Current?.Windows[0].Page);
-                                App.SolicitudesPendientes?.InsertItem(SolicitudEnviar);
-                                //App.SolicitudesPendientes?.InsertItem(SolicitudEnviarAEliminar);
-                                App.SolicitudesPendientes?.InsertItem(SolicitudEnviarControlVisita);
+                                ToastMaker.Make("Favor digite el correo electrónico del médico", App.Current?.Windows[0].Page);
                             }
-
-                            await Shell.Current.Navigation.PopAsync();
                         }
                         else
                         {
-                            ToastMaker.Make("Favor seleccione los días de visita", App.Current?.Windows[0].Page);
+                            ToastMaker.Make("Favor digite el teléfono del médico", App.Current?.Windows[0].Page);
                         }
                     }
                     else
                     {
-                        ToastMaker.Make("Favor seleccione la semana de visita", App.Current?.Windows[0].Page);
+                        ToastMaker.Make("Favor digite la dirección del médico", App.Current?.Windows[0].Page);
                     }
                 }
                 else
                 {
-                    ToastMaker.Make("Favor digite la dirección del médico", App.Current?.Windows[0].Page);
+                    ToastMaker.Make("Favor digite el nombre del médico", App.Current?.Windows[0].Page);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+        }
+
+        private string ObtenerCadenaSemDia(int v)
+        {
+            if (EnableRepetir)
+            {
+                if (v == 1)
+                {
+                    List<string> Semanas = [];
+
+                    if (CheckS1)
+                    {
+                        Semanas.Add("1");
+                    }
+
+                    if (CheckS2)
+                    {
+                        Semanas.Add("2");
+                    }
+
+                    if (CheckS3)
+                    {
+                        Semanas.Add("3");
+                    }
+
+                    if (CheckS4)
+                    {
+                        Semanas.Add("4");
+                    }
+
+                    if (CheckS5)
+                    {
+                        Semanas.Add("5");
+                    }
+
+                    if (CheckS6)
+                    {
+                        Semanas.Add("6");
+                    }
+
+                    return Semanas.Count > 0 ? string.Join(",", Semanas) : "0";
+                }
+                else
+                {
+                    List<string> Dias = [];
+
+                    if (CheckD)
+                    {
+                        Dias.Add("1");
+                    }
+
+                    if (CheckL)
+                    {
+                        Dias.Add("2");
+                    }
+
+                    if (CheckM)
+                    {
+                        Dias.Add("3");
+                    }
+
+                    if (CheckMi)
+                    {
+                        Dias.Add("4");
+                    }
+
+                    if (CheckJ)
+                    {
+                        Dias.Add("5");
+                    }
+
+                    if (CheckV)
+                    {
+                        Dias.Add("6");
+                    }
+
+                    if (CheckS)
+                    {
+                        Dias.Add("7");
+                    }
+
+                    return Dias.Count > 0 ? string.Join(",", Dias) : "0";
                 }
             }
             else
             {
-                ToastMaker.Make("Favor digite el nombre del médico", App.Current?.Windows[0].Page);
+                return "0";
             }
-        }
-
-        private void ObtenerDiasSeleccionados()
-        {
-            Dias = [];
-
-            if (CheckL)
-            {
-                Dias.Add("1");
-            }
-
-            if (CheckM)
-            {
-                Dias.Add("2");
-            }
-
-            if (CheckMi)
-            {
-                Dias.Add("3");
-            }
-
-            if (CheckJ)
-            {
-                Dias.Add("4");
-            }
-
-            if (CheckV)
-            {
-                Dias.Add("5");
-            }
-
-            if (CheckS)
-            {
-                Dias.Add("6");
-            }
-
-            if (CheckD)
-            {
-                Dias.Add("7");
-            }
-
-            DiasSeleccionados = string.Join(",", Dias);
-        }
-
-        private void ObtenerSemanasSeleciconadas()
-        {
-            Semanas = [];
-
-            if (CheckS1)
-            {
-                Semanas.Add("1");
-            }
-
-            if (CheckS2)
-            {
-                Semanas.Add("2");
-            }
-
-            if (CheckS3)
-            {
-                Semanas.Add("3");
-            }
-
-            if (CheckS4)
-            {
-                Semanas.Add("4");
-            }
-
-            if (CheckS5)
-            {
-                Semanas.Add("5");
-            }
-
-            SemanasSeleccionadas = string.Join(",", Semanas);
         }
     }
 }

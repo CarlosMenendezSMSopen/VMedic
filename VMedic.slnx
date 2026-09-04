@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="VMedic/VMedic.csproj" />
+  <Project Path="VMedic/VMedic.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
 </Solution>

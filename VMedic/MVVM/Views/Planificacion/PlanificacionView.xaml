@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="VMedic.MVVM.Views.Planificacion.PlanificacionView"
-             Shell.BackgroundColor="{StaticResource Primary}"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             Shell.BackgroundColor="{StaticResource Secondary}"
              Title="PlanificacionView"
              xmlns:calendar="clr-namespace:Syncfusion.Maui.Scheduler;assembly=Syncfusion.Maui.Scheduler">
 
@@ -21,90 +22,116 @@
             <ImageButton x:Name="btn_actualizar"
                          Grid.Column="1"
                          HeightRequest="50"
-                         Padding="12"
+                         Padding="15"
                          Source="refresh.png"
-                         Clicked="btn_actualizar_Clicked" />
-            <Grid x:Name="container_cuenta"
-                  Grid.Column="1"
-                  HorizontalOptions="Start"
-                  VerticalOptions="Start">
-                <Image Source="circle.png"
-                       HeightRequest="20"
-                       Margin="5" />
-                <Label x:Name="lbl_PlanificacionesPendientes"
-                       TextColor="White"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-            </Grid>
-
+                         Clicked="Btn_actualizar_Clicked" />
             <ImageButton x:Name="btn_agregarVisita"
                          Grid.Column="2"
                          HeightRequest="50"
-                         Padding="12"
+                         Padding="15"
                          Source="add_blanc.png"
-                         Clicked="btn_agregarVisita_Clicked" />
+                         Clicked="Btn_agregarVisita_Clicked" />
         </Grid>
     </Shell.TitleView>
 
-    <Grid RowDefinitions=".5*, .5*">
-        <ScrollView Grid.RowSpan="{Binding RowSpan}">
-            <calendar:SfScheduler x:Name="calendario"
-                                  View="Month"
-                                  VerticalOptions="Fill"
-                                  ShowBusyIndicator="False"
-                                  AllowViewNavigation="True"
-                                  ShowNavigationArrows="True"
-                                  AbsoluteLayout.LayoutBounds="0,0,1,1"
-                                  AbsoluteLayout.LayoutFlags="All"
-                                  ViewChanged="calendario_ViewChanged"
-                                  SelectionChanged="calendario_SelectionChanged"
-                                  QueryAppointments="calendario_QueryAppointments">
-                <calendar:SfScheduler.MonthView>
-                    <calendar:SchedulerMonthView x:Name="VistaMes"
-                                                 AppointmentDisplayMode="Indicator"
-                                                 AppointmentIndicatorCount="5"
-                                                 AppointmentIndicatorSize="5"
-                                                 NumberOfVisibleWeeks="{Binding SemanasVisibles}"
-                                                 ShowLeadingAndTrailingDates="True" />
-                </calendar:SfScheduler.MonthView>
-                <calendar:SfScheduler.CellSelectionView>
-                    <calendar:SchedulerCellSelectionView  Stroke="{StaticResource PrimaryDark}"
-                                                          StrokeWidth="2.5"
-                                                          CornerRadius="4" />
-                </calendar:SfScheduler.CellSelectionView>
-            </calendar:SfScheduler>
-        </ScrollView>
-        <ActivityIndicator x:Name="status"
-                           Grid.RowSpan="{Binding RowSpan}"
-                           IsVisible="True"
-                           VerticalOptions="Center"
-                           HorizontalOptions="Center"
-                           HeightRequest="75"
-                           WidthRequest="75" />
-        <calendar:SfScheduler x:Name="AgendaTareas"
-                              IsVisible="{Binding VisibilidadAdenda}"
-                              Grid.Row="1"
-                              ShowTodayButton="False"
-                              View="Day"
-                              Tapped="AgendaTareas_Tapped"
-                              SelectedAppointmentBackground="Red"
-                              QueryAppointments="AgendaTareas_QueryAppointments">
+    <Grid RowDefinitions=".6*, .4*">
+        <calendar:SfScheduler x:Name="calendario"
+                              View="Month"
+                              AllowViewNavigation="True"
+                              ShowNavigationArrows="True"
+                              AbsoluteLayout.LayoutBounds="0,0,1,1"
+                              AbsoluteLayout.LayoutFlags="All"
+                              SelectionChanged="Calendario_SelectionChanged"
+                              QueryAppointments="Calendario_QueryAppointments">
             <calendar:SfScheduler.HeaderView>
-                <calendar:SchedulerHeaderView Height="50" />
-
-
+                <calendar:SchedulerHeaderView Height="50"
+                                              Background="{StaticResource Primary}">
+                    <calendar:SchedulerHeaderView.TextStyle>
+                        <calendar:SchedulerTextStyle TextColor="White"
+                                                     FontSize="18" />
+                    </calendar:SchedulerHeaderView.TextStyle>
+                </calendar:SchedulerHeaderView>
             </calendar:SfScheduler.HeaderView>
+            <calendar:SfScheduler.MonthView>
+                <calendar:SchedulerMonthView x:Name="VistaMes"
+                                             AppointmentDisplayMode="Indicator"
+                                             AppointmentIndicatorCount="5"
+                                             AppointmentIndicatorSize="5"
+                                             NumberOfVisibleWeeks="6"
+                                             ShowLeadingAndTrailingDates="True"
+                                             NavigationDirection="Vertical">
+                </calendar:SchedulerMonthView>
+            </calendar:SfScheduler.MonthView>
+            <calendar:SfScheduler.CellSelectionView>
+                <calendar:SchedulerCellSelectionView  Stroke="{StaticResource PrimaryDark}"
+                                                      StrokeWidth="2.5"
+                                                      CornerRadius="5" />
+            </calendar:SfScheduler.CellSelectionView>
         </calendar:SfScheduler>
-        <ImageButton x:Name="btn_closeAgenda"
-                     Grid.Row="1"
-                     HeightRequest="50"
-                     IsVisible="{Binding VisibilidadAdenda}"
-                     WidthRequest="55"
-                     Padding="18"
-                     HorizontalOptions="End"
-                     VerticalOptions="Start"
-                     Source="close_black.png"
-                     Clicked="btn_closeAgenda_Clicked" />
+        <core:SfBusyIndicator x:Name="busyIndicator"
+                              Title="Cargando Programaciones..."
+                              Grid.Row="1"
+                              AnimationType="Cupertino"
+                              FontSize="12"
+                              HorizontalOptions="Fill"
+                              IndicatorColor="#2d3e50"
+                              IsRunning="{Binding Indicador, Mode=TwoWay}"
+                              OverlayFill="#50ffffff"
+                              SizeFactor="0.75"
+                              VerticalOptions="Fill">
+            <calendar:SfScheduler x:Name="AgendaTareas"
+                                  IsVisible="True"
+                                  BackgroundColor="White"
+                                  ShowTodayButton="True"
+                                  ShowNavigationArrows="True"
+                                  View="Day"
+                                  Tapped="AgendaTareas_Tapped"
+                                  SelectedAppointmentBackground="Red">
+                <calendar:SfScheduler.AgendaView>
+                    <calendar:SchedulerAgendaView>
+                        <calendar:SchedulerAgendaView.AppointmentTemplate>
+                            <DataTemplate>
+                                <Border Background="{Binding TextColor}"
+                                        StrokeShape="RoundRectangle 10"
+                                        Padding="15,5"
+                                        HeightRequest="47"
+                                        Margin="0,0,15,0">
+                                    <Label Text="{Binding Subject}"
+                                           TextColor="White"
+                                           FontAttributes="Bold"
+                                           FontSize="12"
+                                           HorizontalOptions="Start" />
+                                </Border>
+                            </DataTemplate>
+                        </calendar:SchedulerAgendaView.AppointmentTemplate>
+                        <calendar:SchedulerAgendaView.MonthHeaderSettings>
+                            <calendar:SchedulerMonthHeaderSettings Height="0" />
+                        </calendar:SchedulerAgendaView.MonthHeaderSettings>
+                        <calendar:SchedulerAgendaView.MonthHeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Label x:Name="label"
+                                           HorizontalOptions="Start"
+                                           VerticalOptions="Center"
+                                           TextColor="Black"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           Margin="25,0,0,0"
+                                           Text="{Binding StringFormat='{0:MMMM yyyy}'}" />
+                                </Grid>
+                            </DataTemplate>
+                        </calendar:SchedulerAgendaView.MonthHeaderTemplate>
+                        <calendar:SchedulerAgendaView.WeekHeaderSettings>
+                            <calendar:SchedulerWeekHeaderSettings  DateFormat="MM, ddd"
+                                                                   Height="0"
+                                                                   Background="White" />
+                        </calendar:SchedulerAgendaView.WeekHeaderSettings>
+                    </calendar:SchedulerAgendaView>
+                </calendar:SfScheduler.AgendaView>
+                <calendar:SfScheduler.HeaderView>
+                    <calendar:SchedulerHeaderView Height="0" />
+                </calendar:SfScheduler.HeaderView>
+            </calendar:SfScheduler>
+        </core:SfBusyIndicator>
     </Grid>
 </ContentPage>

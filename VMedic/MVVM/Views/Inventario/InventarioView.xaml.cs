@@ -90,6 +90,7 @@ public partial class InventarioView : ContentPage
         SearchProducto.IsVisible = false;
         searchBox_Producto.Text = "";
         searchBox_Producto.Unfocus();
+        CerrarTeclado.Close();
     }
 
     //metodo evento que habilita la caja de texto de busqueda

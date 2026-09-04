@@ -18,9 +18,11 @@ namespace VMedic.MVVM.Models.DataBase
         public int UbicacionRequerida { get; set; }
         public int? CodPortafolio { get; set; }
         public string? IDLicencia { get; set; }
+        public string? DominioIP { get; set; }
         public string? LicenciaName { get; set; }
         public string? LicenciaPass { get; set; }
         public string? Logo { get; set; }
         public int? CompanyID { get; set; }
+        public int? Codigo_COMPANIA { get; set; }
     }
 }

@@ -6,10 +6,10 @@
 
     <!-- Note: For Android please see also Platforms\Android\Resources\values\colors.xml -->
 
-    <Color x:Key="Primary">#2693ff</Color>
-    <Color x:Key="PrimaryDark">#007fff</Color>
+    <Color x:Key="Primary">#0b7da6</Color>
+    <Color x:Key="PrimaryDark">#17384a</Color>
     <Color x:Key="PrimaryDarkText">#242424</Color>
-    <Color x:Key="Secondary">#DFD8F7</Color>
+    <Color x:Key="Secondary">#103f55</Color>
     <Color x:Key="SecondaryDarkText">#9880e5</Color>
     <Color x:Key="Tertiary">#2B0B98</Color>
     <Color x:Key="Accent">#607D8B</Color>
@@ -71,4 +71,19 @@
     <Color x:Key="SemitransparentInventario">#F57F17</Color>
     <Color x:Key="Exit">#00897B</Color>
     <Color x:Key="SemitransparentExit">#004D40</Color>
+
+    <Color x:Key="menuPrincipalVerde">#9565B688</Color>
+    <Color x:Key="menuPrincipalAzul">#953CA2BB</Color>
+
+    <Color x:Key="Yellow200Accent">#95FFD590</Color>
+
+    <Color x:Key="PrimaryTransparency1">#900b7da6</Color>
+    <Color x:Key="PrimaryTransparency2">#800b7da6</Color>
+    <Color x:Key="PrimaryTransparency3">#700b7da6</Color>
+    <Color x:Key="PrimaryTransparency4">#600b7da6</Color>
+    <Color x:Key="PrimaryTransparency5">#500b7da6</Color>
+    <Color x:Key="PrimaryTransparency6">#400b7da6</Color>
+    <Color x:Key="PrimaryTransparency7">#300b7da6</Color>
+    <Color x:Key="PrimaryTransparency8">#200b7da6</Color>
+    <Color x:Key="PrimaryTransparency9">#100b7da6</Color>
 </ResourceDictionary>

@@ -17,5 +17,16 @@ namespace VMedic.MVVM.Models.DataBase
         public int SEMANA { get; set; }
         public int DIA { get; set; }
         public int SECUENCIA { get; set; }
+        public string? FECHA { get; set; }
+        public string? FECHAFINAL { get; set; }
+        public string? HORA_LLEGADA { get; set; }
+        public int? TIPO_CONTROL { get; set; }
+        public int? ESTADO { get; set; }
+    }
+
+    public class TablaSemanasDias
+    {
+        public int SEMANA { get; set; }
+        public int DIA { get; set; }
     }
 }

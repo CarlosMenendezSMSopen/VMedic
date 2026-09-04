@@ -293,9 +293,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
         //metodo para enviar en orden y clasificadamente las solicitudes pendientes dependiendo de a que ID de procedimiento pertenece
         public async void EnviarSolicitudes()
         {
-            var Mensaje = "";
             var envioCorrecto = 0;
-            var ConteoMensaje = 0;
 
             if (IsInternet.Avilable())
             {
@@ -308,21 +306,13 @@ namespace VMedic.MVVM.ViewModels.Visitas
                         switch (solicitud.OperacionID)
                         {
                             case "VMedicA017":
-                                var datosA017 = (await servicio.ResultadoGET<Resultado>($"{solicitud.OperacionID}/{solicitud.Parametros}", null))?.FirstOrDefault();
+                                var datosA017 = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"{solicitud.OperacionID}/{solicitud.Parametros}", null))?.FirstOrDefault();
                                 if (datosA017 is not null)
                                 {
                                     switch (datosA017.MSG)
                                     {
                                         case "1":
                                             envioCorrecto++;
-                                            var DoctorSeleciconado = App.Doctores?.GetItems()?.Where(D => D.CODIGO_DE_CLIENTE == solicitud.CodigoCliente).FirstOrDefault();
-                                            
-                                            if (DoctorSeleciconado is not null)
-                                            {
-                                                DoctorSeleciconado.Visitas = 1;
-                                                App.Doctores?.UpdateITEM(DoctorSeleciconado);
-                                            }
-
                                             DatosCompartidos.ListaVisitasPendientes?.Children.RemoveAt(i);
                                             App.SolicitudesPendientes?.DeleteItem(solicitud);
 
@@ -341,20 +331,13 @@ namespace VMedic.MVVM.ViewModels.Visitas
 
                                 break;
                             case "VMedicA038":
-                                var datosA038 = (await servicio.ResultadoGET<Resultado>($"{solicitud.OperacionID}/{solicitud.Parametros}", null))?.FirstOrDefault();
+                                var datosA038 = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"{solicitud.OperacionID}/{solicitud.Parametros}", null))?.FirstOrDefault();
                                 if (datosA038 is not null)
                                 {
                                     switch (datosA038.MSG)
                                     {
                                         case "1":
                                             envioCorrecto++;
-                                            var DoctorSeleciconado = App.Doctores?.GetItems()?.Where(D => D.CODIGO_DE_CLIENTE == solicitud.CodigoCliente).FirstOrDefault();
-                                            if (DoctorSeleciconado is not null)
-                                            {
-                                                DoctorSeleciconado.Visitas = 1;
-                                                App.Doctores?.UpdateITEM(DoctorSeleciconado);
-                                            }
-
                                             DatosCompartidos.ListaVisitasPendientes?.Children.RemoveAt(i);
                                             App.SolicitudesPendientes?.DeleteItem(solicitud);
                                             break;
@@ -387,15 +370,12 @@ namespace VMedic.MVVM.ViewModels.Visitas
                                         foreach (var codigo in Codigos)
                                         {
                                             var muestraActualizar = App.Muestras?.GetItems()?.FirstOrDefault(M => M.CODIGO_MUESTRA == codigo.Split(CaracteresEspeciales.BARRA_VERTICAL_ROTA)[0]);
-                                            var clienteActualizar = App.Doctores?.GetItems()?.FirstOrDefault(D => D.CODIGO_DE_CLIENTE == solicitud?.CodigoCliente);
 
-                                            if (muestraActualizar is not null && clienteActualizar is not null)
+                                            if (muestraActualizar is not null)
                                             {
                                                 muestraActualizar.CANT_DISPONIBLE = int.Parse(codigo.Split(CaracteresEspeciales.BARRA_VERTICAL_ROTA)[1]);
-                                                clienteActualizar.Visitas = 1;
 
                                                 App.Muestras?.UpdateITEM(muestraActualizar);
-                                                App.Doctores?.UpdateITEM(clienteActualizar);
 
                                                 var detallesEliminar = App.Evaluaciondetalles?.GetItems()?.Where(Edet => Edet.IdCliente == solicitud?.CodigoCliente).ToList();
                                                 var encabezadoEliminar = App.Evaluacionencabezado?.GetItems()?.Where(Eenc => Eenc.IdCliente == solicitud?.CodigoCliente).ToList();
@@ -430,20 +410,13 @@ namespace VMedic.MVVM.ViewModels.Visitas
 
                                 break;
                             case "VMedicA043":
-                                var datosA043 = (await servicio.ResultadoGET<Resultado>($"{solicitud.OperacionID}/{solicitud.Parametros}", null))?.FirstOrDefault();
+                                var datosA043 = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"{solicitud.OperacionID}/{solicitud.Parametros}", null))?.FirstOrDefault();
                                 if (datosA043 is not null)
                                 {
                                     switch (datosA043.MSG)
                                     {
                                         case "1":
                                             DatosCompartidos.ListaVisitasPendientes?.Children.RemoveAt(i);
-                                            envioCorrecto++;
-                                            var DoctorSeleciconado = App.Doctores?.GetItems()?.Where(D => D.CODIGO_DE_CLIENTE == solicitud?.CodigoCliente).FirstOrDefault();
-                                            if (DoctorSeleciconado is not null)
-                                            {
-                                                DoctorSeleciconado.Visitas = 1;
-                                                App.Doctores?.UpdateITEM(DoctorSeleciconado);
-                                            }
 
                                             DatosCompartidos.ListaVisitasPendientes?.Children.RemoveAt(i);
                                             App.SolicitudesPendientes?.DeleteItem(solicitud);
@@ -476,10 +449,6 @@ namespace VMedic.MVVM.ViewModels.Visitas
                     }
 
                     MostrarVisitasPendientes();
-                    if (DatosCompartidos.Lbl_CatntidadPendientes_Visitas is not null)
-                    {
-                        DatosCompartidos.Lbl_CatntidadPendientes_Visitas.Text = App.SolicitudesPendientes?.GetItems()?.Where(SP => DatosCompartidos.OperacionesIDVisitas.Contains(SP.OperacionID)).ToList().Count.ToString();
-                    }
                 }
             }
         }

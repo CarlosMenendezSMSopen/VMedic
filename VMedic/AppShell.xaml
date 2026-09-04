@@ -6,27 +6,110 @@
        xmlns:visitas="clr-namespace:VMedic.MVVM.Views.Visitas"
        xmlns:planificacion="clr-namespace:VMedic.MVVM.Views.Planificacion"
        xmlns:inventario="clr-namespace:VMedic.MVVM.Views.Inventario"
+       xmlns:sincro="clr-namespace:VMedic.MVVM.Views.Sincronizaciones"
        FlyoutHeaderBehavior="Default"
-       Shell.BackgroundColor="White"
-       Shell.ForegroundColor="White"
+       BackgroundColor="White"
+       ForegroundColor="White"
        FlyoutWidth="300"
-       Shell.TabBarIsVisible="False">
+       TabBarIsVisible="False">
+
+    <Shell.FlyoutBackground>
+        <LinearGradientBrush StartPoint="0,0"
+                             EndPoint="1,1">
+            <GradientStop Color="#125970"
+                          Offset="0.0" />
+            <GradientStop Color="#092f41"
+                          Offset="1.1" />
+        </LinearGradientBrush>
+    </Shell.FlyoutBackground>
+
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid Padding="15,10"
+                  ColumnSpacing="25">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <Border Padding="5"
+                        StrokeShape="RoundRectangle 10"
+                        Stroke="#25FFFFFF"
+                        BackgroundColor="#25FFFFFF">
+                    <Image Source="{Binding Icon}"
+                           WidthRequest="30"
+                           HeightRequest="30" />
+                </Border>
+
+                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       TextColor="White"
+                       FontAttributes="Bold"
+                       FontSize="14"
+                       VerticalTextAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
 
     <Shell.FlyoutHeader>
         <VerticalStackLayout>
-            <Image x:Name="Logo"
-                   Margin="0,25,0,10"
-                   HeightRequest="100"
-                   Source="logo_app.png"
-                   HorizontalOptions="Fill" />
+            <Grid Margin="15, 35"
+                  ColumnSpacing="10"
+                  HorizontalOptions="Start">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Border Grid.RowSpan="2"
+                        Padding="12.5"
+                        WidthRequest="45"
+                        HeightRequest="45"
+                        StrokeShape="RoundRectangle 15"
+                        Stroke="#28a5c4">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0"
+                                             EndPoint="1,1">
+                            <GradientStop Color="#28a5c4"
+                                          Offset="0.0" />
+                            <GradientStop Color="#0e89af"
+                                          Offset="1.1" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <ImageButton Padding="-5"
+                                 Source="vmedic_icon.png" />
+                </Border>
+                <HorizontalStackLayout Grid.Column="1">
+                    <Label Text="VMedic"
+                           FontAttributes="Bold"
+                           FontSize="18"
+                           TextColor="White" />
+                    <Label Text="Core"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#62d6e6" />
+                </HorizontalStackLayout>
+                <Label Grid.Column="1"
+                       Grid.Row="1"
+                       Text="VISITAS MÉDICAS"
+                       FontSize="12"
+                       FontAttributes="Bold"
+                       TextColor="#9cb6bf" />
+            </Grid>
             <HorizontalStackLayout VerticalOptions="Center">
                 <Image Margin="20"
-                       HeightRequest="75"
+                       HeightRequest="50"
                        Source="user.png"
                        WidthRequest="75" />
                 <Label x:Name="lblUserName"
                        FontSize="18"
                        HorizontalOptions="Fill"
+                       FontAttributes="Bold"
+                       TextColor="White"
                        Text="Usuario"
                        VerticalTextAlignment="Center" />
             </HorizontalStackLayout>
@@ -92,6 +175,18 @@
                           ContentTemplate="{DataTemplate planificacion:PlanificacionView}" />
         </Tab>
     </FlyoutItem>
+    
+    <!--<FlyoutItem Title="Sincronización"
+                FlyoutDisplayOptions="AsMultipleItems"
+                IsVisible="True"
+                Route="SincronizacionView"
+                Shell.FlyoutBehavior="Flyout">
+        <Tab Title="Sincronización"
+             Icon="sync.png">
+            <ShellContent Shell.FlyoutHeight="50"
+                          ContentTemplate="{DataTemplate sincro:SincronizacionView}" />
+        </Tab>
+    </FlyoutItem>-->
 
     <Shell.FlyoutFooter>
         <VerticalStackLayout>
@@ -100,6 +195,7 @@
                        Margin="15,0,0,0"
                        FontAttributes="Bold"
                        HorizontalOptions="Start"
+                       TextColor="White"
                        VerticalOptions="Center" />
                 <Image Grid.Column="1"
                        HeightRequest="20"
@@ -107,9 +203,9 @@
                        HorizontalOptions="End" />
             </Grid>
             <Border Padding="10"
-                   BackgroundColor="Transparent"
-                   Stroke="{StaticResource Gray200}"
-                   StrokeShape="RoundRectangle 0">
+                    BackgroundColor="{StaticResource Secondary}"
+                    Stroke="{StaticResource PrimaryDark}"
+                    StrokeShape="RoundRectangle 0">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
                 </Border.GestureRecognizers>
@@ -124,7 +220,7 @@
                            VerticalTextAlignment="Center"
                            FontAttributes="Bold"
                            Text="Cerrar Sesión"
-                           TextColor="Black" />
+                           TextColor="White" />
                 </HorizontalStackLayout>
             </Border>
         </VerticalStackLayout>

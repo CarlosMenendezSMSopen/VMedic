@@ -14,15 +14,20 @@ namespace VMedic.MVVM.Views.Planificacion;
 public partial class NuevaVisitaPlanificacionView : PopupPage
 {
     private ObservableRangeCollection<dynamic>? Medicos { get; set; }
-    private ObservableRangeCollection<string> Repetir { get; set; } = ["Diariamente", "Semanalmente", "Mensualmente"];
-
+    private ObservableRangeCollection<string> Repetir { get; set; } = ["Una Sola Visita", "Varios Días", "Una Vez a la Semana", "Una Vez al Mes"];
     private readonly RestService servicio = new();
     private PlanificacionView? PlanificacionContext { get; set; }
+    private string? ClassFecha { get; set; }
+    private List<TablaSemanasDias>? ListavisitasMensuales { get; set; }
     public NuevaVisitaPlanificacionView(PlanificacionView bindingContext)
     {
         InitializeComponent();
         MostrarMedicos();
         MostrarPeriodoRepeticion();
+
+        time_fechaInicial.Time = DateTime.Now.TimeOfDay;
+        time_fechaFinal.Time = DateTime.Now.AddHours(1).TimeOfDay;
+
         PressedPreferences.EndPressed();
         PlanificacionContext = bindingContext;
     }
@@ -30,14 +35,14 @@ public partial class NuevaVisitaPlanificacionView : PopupPage
     private void MostrarPeriodoRepeticion()
     {
         searchbox_repetir.ItemsSource = Repetir;
-        searchbox_repetir.SelectedItem = Repetir.LastOrDefault();
+        searchbox_repetir.SelectedItem = Repetir.FirstOrDefault();
     }
 
     public async void MostrarMedicos()
     {
-        SincronizacionDataBase.ObtenerDoctores();
+        var listaMedicos = await SincronizacionDataBase.ObtenerDoctores();
 
-        var listaMedicos = App.Doctores?.GetItems()?.ToList();
+        await Task.Delay(1000);
 
         if (listaMedicos is not null)
         {
@@ -46,11 +51,7 @@ public partial class NuevaVisitaPlanificacionView : PopupPage
                 Medicos = new ObservableRangeCollection<dynamic>(listaMedicos.Select(m => new
                 {
                     Medico = m.CODIGO_DE_CLIENTE + " - " + m.NOMBRE_COMERCIAL,
-                    CodigoMedico = m.CODIGO_DE_CLIENTE,
-                    Negocio = m.GIRO_DE_NEGOCIO,
-                    NivelPrecio = m.NIVEL_PRECIO,
-                    IVA = m.PRECIOS_CON_IVA,
-                    Visita = m.Visitas,
+                    CodigoMedico = m.CODIGO_DE_CLIENTE
                 }));
 
                 searchbox_medicos.ItemsSource = Medicos;
@@ -66,110 +67,180 @@ public partial class NuevaVisitaPlanificacionView : PopupPage
         }
     }
 
-    private void btn_Cancelar_Clicked(object sender, EventArgs e)
+    private void Btn_Cancelar_Clicked(object sender, EventArgs e)
     {
         MopupService.Instance.PopAllAsync();
     }
 
-    private void switch_TodoDia_Tapped(object sender, TappedEventArgs e)
-    {
-        switch_TodoDia.IsToggled = !switch_TodoDia.IsToggled;
-
-        if (switch_TodoDia.IsToggled)
-        {
-            timer_FechaInicial.Time = new TimeSpan(8, 0, 0);
-            timer_FechaFinal.Time = new TimeSpan(18, 0, 0);
-        }
-        else
-        {
-            timer_FechaInicial.Time = new TimeSpan(8, 0, 0);
-            timer_FechaFinal.Time = new TimeSpan(9, 0, 0);
-        }
-    }
-
-    private void swicth_repetir_Toggled(object sender, ToggledEventArgs e)
+    private void Swicth_repetir_Toggled(object sender, ToggledEventArgs e)
     {
         searchbox_repetir.IsEnabled = e.Value;
     }
 
-    private void timer_FechaInicial_TimeSelected(object sender, TimeChangedEventArgs e)
-    {
-        switch_TodoDia.IsToggled = (timer_FechaFinal.Time.Hours - timer_FechaInicial.Time.Hours) >= 8;
-        if (timer_FechaFinal.Time.Hours - timer_FechaInicial.Time.Hours <= 1)
-        {
-            timer_FechaFinal.Time = new TimeSpan(e.NewTime.Hours + 1, e.NewTime.Minutes, e.NewTime.Seconds);
-        }
-    }
-
-    private void timer_FechaFinal_TimeSelected(object sender, TimeChangedEventArgs e)
-    {
-        switch_TodoDia.IsToggled = (timer_FechaFinal.Time.Hours - timer_FechaInicial.Time.Hours) >= 8;
-    }
-
-    private async void btn_AgregarVisita_Clicked(object sender, EventArgs e)
+    private async void Btn_AgregarVisita_Clicked(object sender, EventArgs e)
     {
         try
         {
-            var FechaInicial = DateTime.Today.Add(timer_FechaInicial.Time).ToString("yyyyMMdd HH:mm:ss");
-            var FechaFinal = DateTime.Today.Add(timer_FechaFinal.Time).ToString("yyyyMMdd HH:mm:ss");
+            var FechaInicial = date_FechaInicial.Date.ToString("yyyyMMdd");
+            var FechaFinal = date_FechaFinal.Date.ToString("yyyyMMdd");
+
+            var HoraInicial = time_fechaInicial.Time.ToString(@"hh\:mm\:ss");
+            var HoraFinal = time_fechaFinal.Time.ToString(@"hh\:mm\:ss");
 
             var SolicitudEnviar = new TablaSolicitudesNoEnviadas
             {
-                OperacionID = "VMedicA048",
-                Parametros = $"'{App.Usuario?.GetItem().UsuarioName}',{(searchbox_medicos.SelectedItem as dynamic)?.CodigoMedico},'{FechaInicial}','{FechaFinal}',10,{(swicth_repetir.IsToggled ? searchbox_repetir.SelectedIndex + 1 : 0)}",
+                IDSolicitud = App.SolicitudesPendientes?.GetItems()?.Where(S => S.OperacionID == "VMedicA054").ToList().Count,
+                OperacionID = "VMedicA054",
+                Parametros = $"'{App.Usuario?.GetItem().UsuarioName}',{(searchbox_medicos.SelectedItem as dynamic)?.CodigoMedico},'{FechaInicial} {HoraInicial}','{FechaFinal} {HoraFinal}',{searchbox_repetir.SelectedIndex + 1}",
                 ClavesVacias = 0,
                 TipoRestService = 1,
+                ModuloSolicitud = 3
             };
 
-            await MopupService.Instance.PopAllAsync();
-
-            if (IsInternet.Avilable())
+            var datos = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, SolicitudEnviar.OperacionID + "/" + SolicitudEnviar.Parametros, null))?.FirstOrDefault();
+            if (datos is not null)
             {
-                var datos = (await servicio.ResultadoGET<Resultado>(SolicitudEnviar.OperacionID + "/" + SolicitudEnviar.Parametros, null))?.FirstOrDefault();
-                if (datos is not null)
+                switch (datos.MSG)
                 {
-                    switch (datos.MSG)
-                    {
-                        case "1":
-                            PlanificacionContext?.btn_actualizar_Clicked(null, null);
-                            ToastMaker.Make("Visita registrada con éxito", App.Current?.Windows[0].Page);
-                            break;
-                        case "2":
-                            ToastMaker.Make("Error: Cliente no existente, inténtelo de nuevo", App.Current?.Windows[0].Page);
-                            break;
-                        case "3":
-                            ToastMaker.Make("Error: no tiene permisos para agregar visitas", App.Current?.Windows[0].Page);
-                            break;
-                        case "4":
-                            ToastMaker.Make("Ha ocurrido un error inesperado!", App.Current?.Windows[0].Page);
-                            break;
-                        default:
-                            break;
-                    }
+                    case "1":
+                        await MopupService.Instance.PopAllAsync();
+
+                        PlanificacionContext?.Btn_actualizar_Clicked(null, null);
+                        ToastMaker.Make("Visita registrada con éxito", App.Current?.Windows[0].Page);
+                        break;
+                    case "2":
+                        ToastMaker.Make("Error: Cliente no existente, inténtelo de nuevo", App.Current?.Windows[0].Page);
+                        break;
+                    case "3":
+                        ToastMaker.Make("Error: no tiene permisos para agregar visitas", App.Current?.Windows[0].Page);
+                        break;
+                    case "4":
+                        ToastMaker.Make("Ha ocurrido un error inesperado!", App.Current?.Windows[0].Page);
+                        break;
+                    default:
+                        break;
                 }
             }
-            else
+            else if (DatosCompartidos.ErrorResponseValue is not null)
             {
-                await MopupService.Instance.PopAllAsync();
-                ToastMaker.Make("No hay conexión a Internet, verifique su plan de datos para sincronizar la visita agregada", App.Current?.Windows[0].Page);
-                App.SolicitudesPendientes?.InsertItem(SolicitudEnviar);
+                DatosCompartidos.CantidadIntentos++;
 
-                await Task.Delay(1000);
-
-                if (DatosCompartidos.ContenedorCuentaPlanificacion is not null && DatosCompartidos.LabelContarPendientesPlanificacion is not null)
+                if (DatosCompartidos.CantidadIntentos == 4)
                 {
-                    DatosCompartidos.ContenedorCuentaPlanificacion.IsVisible = App.SolicitudesPendientes?.GetItems()?.Where(SP => DatosCompartidos.OperacionesIDPlanifiacion.Contains(SP.OperacionID)).ToList()?.Count > 0;
-                    DatosCompartidos.LabelContarPendientesPlanificacion.Text = App.SolicitudesPendientes?.GetItems()?.Where(SP => DatosCompartidos.OperacionesIDPlanifiacion.Contains(SP.OperacionID)).ToList().Count.ToString();
+                    await NuevaVisitaPlanificacion.DisplayAlert("No fue posible completar el envío", "Después de 3 intentos, el registro se ha almacenado de forma local en el módulo de sincronización, ubicación en la que se podrá enviar nuevamente más tarde", "OK");
+                    App.SolicitudesPendientes?.InsertItem(SolicitudEnviar);
+
+                    await MopupService.Instance.PopAllAsync();
+
+                    DatosCompartidos.CantidadIntentos = 0;
+                }
+                else
+                {
+                    ToastMaker.Make(DatosCompartidos.ErrorResponseValue.FirstOrDefault().Value, App.Current?.Windows[0].Page);
                 }
             }
+
         }
         catch (Exception ex)
         {
             Debug.WriteLine("Error Agregar Visita: " + ex);
         }
-        finally
+    }
+
+    private async void Searchbox_medicos_SelectionChanged(object sender, Syncfusion.Maui.Inputs.SelectionChangedEventArgs e)
+    {
+        try
         {
-            
+            if (searchbox_medicos.Text != "")
+            {
+                await Task.Delay(250);
+                CerrarTeclado.Close();
+                searchbox_medicos.Unfocus();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+        }
+    }
+
+    private async void Searchbox_repetir_SelectionChanged(object sender, Syncfusion.Maui.Inputs.SelectionChangedEventArgs e)
+    {
+        if (searchbox_repetir.SelectedIndex == 0)
+        {
+            date_FechaFinal.Date = date_FechaInicial.Date;
+        }
+        else
+        {
+            date_FechaFinal.Date = date_FechaInicial.Date.AddDays(1);
+        }
+
+        await Task.Delay(1000);
+        searchbox_repetir.Unfocus();
+    }
+
+    private void Date_FechaInicial_DateSelected(object sender, DateChangedEventArgs e)
+    {
+        if (e.NewDate >= DateTime.Today)
+        {
+            if (searchbox_repetir.SelectedIndex == 0)
+            {
+                date_FechaFinal.Date = e.NewDate;
+            }
+            else
+            {
+                date_FechaFinal.Date = e.NewDate.AddDays(1);
+            }
+        }
+        else
+        {
+            date_FechaInicial.Date = DateTime.Today;
+            ToastMaker.Make("No es posibble planificar en fechas pasadas", NuevaVisitaPlanificacion);
+        }
+    }
+
+    private void Date_FechaFinal_DateSelected(object sender, DateChangedEventArgs e)
+    {
+        if (e.NewDate < DateTime.Today && e.NewDate < date_FechaInicial.Date)
+        {
+            date_FechaFinal.Date = date_FechaInicial.Date.AddDays(1);
+            ToastMaker.Make("No es posible planificar en fechas previas a la inicial", NuevaVisitaPlanificacion);
+        }
+
+        if (searchbox_repetir.SelectedIndex == 2)
+        {
+            var FechaMasSemaanaa = date_FechaInicial.Date.AddDays(7);
+
+            if (e.NewDate >= FechaMasSemaanaa)
+            {
+                date_FechaFinal.Date = FechaMasSemaanaa.AddDays(-1);
+                ToastMaker.Make("No se debe planificar un período mayor a 7 días para repetir semanalmente", NuevaVisitaPlanificacion);
+            }
+        }
+
+        if (searchbox_repetir.SelectedIndex == 3)
+        {
+            var FechaMasMes = date_FechaInicial.Date.AddMonths(1);
+
+            if (e.NewDate >= FechaMasMes)
+            {
+                date_FechaFinal.Date = FechaMasMes.AddDays(-1);
+                ToastMaker.Make("No se debe planificar un período mayor a un mes para repetir mensualmente", NuevaVisitaPlanificacion);
+            }
+        }
+    }
+
+    private void Time_fechaInicial_TimeSelected(object sender, TimeChangedEventArgs e)
+    {
+        time_fechaFinal.Time = e.NewTime.Add(TimeSpan.FromHours(1));
+    }
+
+    private void Rime_fechaFinal_TimeSelected(object sender, TimeChangedEventArgs e)
+    {
+        if (e.NewTime.Hours - time_fechaInicial.Time.Hours < 1)
+        {
+            time_fechaFinal.Time = e.NewTime.Add(TimeSpan.FromHours(1));
+            ToastMaker.Make("No es posible planificar una visita menor a una hora", NuevaVisitaPlanificacion);
         }
     }
 }

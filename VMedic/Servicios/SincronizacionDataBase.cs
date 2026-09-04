@@ -49,9 +49,9 @@ namespace VMedic.Servicios
             App.SolicitudesPendientes?.DeleteItems();
         }
 
-        public static async void ObtenerDoctores()
+        public static async Task<List<TablaDoctores>> ObtenerDoctores()
         {
-            var data = await servicio.ResultadoGET<TablaDoctores>($"VMedicA003/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaDoctores>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA003/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert Doctores");
@@ -60,14 +60,17 @@ namespace VMedic.Servicios
                     App.Doctores.DeleteItems();
                     App.Doctores?.InsertItems(data);
                 }
+
+                return [.. data];
             }
+            return [];
         }
 
         public static void ObtenerNiveles()
         {
             Task.Run(async () =>
             {
-                var data = await servicio.ResultadoGET<TablaNiveles>($"VMedicA004/'{UsuarioIniciado?.UsuarioName}'", null);
+                var data = await servicio.ResultadoGET<TablaNiveles>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA004/'{UsuarioIniciado?.UsuarioName}'", null);
                 if (data is not null)
                 {
                     Debug.WriteLine("Insert Niveles");
@@ -84,7 +87,7 @@ namespace VMedic.Servicios
         {
             Task.Run(async () =>
             {
-                var data = await servicio.ResultadoGET<TablaCategorias>($"VMedicA005/'{UsuarioIniciado?.UsuarioName}'", null);
+                var data = await servicio.ResultadoGET<TablaCategorias>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA005/'{UsuarioIniciado?.UsuarioName}'", null);
                 if (data is not null)
                 {
                     Debug.WriteLine("Insert Categorias");
@@ -101,7 +104,7 @@ namespace VMedic.Servicios
         {
             Task.Run(async () =>
             {
-                var data = await servicio.ResultadoGET<TablaSubCategorias>($"VMedicA006/'{UsuarioIniciado?.UsuarioName}'", null);
+                var data = await servicio.ResultadoGET<TablaSubCategorias>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA006/'{UsuarioIniciado?.UsuarioName}'", null);
                 if (data is not null)
                 {
                     Debug.WriteLine("Insert Sub Categorias");
@@ -114,11 +117,9 @@ namespace VMedic.Servicios
             });
         }
 
-        public static async void ObtenerProductos()
+        public static async Task<List<TablaProductos>> ObtenerProductos()
         {
-            //Task.Run(async () =>
-            //{
-            var data = await servicio.ResultadoGET<TablaProductos>($"VMedicA008/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaProductos>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA008/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert Productos");
@@ -127,15 +128,15 @@ namespace VMedic.Servicios
                     App.Productos.DeleteItems();
                     App.Productos?.InsertItems(data);
                 }
+
+                return [.. data];
             }
-            // });
+            return [];
         }
 
-        public static async void ObtenerPresentaciones()
+        public static async Task<List<TablaPresentaciones>> ObtenerPresentaciones()
         {
-            //Task.Run(async () =>
-            //{
-            var data = await servicio.ResultadoGET<TablaPresentaciones>($"VMedicA011/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaPresentaciones>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA011/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert Presentaciones");
@@ -144,13 +145,15 @@ namespace VMedic.Servicios
                     App.Presentaciones.DeleteItems();
                     App.Presentaciones?.InsertItems(data);
                 }
+
+                return [.. data];
             }
-            //});
+            return [];
         }
 
-        public static async void ObtenerTiposVisitas()
+        public static async Task<List<TablaTiposVisitas>> ObtenerTiposVisitas()
         {
-            var data = await servicio.ResultadoGET<TablaTiposVisitas>($"VMedicA018/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaTiposVisitas>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA018/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert Tipos de Visitas");
@@ -159,12 +162,15 @@ namespace VMedic.Servicios
                     App.Tiposvisitas.DeleteItems();
                     App.Tiposvisitas?.InsertItems(data);
                 }
+
+                return [.. data];
             }
+            return [];
         }
 
-        public static async void ObtenerVisitasMensuales()
+        public static async Task<List<TablaVisitasMensuales>> ObtenerVisitasMensuales(string? cODIGO_DE_CLIENTE)
         {
-            var data = await servicio.ResultadoGET<TablaVisitasMensuales>($"VMedicA019/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaVisitasMensuales>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA019/'{UsuarioIniciado?.UsuarioName}'{(cODIGO_DE_CLIENTE is not null ? $",{cODIGO_DE_CLIENTE}" : "")}", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert Visitas Mensuales");
@@ -173,14 +179,15 @@ namespace VMedic.Servicios
                     App.Visitasmensuales.DeleteItems();
                     App.Visitasmensuales?.InsertItems(data);
                 }
+
+                return [.. data];
             }
+            return [];
         }
 
-        public static async void ObtenerNivelesdePrecios()
+        public static async Task<List<TablaNivelesPrecio>> ObtenerNivelesdePrecios()
         {
-            //Task.Run(async () =>
-            //{
-            var data = await servicio.ResultadoGET<TablaNivelesPrecio>($"VMedicA022/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaNivelesPrecio>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA022/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert Niveles de Precio");
@@ -189,13 +196,15 @@ namespace VMedic.Servicios
                     App.NivelesPrecio.DeleteItems();
                     App.NivelesPrecio?.InsertItems(data);
                 }
+
+                return [.. data];
             }
-            //});
+            return [];
         }
 
-        public static async void ObtenerLugaresdeVentas()
+        public static async Task<List<TablaLugaresVenta>> ObtenerLugaresdeVentas()
         {
-            var data = await servicio.ResultadoGET<TablaLugaresVenta>($"VMedicA037/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaLugaresVenta>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA037/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert Lugares de Venta");
@@ -204,12 +213,15 @@ namespace VMedic.Servicios
                     App.Lugaresventas.DeleteItems();
                     App.Lugaresventas?.InsertItems(data);
                 }
+
+                return [.. data];
             }
+            return [];
         }
 
-        public static async void ObtenerEspecialidades()
+        public static async Task<List<TablaClasesEspecializaciones>> ObtenerEspecialidades()
         {
-            var data = await servicio.ResultadoGET<TablaClasesEspecializaciones>($"VMedicA040/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaClasesEspecializaciones>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA040/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert especialidades");
@@ -218,12 +230,15 @@ namespace VMedic.Servicios
                     App.Especialidades.DeleteItems();
                     App.Especialidades?.InsertItems(data);
                 }
+
+                return [.. data];
             }
+            return [];
         }
 
-        public static async void ObtenerMateriales()
+        public static async Task<List<TablaMateriales>> ObtenerMateriales()
         {
-            var data = await servicio.ResultadoGET<TablaMateriales>($"VMedicA044/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaMateriales>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA044/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert materiales");
@@ -232,12 +247,15 @@ namespace VMedic.Servicios
                     App.Materiales.DeleteItems();
                     App.Materiales?.InsertItems(data);
                 }
+
+                return [.. data];
             }
+            return [];
         }
 
-        public static async void ObtenerMuestras()
+        public static async Task<List<TablaMuestras>> ObtenerMuestras()
         {
-            var data = await servicio.ResultadoGET<TablaMuestras>($"VMedicA045/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaMuestras>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA045/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert materiales");
@@ -249,14 +267,17 @@ namespace VMedic.Servicios
                         App.Muestras?.InsertItems(data);
                     }
                 }
+
+                return [.. data];
             }
+            return [];
         }
 
         public static void ObtenerAgendaCompleta()
         {
             Task.Run(async () =>
             {
-                var data = await servicio.ResultadoGET<TablaAgenda>($"VMedicA047/'{UsuarioIniciado?.UsuarioName}'", null);
+                var data = await servicio.ResultadoGET<TablaAgenda>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA047/'{UsuarioIniciado?.UsuarioName}'", null);
                 if (data is not null)
                 {
                     Debug.WriteLine("Insert agenda");
@@ -272,9 +293,9 @@ namespace VMedic.Servicios
             });
         }
 
-        public static async void ObtenerCategoriasMedico()
+        public static async Task<List<TablaCategoriasMedico>> ObtenerCategoriasMedico()
         {
-            var data = await servicio.ResultadoGET<TablaCategoriasMedico>($"VMedicA050/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaCategoriasMedico>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA050/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert categorias medico");
@@ -283,12 +304,15 @@ namespace VMedic.Servicios
                     App.Categoriasmedico.DeleteItems();
                     App.Categoriasmedico?.InsertItems(data);
                 }
+
+                return [.. data];
             }
+            return [];
         }
 
-        public static async void ObtenerProductosPreferencias()
+        public static async Task<List<TablaProductoPreferencia>> ObtenerProductosPreferencias()
         {
-            var data = await servicio.ResultadoGET<TablaProductoPreferencia>($"VMedicA051/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaProductoPreferencia>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA051/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert productos preferencias");
@@ -297,12 +321,15 @@ namespace VMedic.Servicios
                     App.Productospreferencias.DeleteItems();
                     App.Productospreferencias?.InsertItems(data);
                 }
+
+                return [.. data];
             }
+            return [];
         }
 
-        public static async void ObtenerMedicosProductosPreferencias()
+        public static async Task<List<TablaMedicoProductoPreferencia>> ObtenerMedicosProductosPreferencias()
         {
-            var data = await servicio.ResultadoGET<TablaMedicoProductoPreferencia>($"VMedicA052/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaMedicoProductoPreferencia>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA052/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert productos preferencias de medico");
@@ -311,12 +338,15 @@ namespace VMedic.Servicios
                     App.Medicoprodpreferencias.DeleteItems();
                     App.Medicoprodpreferencias?.InsertItems(data);
                 }
+
+                return [.. data];
             }
+            return [];
         }
 
-        public static async void ObtenerSKUProductos()
+        public static async Task<List<TablaSKUProducto>> ObtenerSKUProductos()
         {
-            var data = await servicio.ResultadoGET<TablaSKUProducto>($"VMedicA053/'{UsuarioIniciado?.UsuarioName}'", null);
+            var data = await servicio.ResultadoGET<TablaSKUProducto>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA053/'{UsuarioIniciado?.UsuarioName}'", null);
             if (data is not null)
             {
                 Debug.WriteLine("Insert SKU productos");
@@ -325,7 +355,29 @@ namespace VMedic.Servicios
                     App.Skuproductos.DeleteItems();
                     App.Skuproductos?.InsertItems(data);
                 }
+
+                return [.. data];
             }
+            return [];
+        }
+        
+        public static async Task<List<TablaDatosPais>> ObtenerDatosPaises(int Tipo, int? IdParent)
+        {
+            var parametros = $"{(Tipo == 1 ? "VMedicA055" : Tipo == 2 ? "VMedicA056" : "VMedicA057")}/{UsuarioIniciado?.Codigo_COMPANIA}{(IdParent is not null ? $",{IdParent}" : "")}";
+            var data = await servicio.ResultadoGET<TablaDatosPais>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, parametros, null);
+            if (data is not null)
+            {
+                return [.. data];
+            }
+            return [];
+        }
+
+        public static async void ObtenerDireccion(double Lat, double Lon)
+        {
+            using HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(60);
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            string jsonResponse = await client.GetStringAsync($"https://nominatim.openstreetmap.org/reverse?lat={Lat}&lon={Lon}&format=jsonv2");
         }
     }
 }

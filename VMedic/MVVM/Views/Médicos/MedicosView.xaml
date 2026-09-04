@@ -2,15 +2,26 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="VMedic.MVVM.Views.MedicosView"
+             xmlns:calendar="clr-namespace:Syncfusion.Maui.Scheduler;assembly=Syncfusion.Maui.Scheduler"
              xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
-             Shell.BackgroundColor="{StaticResource Primary}"
+             Shell.BackgroundColor="{StaticResource Secondary}"
              Title="Médicos">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0"
+                             EndPoint="1,0">
+            <GradientStop Color="#90c3e3"
+                          Offset="0.0" />
+            <GradientStop Color="#eafafc"
+                          Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
     <Shell.TitleView>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="50" />
             </Grid.ColumnDefinitions>
             <Label x:Name="titulo"
                    Text="Médicos"
@@ -18,21 +29,29 @@
                    TextColor="White"
                    FontAttributes="Bold"
                    FontSize="20" />
-            <ImageButton x:Name="btn_habilitarBuscar"
+            <ImageButton x:Name="btn_sincronizar"
                          Grid.Column="1"
+                         HeightRequest="50"
+                         WidthRequest="50"
+                         Padding="15"
+                         Source="refresh.png"
+                         HorizontalOptions="End"
+                         VerticalOptions="Center"
+                         Clicked="refresh_Refreshing" />
+            <ImageButton x:Name="btn_habilitarBuscar"
+                         Grid.Column="2"
                          HeightRequest="50"
                          WidthRequest="50"
                          Padding="12.5"
                          Source="ic_search.png"
                          HorizontalOptions="End"
                          VerticalOptions="Center"
-                         Clicked="btn_habilitarBuscar_Clicked">
-            </ImageButton>
+                         Clicked="Btn_habilitarBuscar_Clicked" />
             <Grid x:Name="SearchMedico"
                   IsVisible="False"
-                  Grid.ColumnSpan="2">
+                  Grid.ColumnSpan="3">
                 <Entry x:Name="searchBox_Medico"
-                       TextChanged="searchBox_Medico_TextChanged"
+                       TextChanged="SearchBox_Medico_TextChanged"
                        HorizontalOptions="Fill"
                        TextColor="White" />
                 <ImageButton x:Name="btn_cancel_text"
@@ -41,7 +60,7 @@
                              WidthRequest="50"
                              Padding="15"
                              Source="close_blanc.png"
-                             Clicked="btn_cancel_text_Clicked" />
+                             Clicked="Btn_cancel_text_Clicked" />
             </Grid>
         </Grid>
     </Shell.TitleView>
@@ -52,7 +71,6 @@
                               Grid.Row="1"
                               Margin="0,5"
                               AnimationType="Cupertino"
-                              CompressedLayout.IsHeadless="True"
                               FontSize="12"
                               HorizontalOptions="Fill"
                               IndicatorColor="#2d3e50"
@@ -66,14 +84,63 @@
                          IsRefreshing="{Binding IsRefreshing}">
                 <ScrollView Grid.Row="1"
                             x:Name="scroll_container"
-                            CompressedLayout.IsHeadless="True"
                             Scrolled="scroll_container_Scrolled">
                     <VerticalStackLayout x:Name="List_Medicos"
                                          VerticalOptions="Fill"
-                                         HorizontalOptions="Fill" />
+                                         HorizontalOptions="Fill"
+                                         Margin="0,10">
+                        <Border Margin="15,5"
+                                StrokeShape="RoundRectangle 10"
+                                BackgroundColor="White">
+                            <Grid ColumnSpacing="5"
+                                  RowSpacing="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="15" />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid Grid.RowSpan="4"
+                                      BackgroundColor="Green"
+                                      Margin="0,0,7.5,0" />
+                                <Label Grid.Column="1"
+                                       Grid.ColumnSpan="2"
+                                       Margin="0,10,0,0"
+                                       Text="Carlos Samuel Menéndez Hernández"
+                                       FontAttributes="Bold"
+                                       FontSize="16" />
+                                <Label Grid.Column="1"
+                                       Grid.Row="1"
+                                       Text="Alergólogo"
+                                       FontAttributes="Bold"
+                                       FontSize="12" />
+                                <Label Grid.Column="1"
+                                       Grid.Row="2"
+                                       Text="cmenendez.hernandez@hotmail"
+                                       FontSize="13" />
+                                <Label Grid.Column="2"
+                                       Grid.Row="2"
+                                       Margin="0,0,10,0"
+                                       Text="7919 9041"
+                                       FontSize="13" />
+                                <Label Grid.Column="1"
+                                       Grid.ColumnSpan="2"
+                                       Grid.Row="3"
+                                       Margin="0,0,0,10"
+                                       Text="3a Calle Poniente,21 Avenida Norte"
+                                       FontSize="14" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
                 </ScrollView>
             </RefreshView>
         </core:SfBusyIndicator>
+
         <Label Text="No hay resultados"
                HorizontalOptions="Center"
                VerticalOptions="Center"

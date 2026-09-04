@@ -2,9 +2,18 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="VMedic.MVVM.Views.Visitas.EvaluacionesView"
-             Shell.BackgroundColor="{StaticResource Primary}"
+             Shell.BackgroundColor="{StaticResource Secondary}"
              Shell.TitleColor="White"
              Title="Evaluación">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0"
+                             EndPoint="1,0">
+            <GradientStop Color="#90c3e3"
+                          Offset="0.0" />
+            <GradientStop Color="#eafafc"
+                          Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
     <Shell.TitleView>
         <Grid>
@@ -41,12 +50,26 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Label x:Name="nombre_doctor"
-               Text="Nombre doctor"
-               FontSize="15"
-               FontAttributes="Bold"
-               TextColor="Blue"
-               HorizontalTextAlignment="Center" />
+        <Border HorizontalOptions="Center"
+                Padding="20, 10"
+                Margin="0,0,0,0"
+                StrokeShape="RoundRectangle 10">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0"
+                                     EndPoint="1,0">
+                    <GradientStop Color="#f4fbfd"
+                                  Offset="0.0" />
+                    <GradientStop Color="White"
+                                  Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Label x:Name="nombre_doctor"
+                   Text="Nombre doctor"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource PrimaryDark}"
+                   HorizontalTextAlignment="Center" />
+        </Border>
         <RefreshView x:Name="refresh"
                      Grid.Row="1"
                      Refreshing="refresh_Refreshing"
@@ -56,7 +79,8 @@
                         VerticalOptions="Fill">
                 <VerticalStackLayout x:Name="List_Evaluaciones"
                                      HorizontalOptions="Fill"
-                                     VerticalOptions="Fill" />
+                                     VerticalOptions="Fill">
+                </VerticalStackLayout>
             </ScrollView>
         </RefreshView>
         <ActivityIndicator x:Name="SeeStatus"

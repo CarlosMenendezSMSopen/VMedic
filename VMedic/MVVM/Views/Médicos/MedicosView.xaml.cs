@@ -1,12 +1,15 @@
 using Mopups.Services;
+using Syncfusion.Maui.Scheduler;
 using System.Diagnostics;
 using System.Timers;
 using VMedic.Conversores;
 using VMedic.Global;
 using VMedic.MVVM.ViewModels;
 using VMedic.MVVM.ViewModels.Medicos;
+using VMedic.MVVM.Views.Médicos;
 using VMedic.MVVM.Views.Menus;
 using VMedic.Servicios;
+using VMedic.Utilidades;
 using Timer = System.Timers.Timer;
 
 namespace VMedic.MVVM.Views;
@@ -14,20 +17,12 @@ namespace VMedic.MVVM.Views;
 public partial class MedicosView : ContentPage
 {
     private Timer? SearchMedicosTimer { get; set; }
+    private bool Cargado { get; set; } = false;
     public MedicosView()
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
+        busyIndicator.IsRunning = true;
         DatosCompartidos.ListaMedicos = List_Medicos;
-        SincronizacionDataBase.ObtenerEspecialidades();
-
-        if (DeviceInfo.Platform == DevicePlatform.Android)
-        {
-            btn_cancel_text.Padding = 5;
-        }
-        else
-        {
-            btn_cancel_text.Padding = 12;
-        }
 
         BindingContext = new MedicosViewModel();
 
@@ -47,7 +42,7 @@ public partial class MedicosView : ContentPage
     }
 
     //metodo evento que asina una variable en base a lo que se ingresa en la caja de busqueda de los medicos
-    private void searchBox_Medico_TextChanged(object sender, TextChangedEventArgs e)
+    private void SearchBox_Medico_TextChanged(object sender, TextChangedEventArgs e)
     {
         DatosCompartidos.TextoBusquedaMedicos = e.NewTextValue?.Trim() ?? "";
         SearchMedicosTimer?.Stop();
@@ -55,7 +50,7 @@ public partial class MedicosView : ContentPage
     }
 
     //metodo evento que oculta la caja de texto de busqueda|
-    private void btn_cancel_text_Clicked(object sender, EventArgs e)
+    private void Btn_cancel_text_Clicked(object sender, EventArgs e)
     {
         titulo.IsVisible = true;
         btn_habilitarBuscar.IsVisible = true;
@@ -64,7 +59,7 @@ public partial class MedicosView : ContentPage
         searchBox_Medico.Unfocus();
     }
 
-    private void btn_habilitarBuscar_Clicked(object sender, EventArgs e)
+    private void Btn_habilitarBuscar_Clicked(object sender, EventArgs e)
     {
         titulo.IsVisible = false;
         btn_habilitarBuscar.IsVisible = false;
@@ -100,24 +95,37 @@ public partial class MedicosView : ContentPage
 
     private void AgregarMedicos_Tapped(object sender, TappedEventArgs e)
     {
-        MopupService.Instance.PushAsync(new MenuMedicos());
+        Shell.Current.Navigation.PushAsync(new NuevoMedicoView());
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
-        if (DatosCompartidos.StatusVolver == 1)
+        if (Cargado)
         {
+            busyIndicator.IsRunning = true;
             var vm = (MedicosViewModel)BindingContext;
             vm.MostrarMedicos();
-            DatosCompartidos.StatusVolver = 0;
         }
+
+        Cargado = true;
     }
 
     private void refresh_Refreshing(object sender, EventArgs e)
     {
         var vm = (MedicosViewModel)BindingContext;
         vm.Refresh();
+    }
+
+    private void ListaMedicos_agenda_QueryAppointments(object? sender, Syncfusion.Maui.Scheduler.SchedulerQueryAppointmentsEventArgs e)
+    {
+        var vm = (MedicosViewModel)BindingContext;
+        vm.ObtenerMedicosPrueba(sender as SfScheduler);
+    }
+
+    private void ListaMedicos_agenda_Loaded(object sender, EventArgs e)
+    {
+
     }
 }

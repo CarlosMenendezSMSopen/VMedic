@@ -430,7 +430,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
                         var SolicitudPendiente = PendientesPadre[i];
                         if (SolicitudPendiente.OperacionID == "VMedicA014")
                         {
-                            var datos = (await servicio.ResultadoGET<Resultado>(SolicitudPendiente.OperacionID + "/" + SolicitudPendiente.Parametros, null))?.FirstOrDefault();
+                            var datos = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, SolicitudPendiente.OperacionID + "/" + SolicitudPendiente.Parametros, null))?.FirstOrDefault();
                             if (datos is not null)
                             {
                                 switch (datos.MSG)
@@ -440,11 +440,11 @@ namespace VMedic.MVVM.ViewModels.Medicos
                                         DatosCompartidos.ListaMedicosPendientes?.Children.RemoveAt(i);
                                         App.SolicitudesPendientes?.DeleteItem(SolicitudPendiente);
 
-                                        var SolicitudHija = MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.TableID.ToString()) ?? MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.CodigoCliente);
-                                        var resultados = (await servicio.ResultadoGET<Resultado>(SolicitudHija?.OperacionID + "/" + SolicitudHija?.Parametros, null))?.FirstOrDefault();
+                                        var SolicitudHija = MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.TableID) ?? MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == 0);
+                                        var resultados = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, SolicitudHija?.OperacionID + "/" + SolicitudHija?.Parametros, null))?.FirstOrDefault();
                                         if (resultados is not null)
                                         {
-                                            var IndiceMedicoPendiente = MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.TableID.ToString()) ?? MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.CodigoCliente);
+                                            var IndiceMedicoPendiente = MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.TableID) ?? MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == 0);
                                             if (IndiceMedicoPendiente is not null)
                                             {
                                                 switch (resultados.MSG)
@@ -482,7 +482,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
                         }
                         else if (SolicitudPendiente.OperacionID == "VMedicA042")
                         {
-                            var datos = (await servicio.ResultadoGET<Resultado>(SolicitudPendiente.OperacionID + "/" + SolicitudPendiente.Parametros, null))?.FirstOrDefault();
+                            var datos = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, SolicitudPendiente.OperacionID + "/" + SolicitudPendiente.Parametros, null))?.FirstOrDefault();
                             if (datos is not null)
                             {
                                 switch (datos.MSG)
@@ -492,11 +492,11 @@ namespace VMedic.MVVM.ViewModels.Medicos
                                         DatosCompartidos.ListaMedicosPendientes?.Children.RemoveAt(i);
                                         App.SolicitudesPendientes?.DeleteItem(SolicitudPendiente);
 
-                                        var SolicitudHija = MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.TableID.ToString()) ?? MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.CodigoCliente);
-                                        var resultados = (await servicio.ResultadoGET<Resultado>(SolicitudHija?.OperacionID + "/" + SolicitudHija?.Parametros, null))?.FirstOrDefault();
+                                        var SolicitudHija = MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.TableID) ?? MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == 0);
+                                        var resultados = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, SolicitudHija?.OperacionID + "/" + SolicitudHija?.Parametros, null))?.FirstOrDefault();
                                         if (resultados is not null)
                                         {
-                                            var IndiceMedicoPendiente = MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.TableID.ToString()) ?? MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.CodigoCliente);
+                                            var IndiceMedicoPendiente = MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == SolicitudPendiente.TableID) ?? MedicosPendientes.FirstOrDefault(MP => MP.IDSolicitudPadre == 0);
                                             if (IndiceMedicoPendiente is not null)
                                             {
                                                 switch (resultados.MSG)
@@ -534,7 +534,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
                         }
                         else if (SolicitudPendiente.OperacionID == "VMedicA021")
                         {
-                            var resultados = (await servicio.ResultadoGET<Resultado>(SolicitudPendiente.OperacionID + "/" + SolicitudPendiente.Parametros, null))?.FirstOrDefault();
+                            var resultados = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, SolicitudPendiente.OperacionID + "/" + SolicitudPendiente.Parametros, null))?.FirstOrDefault();
                             if (resultados is not null)
                             {
                                 switch (resultados.MSG)

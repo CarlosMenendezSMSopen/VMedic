@@ -14,21 +14,23 @@ namespace VMedic.Servicios
     public class RestService : IRestService
     {
         private string DomainExtension { get; } = "wapiidc/query/smsdadaadmin/4811a970b1ee42edc719c9675e757313/";
-        public async Task<IList<T>?> ResultadoGET<T>(string consulta, Func<string[], T>? map)
+        public async Task<IList<T>?> ResultadoGET<T>(string? domain, string consulta, Func<string[], T>? map)
         {
             try
             {
                 if (IsInternet.Avilable())
                 {
-                    string urlRequest = (await URL.GetDomain()) + DomainExtension + consulta;
+                    DatosCompartidos.ErrorResponseValue = null;
+ 
+                    string urlRequest = domain + DomainExtension + consulta;
                     Debug.WriteLine("URL Request " + urlRequest);
                     using HttpClient client = new HttpClient();
-                    client.Timeout = TimeSpan.FromSeconds(120);
+                    client.Timeout = TimeSpan.FromSeconds(10);
                     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
                     string jsonResponse = await client.GetStringAsync(urlRequest);
                     if (jsonResponse.Contains("{\"value\":\""))
                     {
-                        DatosCompartidos.ErrorResponseValue = jsonResponse.Split("\":")[1].Split(",\"")[0].Replace("\"", "");
+                        DatosCompartidos.ErrorResponseValue = new Dictionary<int, string> { { 1, jsonResponse.Split("\":")[1].Split(",\"")[0].Replace("\"", "") } };
                         return null;
                     }
 
@@ -61,7 +63,7 @@ namespace VMedic.Servicios
                 }
                 else
                 {
-                    ToastMaker.Make("No hay conexión de Internet, verifique su plan de datos o Wi-fi e inténtelo de nuevo", App.Current?.Windows[0].Page);
+                    DatosCompartidos.ErrorResponseValue = new Dictionary<int, string> { { 2, "No hay conexión de Internet, verifique su plan de datos o Wi-fi e inténtelo de nuevo" } };
                     return null;
                 }
             }
@@ -71,8 +73,10 @@ namespace VMedic.Servicios
                 PressedPreferences.EndPressed();
                 if (!ex.Message.Contains("The operation has timed out."))
                 {
-                    ExceptionMessageMaker.Make("Error resultado", ex.ToString(), ex.Message, App.Current?.Windows[0].Page);
+                    DatosCompartidos.ErrorResponseValue = new Dictionary<int, string> { { 3, "Ha ocurrido un error inesperado" } };
+                    ExceptionMessageMaker.Make("Error resultado al obtener datos", ex.ToString(), ex.Message, App.Current?.Windows[0].Page);
                 }
+
                 return null;
             }
         }
@@ -125,6 +129,11 @@ namespace VMedic.Servicios
                         }
                     }
                 }
+                else
+                {
+                    DatosCompartidos.ErrorResponseValue = new Dictionary<int, string> { { 2, "No hay conexión de Internet, verifique su plan de datos o Wi-fi e inténtelo de nuevo" } };
+                }
+
                 return null;
             }
             catch (Exception ex)
@@ -133,7 +142,8 @@ namespace VMedic.Servicios
                 PressedPreferences.EndPressed();
                 if (!ex.Message.Contains("The operation has timed out."))
                 {
-                    ExceptionMessageMaker.Make("Error resultado", ex.ToString(), ex.Message, App.Current?.Windows[0].Page);
+                    DatosCompartidos.ErrorResponseValue = new Dictionary<int, string> { { 3, "Ha ocurrido un error inesperado" } };
+                    ExceptionMessageMaker.Make("Error resultado envío", ex.ToString(), ex.Message, App.Current?.Windows[0].Page);
                 }
                 return null;
             }

@@ -103,7 +103,7 @@ public partial class ConfiguracionView : PopupPage
             }
 
             var consulta = $"{nameof(KontrolA030)}/'{txt_usuario.Text}','{EncriptarSHA1.GetSHA1(txt_contraseña.Text)}','{IMEI}'";
-            var licencia = await servicio.ResultadoGET<KontrolA030>(consulta, null);
+            var licencia = await servicio.ResultadoGET<KontrolA030>((await URL.GetDomain()), consulta, null);
             if (licencia is not null)
             {
                 var usuarioLicencia = licencia.ToList().FirstOrDefault();
@@ -129,6 +129,7 @@ public partial class ConfiguracionView : PopupPage
                                 UbicacionRequerida = -1,
                                 CodPortafolio = -1,
                                 IDLicencia = usuarioLicencia?.licenciaid,
+                                DominioIP = "https://" + usuarioLicencia?.URL?.Split('/')?[2] + "/",
                                 LicenciaName = txt_usuario.Text,
                                 LicenciaPass = txt_contraseña.Text,
                                 Logo = usuarioLicencia?.LOGO,
@@ -141,13 +142,14 @@ public partial class ConfiguracionView : PopupPage
                         else
                         {
                             var tablaUsuario = App.Usuario.GetItem();
+                            var URLS = usuarioLicencia?.URL?.Split('/');
 
                             tablaUsuario.IDLicencia = usuarioLicencia?.licenciaid;
+                            tablaUsuario.DominioIP = "https://" + URLS?[2] + "/";
                             tablaUsuario.LicenciaName = txt_usuario.Text;
                             tablaUsuario.LicenciaPass = txt_contraseña.Text;
                             tablaUsuario.Logo = usuarioLicencia?.LOGO;
                             tablaUsuario.CompanyID = usuarioLicencia?.COMPANYID;
-
 
                             App.Usuario.UpdateITEM(tablaUsuario);
                             ToastMaker.Make("Configuracion realizada con éxito", App.Current?.Windows[0].Page);

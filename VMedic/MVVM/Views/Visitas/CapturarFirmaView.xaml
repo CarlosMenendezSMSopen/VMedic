@@ -5,28 +5,64 @@
                   x:Class="VMedic.MVVM.Views.Visitas.CapturarFirmaView"
                   BackgroundColor="#50000000"
                   Title="CapturarFirmaView">
-    <Grid Margin="15">
-        <Border BackgroundColor="White" Padding="15">
+    <Grid Margin="15"
+          VerticalOptions="Center">
+        <Border BackgroundColor="White"
+                Padding="15"
+                StrokeShape="RoundRectangle 10">
             <Grid ColumnDefinitions=".5*,.5*"
                   ColumnSpacing="15">
                 <Grid.RowDefinitions>
-                    <RowDefinition />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="250" />
                     <RowDefinition Height="50" />
                 </Grid.RowDefinitions>
-                <GraphicsView x:Name="dibujoFirma"
-                              Grid.ColumnSpan="2"
-                              IsEnabled="True"
-                              Margin="10,20,10,20"
-                              InputTransparent="False"
-                              StartInteraction="DibujoFirma_StartInteraction"
-                              DragInteraction="DibujoFirma_DragInteraction"
-                              EndInteraction="DibujoFirma_EndInteraction" />
+
+                <Label Grid.ColumnSpan="2"
+                       Text="Hago constar que recibí:"
+                       VerticalOptions="Center"
+                       FontSize="15" />
+
+                <ScrollView x:Name="ScroLL"
+                            Grid.Row="1"
+                            Margin="0,0,0,10"
+                            MaximumHeightRequest="250"
+                            Grid.ColumnSpan="2"
+                            Scrolled="ScroLL_Scrolled"
+                            VerticalOptions="Fill">
+                    <VerticalStackLayout x:Name="Lista_NombresEvaluaciones"
+                                         HorizontalOptions="Fill"
+                                         VerticalOptions="Fill" />
+                </ScrollView>
+
+                <Border Grid.Row="2"
+                        Grid.ColumnSpan="2"
+                        Stroke="Black"
+                        StrokeShape="RoundRectangle 10"
+                        Margin="5,10">
+                    <GraphicsView x:Name="dibujoFirma"
+                                  IsEnabled="True"
+                                  Margin="10,20,10,20"
+                                  InputTransparent="False"
+                                  StartInteraction="DibujoFirma_StartInteraction"
+                                  DragInteraction="DibujoFirma_DragInteraction"
+                                  EndInteraction="DibujoFirma_EndInteraction" />
+                </Border>
+                <Label Grid.Row="2"
+                       Text="Firma:"
+                       Background="White"
+                       VerticalOptions="Start"
+                       HorizontalOptions="Start"
+                       Padding="10, 0"
+                       Margin="10,0,0,0" />
+
                 <Button x:Name="btn_limpiar"
-                        Grid.Row="1"
+                        Grid.Row="3"
                         Text="Limpiar"
                         Clicked="Btn_limpiar_Clicked" />
                 <Button x:Name="btn_firmar"
-                        Grid.Row="1"
+                        Grid.Row="3"
                         Grid.Column="1"
                         Text="Firmar"
                         IsEnabled="False"

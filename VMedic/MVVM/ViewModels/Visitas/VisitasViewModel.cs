@@ -4,19 +4,21 @@ using MvvmHelpers;
 using PropertyChanged;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using VMedic.Global;
 using VMedic.Interfaces;
 using VMedic.MVVM.Models;
 using VMedic.MVVM.Models.DataBase;
+using VMedic.MVVM.Views.Visitas;
+using VMedic.Servicios;
+using VMedic.Utilidades;
 using BaseViewModel = VMedic.Behaviors.BaseViewModel;
 using Timer = System.Timers.Timer;
-using VMedic.Utilidades;
-using VMedic.Servicios;
-using VMedic.MVVM.Views.Visitas;
 
 namespace VMedic.MVVM.ViewModels.Visitas
 {
@@ -48,6 +50,9 @@ namespace VMedic.MVVM.ViewModels.Visitas
         private string? _ubicacionimg = "";
 
         [ObservableProperty]
+        private string? _avisoGPS = "";
+
+        [ObservableProperty]
         private ObservableRangeCollection<string>? _motivos;
 
         [ObservableProperty]
@@ -67,6 +72,9 @@ namespace VMedic.MVVM.ViewModels.Visitas
 
         [ObservableProperty]
         private string? _textoBoton = "";
+
+        [ObservableProperty]
+        private bool _indicador;
 
         [ObservableProperty]
         private bool _visibilidadNumeroSemana;
@@ -107,8 +115,10 @@ namespace VMedic.MVVM.ViewModels.Visitas
         private string? FechaGPS { get; set; }
         public VisitasViewModel()
         {
+            _indicador = true;
             _textoBoton = "Enviar";
             _ubicacionimg = "gps_off.png";
+            _avisoGPS = "GPS No Disponible";
             _visibilidadNumeroSemana = true;
             _visibilidadDiaSemana = true;
             _visibilidadLugarVenta = false;
@@ -117,36 +127,24 @@ namespace VMedic.MVVM.ViewModels.Visitas
             _visibilidadMotivo = true;
             _visibilidadComentarios = true;
 
-            if (DatosCompartidos.Lbl_CatntidadPendientes_Visitas is not null)
-            {
-                DatosCompartidos.Lbl_CatntidadPendientes_Visitas.Text = App.SolicitudesPendientes?.GetItems()?.Where(SP => DatosCompartidos.OperacionesIDVisitas.Contains(SP.OperacionID)).ToList().Count.ToString();
-            }
-
-            SincronizacionInicial();
+            GeolocationsPermissions();
             ConsultarSemanadeMes();
             ConsultarDiaSemana();
             MostrarTiposVisitas();
-            GeolocationsPermissions();
+            MostrarLugaresdeVenta();
             MostrarMotivos();
             PressedPreferences.EndPressed();
-        }
-
-        private async void SincronizacionInicial()
-        {
-            
-            
-            
         }
 
         //metodo que llena la lista desplegable con los lugares de venta en la visita de tipo Lugar
         private async void MostrarLugaresdeVenta()
         {
-            await Task.Delay(500);
-            var ListalugaresdeVenta = App.Lugaresventas?.GetItems()?.Select(lv => lv.DESCRIPCION).ToList();
+            var ListalugaresdeVenta = (await SincronizacionDataBase.ObtenerLugaresdeVentas())?.Select(lv => lv.DESCRIPCION).ToList();
+            await Task.Delay(5);
             if (ListalugaresdeVenta is not null)
             {
                 LugaresVenta = new ObservableRangeCollection<string?>(ListalugaresdeVenta);
-                await Task.Delay(1000);
+                await Task.Delay(5);
                 LugarVenta = LugaresVenta.FirstOrDefault();
             }
         }
@@ -165,7 +163,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
                 "Establecimiento Cerrado", "No se dió atención", "Doctor no disponible", "Otro"
             ];
 
-            await Task.Delay(1000);
+            await Task.Delay(5);
 
             Motivo = Motivos.FirstOrDefault();
         }
@@ -173,9 +171,6 @@ namespace VMedic.MVVM.ViewModels.Visitas
         //metodo para llenar la lista desplegable con los nombres y ids de los medicos
         public async void MostrarMedicos()
         {
-            SincronizacionDataBase.ObtenerVisitasMensuales();
-            SincronizacionDataBase.ObtenerDoctores();
-
             if (NumeroSemana is not null)
                 PositionSemana = Semanas?.IndexOf(NumeroSemana) + 1;
             if (NombreDia is not null)
@@ -183,25 +178,61 @@ namespace VMedic.MVVM.ViewModels.Visitas
 
             if (PositionSemana is not null && PositionDia is not null)
             {
-                var listavisitasMensuales = App.Visitasmensuales?.GetItems()?.Where(lvm => lvm.SEMANA == PositionSemana && lvm.DIA == PositionDia).ToList();
-                var listaMedicos = App.Doctores?.GetItems()?.Where(D => listavisitasMensuales is not null ? listavisitasMensuales.Any(LVM => LVM.CODIGO_DE_CLIENTE == (D.CODIGO_DE_CLIENTE is not null ? int.Parse(D.CODIGO_DE_CLIENTE) : 0)) : D is not null).ToList();
-
-                if (listaMedicos is not null)
+                var listavisitasMensuales = (await SincronizacionDataBase.ObtenerVisitasMensuales(null)).Where(VM =>
                 {
-                    if (listaMedicos.Count > 0)
+                    if (PositionDia < 8 && PositionSemana < Semanas?.Count) //Numero día && Numero Semana
                     {
-                        Medicos = new ObservableRangeCollection<dynamic>(listaMedicos.Select(m => new
-                        {
-                            Medico = m.CODIGO_DE_CLIENTE + " - " + m.NOMBRE_COMERCIAL,
-                            CodigoMedico = m.CODIGO_DE_CLIENTE,
-                            Negocio = m.GIRO_DE_NEGOCIO,
-                            NivelPrecio = m.NIVEL_PRECIO,
-                            IVA = m.PRECIOS_CON_IVA,
-                            Visita = m.Visitas,
-                        }));
+                        return VM.TIPO_CONTROL is not null && VM.FECHA is not null && VM.FECHAFINAL is not null && VM.ESTADO == 1 && VM.SEMANA == PositionSemana && VM.DIA == PositionDia;
+                    }
+                    else if (PositionDia == 8 && PositionSemana < Semanas?.Count)//Todos los días && Numero Semana 
+                    {
+                        return VM.TIPO_CONTROL is not null && VM.FECHA is not null && VM.FECHAFINAL is not null && VM.ESTADO == 1 && VM.SEMANA == PositionSemana;
+                    }
+                    else if (PositionDia < 8 && PositionSemana == Semanas?.Count)//Numero día && Todas las semanas
+                    {
+                        return VM.TIPO_CONTROL is not null && VM.FECHA is not null && VM.FECHAFINAL is not null && VM.ESTADO == 1 && VM.DIA == PositionDia;
+                    }
+                    else if (PositionDia == 8 && PositionSemana == Semanas?.Count)//Todos los días && Todas las semanas
+                    {
+                        return VM.TIPO_CONTROL is not null && VM.FECHA is not null && VM.FECHAFINAL is not null && VM.ESTADO == 1;
+                    }
 
-                        await Task.Delay(1000);
+                    return true;
+                }
+                ).ToList();
 
+                await Task.Delay(5);
+
+                Medicos = new ObservableRangeCollection<dynamic>
+                (
+                    (from a in await SincronizacionDataBase.ObtenerDoctores()
+                     join b in listavisitasMensuales on a.CODIGO_DE_CLIENTE equals (b.CODIGO_DE_CLIENTE + "")
+                     select new
+                     {
+                         a.CODIGO_DE_CLIENTE,
+                         a.NOMBRE_COMERCIAL,
+                         a.LATITUD,
+                         a.LONGITUD,
+                         b.HORA_LLEGADA,
+                         b.FECHA,
+                         b.FECHAFINAL
+                     }
+                     ).Select(m => new
+                     {
+                         Medico = m.CODIGO_DE_CLIENTE + " - " + m.NOMBRE_COMERCIAL,
+                         CodigoMedico = m.CODIGO_DE_CLIENTE,
+                         ColorEstado = m.HORA_LLEGADA is not null ? Colors.Green : m.HORA_LLEGADA is null && DateTime.Parse(m.FECHAFINAL.Replace("T", " ")) < DateTime.Today ? Colors.Black : Colors.Red,
+                         Latitud = m.LATITUD,
+                         Longitud = m.LONGITUD,
+                     }).DistinctBy(m => m.CodigoMedico).ToList()
+                );
+
+                await Task.Delay(5);
+
+                if (Medicos is not null)
+                {
+                    if (Medicos.Count > 0)
+                    {
                         Medico = Medicos.FirstOrDefault();
                     }
                     else
@@ -209,12 +240,18 @@ namespace VMedic.MVVM.ViewModels.Visitas
                         MedicoSeleciconado = "No hay medicos disponibles";
                     }
                 }
+
+                await Task.Delay(10);
+
+                Indicador = false;
             }
         }
 
         //metodo paraa solicitar permisos de localización del usuario
         private async void GeolocationsPermissions()
         {
+            await Task.Delay(1000);
+
             var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
             if (status != PermissionStatus.Granted)
             {
@@ -223,38 +260,41 @@ namespace VMedic.MVVM.ViewModels.Visitas
             }
             else
             {
-                LocationTimer = new Timer(5000); // cada 5 segundos
-                LocationTimer.Elapsed += async (s, e) =>
+                try
                 {
-                    LocalizacionUsuario = await Geolocation.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Best));
+                    var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(1));
+                    LocalizacionUsuario = await Geolocation.Default.GetLocationAsync(request);
 
                     if (LocalizacionUsuario != null)
                     {
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
                             Ubicacionimg = "gps_off.png";
+                            AvisoGPS = "GPS No Disponible";
                             await Task.Delay(100);
                             Ubicacionimg = "gps_on.png";
+                            AvisoGPS = "GPS Disponible";
                         });
 
                         FechaGPS = LocalizacionUsuario.Timestamp.LocalDateTime.ToString("yyyyMMdd HH:mm:ss");
                     }
-                };
-                LocationTimer.AutoReset = true;
-                LocationTimer.Enabled = true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("localizacionjdjhdhd" + ex);
+                }
             }
         }
 
         //metodo que llena la lista desplegable de los tipos de visita
         private async void MostrarTiposVisitas()
         {
-            SincronizacionDataBase.ObtenerTiposVisitas();
-            await Task.Delay(1000);
-            var ListaTiposVisitas = App.Tiposvisitas?.GetItems()?.OrderBy(tv => tv.CODIGO_TIPO_VISITA).Select(tv => tv.DESCRIPCION).ToList();
+            var ListaTiposVisitas = (await SincronizacionDataBase.ObtenerTiposVisitas())?.OrderBy(tv => tv.CODIGO_TIPO_VISITA).Select(tv => tv.DESCRIPCION).ToList();
+            await Task.Delay(5);
             if (ListaTiposVisitas is not null)
             {
                 TiposVisitas = new ObservableRangeCollection<string?>(ListaTiposVisitas);
-                await Task.Delay(1000);
+                await Task.Delay(5);
                 TipoVisita = TiposVisitas.FirstOrDefault();
             }
         }
@@ -264,14 +304,14 @@ namespace VMedic.MVVM.ViewModels.Visitas
         {
             DiasSemana = [];
 
-            var dias = new string[] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo", "TODOS" };
+            var dias = new string[] { "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "TODOS" };
 
             foreach (var dia in dias)
             {
                 DiasSemana.Add(dia);
             }
 
-            var diaHoy = (int)DateTime.Today.DayOfWeek;
+            var diaHoy = (int)DateTime.Today.DayOfWeek + 1;
             int indexSeleccionado;
 
             if (diaHoy > 0)
@@ -279,7 +319,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
             else
                 indexSeleccionado = 6;
 
-            await Task.Delay(1000);
+            await Task.Delay(50);
 
             NombreDia = DiasSemana?[indexSeleccionado];
         }
@@ -319,14 +359,14 @@ namespace VMedic.MVVM.ViewModels.Visitas
                 }
                 Semanas?.Add("TODOS");
 
-                await Task.Delay(1000);
+                await Task.Delay(50);
 
                 NumeroSemana = Semanas?[semanaActualMes - 1];
             }
         }
 
         //metodo que cambia la visibilidad de los apartados del formulario de visitas segun el tipo de visita
-        public async void ChangeTipoVisitas()
+        public void ChangeTipoVisitas()
         {
             IDTiposVisitas = App.Tiposvisitas?.GetItems()?.Where(tv => tv.DESCRIPCION == TipoVisita).FirstOrDefault()?.CODIGO_TIPO_VISITA;
             switch (IDTiposVisitas)
@@ -341,7 +381,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
                     VisibilidadMedicos = true;
                     VisibilidadMotivo = true;
                     VisibilidadComentarios = true;
-                    TextoBoton = "Enviar";
+                    TextoBoton = "Enviar Registro de Visita";
                     break;
                 case "3":
                     break;
@@ -360,7 +400,6 @@ namespace VMedic.MVVM.ViewModels.Visitas
                 case "6":
                     break;
                 case "7":
-                    SincronizacionDataBase.ObtenerLugaresdeVentas();
                     VisibilidadNumeroSemana = false;
                     VisibilidadDiaSemana = false;
                     VisibilidadLugarVenta = true;
@@ -368,8 +407,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
                     VisibilidadMedicos = false;
                     VisibilidadMotivo = false;
                     VisibilidadComentarios = true;
-                    TextoBoton = "Enviar";
-                    MostrarLugaresdeVenta();
+                    TextoBoton = "Enviar Registro de Visita";
                     EntradaOp = true;
                     break;
                 case "8":
@@ -390,7 +428,7 @@ namespace VMedic.MVVM.ViewModels.Visitas
                     VisibilidadMedicos = true;
                     VisibilidadMotivo = false;
                     VisibilidadComentarios = true;
-                    TextoBoton = "Enviar";
+                    TextoBoton = "Enviar Registro de Visita";
                     break;
                 default:
                     break;
@@ -402,128 +440,163 @@ namespace VMedic.MVVM.ViewModels.Visitas
         {
             try
             {
-                if (MedicoSeleciconado != "No hay medicos disponibles" || IDTiposVisitas == "7")
+                if (FechaGPS is not null)
                 {
-                    var visitas = new TablaVisitasPendientes
+                    if ((MedicoSeleciconado != "No hay medicos disponibles" || IDTiposVisitas == "7") && Medico is not null)
                     {
-                        CodCliente = Medico?.CodigoMedico,
-                        CodLugar = IDLugaresEventos,
-                        IDTipoVisita = IDTiposVisitas,
-                        Comentarios = IDTiposVisitas == "2" ? Motivo + " " + Comentarios : Comentarios,
-                        CodVendedor = App.Usuario?.GetItem().UsuarioName,
-                        FechaGPS = FechaGPS,
-                        Latitud = LocalizacionUsuario?.Latitude,
-                        Longitud = LocalizacionUsuario?.Longitude
-                    };
+                        var Distancia = CalcularDistancia(Medico.Latitud, Medico.Longitud, LocalizacionUsuario?.Latitude, LocalizacionUsuario?.Longitude) * 1000;
 
-                    var NivelPrecio = Medico?.NivelPrecio;
+                        int Actualizar_ubicacion = 0;
 
-                    if (Preferences.Default.ContainsKey("ModeTipoVisitas"))
-                    {
-                        Preferences.Default.Remove("ModeTipoVisitas");
-                    }
-                    Preferences.Default.Set("ModeTipoVisitas", 1);
-
-                    var count = 0;
-                    if (App.Usuario?.GetItem().UbicacionRequerida == 1)
-                    {
-                        if (count < 3)
+                        if (Distancia > 100 && IDTiposVisitas != "7")
                         {
-                            IsLocationImportant = true;
-                            count++;
-                        }
-                        else if (count > 2)
-                        {
-                            IsLocationImportant = false;
-                            count = 0;
-                        }
-                    }
-                    else
-                    {
-                        IsLocationImportant = false;
-                    }
+                            var MainPage = App.Current?.Windows[0].Page;
 
-                    if (IsLocationImportant)
-                    {
-                        if (LocalizacionUsuario?.Longitude.ToString().Replace(",", ".") == "0"
-                            || LocalizacionUsuario?.Latitude.ToString().Replace(",", ".") == "0"
-                            || LocalizacionUsuario?.Longitude.ToString().Replace(",", ".") == ""
-                            || LocalizacionUsuario?.Latitude.ToString().Replace(",", ".") == ""
-                            )
-                        {
-                            ToastMaker.Make("Espere mientras el GPS obtiene su ubicación", App.Current?.Windows[0].Page);
-                            return;
+                            if (MainPage is not null)
+                            {
+                                var Opciones = await MainPage.DisplayAlert("Advertencia", "La ubicación del médico no se encuentra en el área en que intenta registrar la visita, ¿Desea actualizar la ubicación del médico?", "Sí", "No");
+
+                                if (Opciones)
+                                {
+                                    Actualizar_ubicacion = 1;
+                                }
+                                else
+                                {
+                                    Actualizar_ubicacion = -1;
+                                }
+                            }
                         }
                         else
                         {
-                            if (IDTiposVisitas == "7")
-                            {
-                                if (EntradaOp)
-                                {
-                                    visitas.Comentarios = "ENTRADA. " + Comentarios;
-                                }
-
-                                if (SalidaOp)
-                                {
-                                    visitas.Comentarios = "SALIDA. " + Comentarios;
-                                }
-
-                                if (Preferences.Default.ContainsKey("ModeTipoVisitas"))
-                                {
-                                    Preferences.Default.Remove("ModeTipoVisitas");
-                                }
-                                Preferences.Default.Set("ModeTipoVisitas", 2);
-                            }
-                            else if (IDTiposVisitas == "8")
-                            {
-                                await Shell.Current.Navigation.PushAsync(new EvaluacionesView(visitas, NivelPrecio));
-                                return;
-                            }
+                            Actualizar_ubicacion = 0;
                         }
-                    }
-                    else
-                    {
-                        if (IDTiposVisitas == "2" && Motivo == "Otro" && Comentarios == "")
-                        {
-                            ToastMaker.Make("Digite un comentario por favor", App.Current?.Windows[0].Page);
-                            return;
-                        }
-                        else if (IDTiposVisitas == "5")
-                        {
-                            await MopupService.Instance.PushAsync(new PromocionalesView(visitas, NivelPrecio));
-                            return;
-                        }
-                        else if (IDTiposVisitas == "7")
-                        {
-                            if (EntradaOp)
-                            {
-                                visitas.Comentarios = "ENTRADA. " + Comentarios;
-                            }
 
-                            if (SalidaOp)
+                        if (Actualizar_ubicacion > -1)
+                        {
+                            var visitas = new TablaVisitasPendientes
                             {
-                                visitas.Comentarios = "SALIDA. " + Comentarios;
-                            }
+                                CodCliente = Medico?.CodigoMedico,
+                                CodLugar = IDLugaresEventos,
+                                IDTipoVisita = IDTiposVisitas,
+                                Comentarios = IDTiposVisitas == "2" ? Motivo + " " + Comentarios : Comentarios,
+                                CodVendedor = App.Usuario?.GetItem().UsuarioName,
+                                FechaGPS = FechaGPS,
+                                Latitud = LocalizacionUsuario?.Latitude,
+                                Longitud = LocalizacionUsuario?.Longitude
+                            };
 
                             if (Preferences.Default.ContainsKey("ModeTipoVisitas"))
                             {
                                 Preferences.Default.Remove("ModeTipoVisitas");
                             }
-                            Preferences.Default.Set("ModeTipoVisitas", 2);
-                        }
-                        else if (IDTiposVisitas == "8")
-                        {
-                            await Shell.Current.Navigation.PushAsync(new EvaluacionesView(visitas, NivelPrecio));
-                            return;
+                            Preferences.Default.Set("ModeTipoVisitas", 1);
+
+                            var count = 0;
+                            if (App.Usuario?.GetItem().UbicacionRequerida == 1)
+                            {
+                                if (count < 3)
+                                {
+                                    IsLocationImportant = true;
+                                    count++;
+                                }
+                                else if (count > 2)
+                                {
+                                    IsLocationImportant = false;
+                                    count = 0;
+                                }
+                            }
+                            else
+                            {
+                                IsLocationImportant = false;
+                            }
+
+                            if (IsLocationImportant)
+                            {
+                                if (LocalizacionUsuario?.Longitude.ToString().Replace(",", ".") == "0"
+                                    || LocalizacionUsuario?.Latitude.ToString().Replace(",", ".") == "0"
+                                    || LocalizacionUsuario?.Longitude.ToString().Replace(",", ".") == ""
+                                    || LocalizacionUsuario?.Latitude.ToString().Replace(",", ".") == ""
+                                    )
+                                {
+                                    ToastMaker.Make("Espere mientras el GPS obtiene su ubicación", App.Current?.Windows[0].Page);
+                                    return;
+                                }
+                                else
+                                {
+                                    if (IDTiposVisitas == "7")
+                                    {
+                                        if (EntradaOp)
+                                        {
+                                            visitas.Comentarios = "ENTRADA. " + Comentarios;
+                                        }
+
+                                        if (SalidaOp)
+                                        {
+                                            visitas.Comentarios = "SALIDA. " + Comentarios;
+                                        }
+
+                                        if (Preferences.Default.ContainsKey("ModeTipoVisitas"))
+                                        {
+                                            Preferences.Default.Remove("ModeTipoVisitas");
+                                        }
+                                        Preferences.Default.Set("ModeTipoVisitas", 2);
+                                    }
+                                    else if (IDTiposVisitas == "8")
+                                    {
+                                        await Shell.Current.Navigation.PushAsync(new EvaluacionesView(visitas, Actualizar_ubicacion));
+                                        return;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (IDTiposVisitas == "2" && Motivo == "Otro" && Comentarios == "")
+                                {
+                                    ToastMaker.Make("Digite un comentario por favor", App.Current?.Windows[0].Page);
+                                    return;
+                                }
+                                else if (IDTiposVisitas == "5")
+                                {
+                                    await MopupService.Instance.PushAsync(new PromocionalesView(visitas, Actualizar_ubicacion));
+                                    return;
+                                }
+                                else if (IDTiposVisitas == "7")
+                                {
+                                    if (EntradaOp)
+                                    {
+                                        visitas.Comentarios = "ENTRADA. " + Comentarios;
+                                    }
+
+                                    if (SalidaOp)
+                                    {
+                                        visitas.Comentarios = "SALIDA. " + Comentarios;
+                                    }
+
+                                    if (Preferences.Default.ContainsKey("ModeTipoVisitas"))
+                                    {
+                                        Preferences.Default.Remove("ModeTipoVisitas");
+                                    }
+                                    Preferences.Default.Set("ModeTipoVisitas", 2);
+                                }
+                                else if (IDTiposVisitas == "8")
+                                {
+                                    await Shell.Current.Navigation.PushAsync(new EvaluacionesView(visitas, Actualizar_ubicacion));
+                                    return;
+                                }
+                            }
+
+                            //1 = visitas ------- 2 = visitas ENTRADA Y SALIDA
+                            EnviarDatos(visitas, Actualizar_ubicacion);
                         }
                     }
-
-                    //1 = visitas ------- 2 = visitas ENTRADA Y SALIDA
-                    EnviarDatos(visitas);
+                    else
+                    {
+                        ToastMaker.Make("Debe seleccionar una semana y un día en el que hayan médicos disponibles", App.Current?.Windows[0].Page);
+                    }
                 }
                 else
                 {
-                    ToastMaker.Make("Debe seleccionar una semana y un día en el que hayan médicos disponibles", App.Current?.Windows[0].Page);
+                    ToastMaker.Make("La fecha actual no se a capturado correctamente, intente de nuevo más tarde", App.Current?.Windows[0].Page);
                 }
             }
             catch (Exception ex)
@@ -533,58 +606,86 @@ namespace VMedic.MVVM.ViewModels.Visitas
         }
 
         //metodo para enviar datos por api rest si el tipo de visita corresponde al ID de 
-        private async void EnviarDatos(TablaVisitasPendientes visitas)
+        private async void EnviarDatos(TablaVisitasPendientes visitas, int actualizar_ubicacion)
         {
             var SolicitudEnviar = new TablaSolicitudesNoEnviadas
             {
+                IDSolicitud = Preferences.Default.Get("ModeTipoVisitas", -1) == 1 ?
+                                    App.SolicitudesPendientes?.GetItems()?.Where(S => S.OperacionID == "VMedicA017").ToList().Count
+                                    : App.SolicitudesPendientes?.GetItems()?.Where(S => S.OperacionID == "VMedicA038").ToList().Count,
                 OperacionID = Preferences.Default.Get("ModeTipoVisitas", -1) == 1 ?
-                                    $"VMedicA017" //insertar visitas
+                                    $"VMedicA017" //insertar visitas no efectivas u otras visitas
                                     : $"VMedicA038",//insertar visitas ENTRADA SALIDA
                 Parametros = Preferences.Default.Get("ModeTipoVisitas", -1) == 1 ?
-                                    $"'{visitas.CodVendedor}','{visitas.CodCliente}','{IDTiposVisitas}','{visitas.Comentarios}','{visitas.FechaGPS}','{visitas.Longitud}','{visitas.Latitud}'"
+                                    $"'{visitas.CodVendedor}','{visitas.CodCliente}','{IDTiposVisitas}','{visitas.Comentarios}','{visitas.FechaGPS}','{visitas.Longitud}','{visitas.Latitud}','{Medico?.Latitud}','{Medico?.Longitud}',{actualizar_ubicacion}"
                                     : $"'{visitas.CodVendedor}','{visitas.CodLugar}','{IDTiposVisitas}','{visitas.Comentarios}','{visitas.FechaGPS}','{visitas.Longitud}','{visitas.Latitud}'",
                 ClavesVacias = 0,
                 TipoRestService = 1,
                 CodigoCliente = visitas.CodCliente,
+                ModuloSolicitud = 1
             };
 
-            if (IsInternet.Avilable())
+            var datos = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"{SolicitudEnviar.OperacionID}/{SolicitudEnviar.Parametros}", null))?.FirstOrDefault();
+            if (datos is not null)
             {
-                var datos = (await servicio.ResultadoGET<Resultado>($"{SolicitudEnviar.OperacionID}/{SolicitudEnviar.Parametros}", null))?.FirstOrDefault();
-                if (datos is not null)
+                switch (datos.MSG)
                 {
-                    switch (datos.MSG)
-                    {
-                        case "1":
-                            ToastMaker.Make("Datos enviados con éxito", App.Current?.Windows[0].Page);
-                            var DoctorSeleciconado = App.Doctores?.GetItems()?.Where(D => D.CODIGO_DE_CLIENTE == visitas.CodCliente).FirstOrDefault();
-                            if (DoctorSeleciconado is not null)
-                            {
-                                DoctorSeleciconado.Visitas = 1;
-                                App.Doctores?.UpdateITEM(DoctorSeleciconado);
-                            }
-                            break;
-                        case "2":
-                            ToastMaker.Make("Médico no existente, enviar datos de médico primero", App.Current?.Windows[0].Page);
-                            break;
-                        case "3":
-                            ToastMaker.Make("No tiene permisos para el registro de visitas", App.Current?.Windows[0].Page);
-                            break;
-                        default:
-                            ToastMaker.Make("Lo sentimos, ha ocurrido un error inesperado", App.Current?.Windows[0].Page);
-                            break;
-                    }
+                    case "1":
+                        ToastMaker.Make("Datos enviados con éxito", App.Current?.Windows[0].Page);
+                        break;
+                    case "2":
+                        ToastMaker.Make("Médico no existente, enviar datos de médico primero", App.Current?.Windows[0].Page);
+                        break;
+                    case "3":
+                        ToastMaker.Make("No tiene permisos para el registro de visitas", App.Current?.Windows[0].Page);
+                        break;
+                    default:
+                        ToastMaker.Make("Lo sentimos, ha ocurrido un error inesperado", App.Current?.Windows[0].Page);
+                        break;
                 }
             }
-            else
+            else if (DatosCompartidos.ErrorResponseValue is not null)
             {
-                ToastMaker.Make("No hay conexión a Internet, verifique su plan de datos para enviar la visita pendiente", App.Current?.Windows[0].Page);
-                App.SolicitudesPendientes?.InsertItem(SolicitudEnviar);
-                if (DatosCompartidos.Lbl_CatntidadPendientes_Visitas is not null)
+                DatosCompartidos.CantidadIntentos++;
+
+                if (DatosCompartidos.CantidadIntentos == 4)
                 {
-                    DatosCompartidos.Lbl_CatntidadPendientes_Visitas.Text = App.SolicitudesPendientes?.GetItems()?.Where(SP => DatosCompartidos.OperacionesIDVisitas.Contains(SP.OperacionID)).ToList().Count.ToString();
+                    App.Current?.Windows[0].Page?.DisplayAlert("No fue posible completar el envío", "Después de 3 intentos, el registro se ha almacenado de forma local en el módulo de sincronización, ubicación en la que se podrá enviar nuevamente más tarde", "OK");
+                    App.SolicitudesPendientes?.InsertItem(SolicitudEnviar);
+                    DatosCompartidos.CantidadIntentos = 0;
+                }
+                else
+                {
+                    ToastMaker.Make(DatosCompartidos.ErrorResponseValue.FirstOrDefault().Value, App.Current?.Windows[0].Page);
                 }
             }
+        }
+
+        public static double CalcularDistancia(double LatA, double LonA, double? LatB, double? LonB)
+        {
+            if (LatB is not null && LonB is not null)
+            {
+                const double radioTierraKm = 6371.0;
+
+                double lat1Rad = LatA * Math.PI / 180.0;
+                double lat2Rad = (double)LatB * Math.PI / 180.0;
+
+                double deltaLat = ((double)LatB - LatA) * Math.PI / 180.0;
+                double deltaLon = ((double)LonB - LonA) * Math.PI / 180.0;
+
+                double a =
+                    Math.Sin(deltaLat / 2) * Math.Sin(deltaLat / 2) +
+                    Math.Cos(lat1Rad) *
+                    Math.Cos(lat2Rad) *
+                    Math.Sin(deltaLon / 2) *
+                    Math.Sin(deltaLon / 2);
+
+                double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+                return radioTierraKm * c;
+            }
+
+            return 0.0;
         }
     }
 }

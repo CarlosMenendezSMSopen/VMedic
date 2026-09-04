@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
@@ -20,15 +19,15 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>VMedic</ApplicationTitle>
+		<ApplicationTitle>VMedicCore</ApplicationTitle>
 	
 		<!-- App Identifier -->
 		<ApplicationId>com.softwaremobilesolutions.vmedic</ApplicationId>
 
 		<!-- Versions -->
-		<!-- Published Versions === Android 0 (0.0.0) || iOS 0 (0.0.0) -->
-		<!-- VMEDIC 1 1 2.0.0 -->
-		<ApplicationDisplayVersion>2.0.0</ApplicationDisplayVersion>
+		<!-- Published Versions === Android 3 (2.0.0) || iOS 1 (2.0.0) -->
+		<!-- VMEDIC 3 1 2.0.1 -->
+		<ApplicationDisplayVersion>2.1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
@@ -36,7 +35,7 @@
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">23.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
@@ -52,16 +51,12 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
-		<ApplicationVersion>1</ApplicationVersion> <!--VERSION DE COMPILACION DE IOS-->
+		<ApplicationVersion>2</ApplicationVersion> <!--VERSION DE COMPILACION DE IOS-->
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
-		<ApplicationVersion>2</ApplicationVersion> <!--VERSION DE COMPILACION DE ANDROID-->
-		<usemaui>true</usemaui>
-		<targetandroidversion>35</targetandroidversion>
-		<targetsdkversion>35</targetsdkversion>
-		<supportedosplatformversion>23</supportedosplatformversion>
+		<ApplicationVersion>3</ApplicationVersion> <!--VERSION DE COMPILACION DE ANDROID-->
 	</PropertyGroup>
 
 	<!--Publicar en IOS-->
@@ -98,12 +93,16 @@
 		<AndroidSigningStorePass></AndroidSigningStorePass>
 		<AndroidSigningKeyStore>C:\Users\Desarrollador\AppData\Local\Xamarin\Mono for Android\Keystore\vmedic\vmedic.keystore</AndroidSigningKeyStore>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
+	  <EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
+	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\ic_launcher.png" />
 
-		<!-- Images -->
+		<!-- Images ==== Imagen 114 x 94 ==== Fondo -->
 		<MauiImage Include="Resources\Images\*" />
 		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
 		
@@ -113,7 +112,7 @@
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 
-		<MauiSplashScreen Include="Resources\Splash\ic_launcher_icon.png" Color="#FFF" />
+		<MauiSplashScreen Include="Resources\Splash\ic_launcher_icon.png" Color="#F7FCFE" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -129,31 +128,35 @@
 	</ItemGroup>
 		
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="12.2.0" />
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.120" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.10" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.120" />
-		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="9.0.120" />
-		<PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.120" />
-		<PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.120" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.111" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.11" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.111" />
+		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="9.0.111" />
+		<PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.111" />
+		<PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.111" />
 		<PackageReference Include="Mopups" Version="1.3.4" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
-		<PackageReference Include="SkiaSharp" Version="3.119.1" />
-		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+		<PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
+		<PackageReference Include="SkiaSharp" Version="4.151.1" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.11.285" />
 		<PackageReference Include="SQLiteNetExtensions" Version="2.1.0" />
-		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.2" />
-		<PackageReference Include="Syncfusion.Licensing" Version="31.2.4" />
-		<PackageReference Include="Syncfusion.Maui.Calendar" Version="31.2.4" />
-		<PackageReference Include="Syncfusion.Maui.Core" Version="31.2.4" />
-		<PackageReference Include="Syncfusion.Maui.Gauges" Version="31.2.4" />
-		<PackageReference Include="Syncfusion.Maui.Inputs" Version="31.2.4" />
-		<PackageReference Include="Syncfusion.Maui.Scheduler" Version="31.2.4" />
+		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
+		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.13" />
+		<PackageReference Include="Syncfusion.Licensing" Version="34.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Buttons" Version="34.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Calendar" Version="34.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Core" Version="34.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Gauges" Version="34.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Inputs" Version="34.2.4" />
+		<PackageReference Include="Syncfusion.Maui.Scheduler" Version="34.2.4" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Folder Include="MVVM\Models\SKObjects\" />
+	  <Folder Include="Platforms\Android\Resources\xml\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -191,6 +194,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="MVVM\Views\Planificacion\PlanificacionView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="MVVM\Views\Sincronizaciones\SincronizacionView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="MVVM\Views\Visitas\CapturarFirmaView.xaml">

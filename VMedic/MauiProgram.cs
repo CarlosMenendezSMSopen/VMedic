@@ -5,6 +5,7 @@ using Mopups.PreBaked.PopupPages.Login;
 using Syncfusion.Maui.Core.Hosting;
 using VMedic.MVVM.ViewModels.Visitas;
 using VMedic.MVVM.Views;
+using VMedic.MVVM.Views.Planificacion;
 using VMedic.MVVM.Views.Visitas;
 using VMedic.Utilidades;
 
@@ -35,10 +36,6 @@ namespace VMedic
 
             builder.Services.AddTransient<LoginView>();
             builder.Services.AddTransient<LoginViewModel>();
-
-            builder.Services.AddTransient<VisitasView>();
-            builder.Services.AddTransient<VisitasViewModel>();
-            builder.Services.AddTransient<MedicosView>();
 
             builder.ConfigureMauiHandlers(handlers =>
             {

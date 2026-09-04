@@ -9,14 +9,13 @@ namespace VMedic.MVVM.Views.Visitas;
 public partial class EvaluacionesView : ContentPage
 {
     private TablaVisitasPendientes? Visitas { get; set; }
-    private string? NivelPRecio { get; set; }
-    public EvaluacionesView(TablaVisitasPendientes visitas, string? nivelPrecio)
+    private bool Cargado { get; set; } = false;
+    public EvaluacionesView(TablaVisitasPendientes visitas, int actualizar_ubicacion)
     {
         InitializeComponent();
         DatosCompartidos.ListaEvaluaciones = List_Evaluaciones;
-        BindingContext = new EvaluacionesViewModel(visitas, nivelPrecio);
+        BindingContext = new EvaluacionesViewModel(visitas, actualizar_ubicacion);
         Visitas = visitas;
-        NivelPRecio = nivelPrecio;
         nombre_doctor.Text = App.Doctores?.GetItems()?.Where(D => D.CODIGO_DE_CLIENTE == Visitas?.CodCliente).Select(D => D.CODIGO_DE_CLIENTE + " - " + D.NOMBRE_COMERCIAL).FirstOrDefault();
         var firmaEvaluacion = App.Evaluacionencabezado?.GetItems()?.FirstOrDefault(Eenc => Eenc.IdCliente == visitas.CodCliente)?.Base64Image;
         if (firmaEvaluacion is not null && firmaEvaluacion != "")
@@ -43,19 +42,20 @@ public partial class EvaluacionesView : ContentPage
             };
             App.Evaluacionencabezado?.InsertItem(tablaEncabezadoEvaluacion);
         }
-        Shell.Current.Navigation.PushAsync(new NuevaEvaluacionView(Visitas?.CodCliente, NivelPRecio));
+        Shell.Current.Navigation.PushAsync(new NuevaEvaluacionView(Visitas?.CodCliente));
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
-        if (DatosCompartidos.StatusVolver == 1)
+        if (Cargado)
         {
             var vm = (EvaluacionesViewModel)BindingContext;
             vm.MostrarEvaluaciones();
-            DatosCompartidos.StatusVolver = 0;
         }
+
+        Cargado = true;
     }
 
     private async void btn_sign_Clicked(object sender, EventArgs e)

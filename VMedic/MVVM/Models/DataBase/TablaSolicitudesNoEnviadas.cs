@@ -11,12 +11,14 @@ namespace VMedic.MVVM.Models.DataBase
     [Table("SOLICITUDES_NO_ENVIADAS")]
     public class TablaSolicitudesNoEnviadas : TableData
     {
+        public int? IDSolicitud { get; set; }
         public string? OperacionID { get; set; }
         public string? Parametros { get; set; }
         public int ClavesVacias { get; set; } //0 == NO \\ 1 == SI
         public int TipoRestService { get; set; }
         public string? CodigoCliente { get; set; }
-        public string? IDSolicitudPadre { get; set; }
+        public int? IDSolicitudPadre { get; set; }
         public string? OperacionIdPadre { get; set; }
+        public int? ModuloSolicitud { get; set; }
     }
 }

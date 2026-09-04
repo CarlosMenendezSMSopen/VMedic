@@ -36,12 +36,9 @@ namespace VMedic.MVVM.ViewModels.Visitas
         private string? _observaciones;
         public dynamic? Producto { get; set; }
         private string? CodigoCliente { get; set; }
-        private string? NiveldePRecio { get; set; }
-        public NuevaEvaluacionViewModel(string? codCliente, string? nivelPRecio)
+        public NuevaEvaluacionViewModel(string? codCliente)
         {
             CodigoCliente = codCliente;
-            NiveldePRecio = nivelPRecio;
-            SincronizacionDataBase.ObtenerSKUProductos();
             MostrarProductos();
             ValidarEditar();
         }
@@ -49,7 +46,8 @@ namespace VMedic.MVVM.ViewModels.Visitas
         //metodo para llenar la lista desplegable de los productos
         private async void MostrarProductos()
         {
-            var ListaMuestras = App.Muestras?.GetItems();
+            var ListaMuestras = await SincronizacionDataBase.ObtenerMuestras();
+            await Task.Delay(1000);
             if (ListaMuestras is not null)
             {
                 Productos = new ObservableRangeCollection<dynamic>(ListaMuestras.Select(m => new
@@ -59,30 +57,29 @@ namespace VMedic.MVVM.ViewModels.Visitas
                     Cantidad = m.CANT_DISPONIBLE,
                 }).ToList());
                 await Task.Delay(1000);
-                Producto = Productos.FirstOrDefault();
+                Producto = Productos.FirstOrDefault(P => DatosCompartidos.EvaluacionEditar is not null ? P.ID == DatosCompartidos.EvaluacionEditar.IdProducto : true);
             }
         }
 
         //metodo para llenar la lista desplegable de las presentaciones SKU
         public async void MostrarPresentaciones()
         {
-            var ListaPresentaciones = App.Skuproductos?.GetItems()?.Where(SKU => SKU.PRODUCTO == Producto?.ID).Select(SKU => SKU.CODIGO_UNIDAD_VENTA).ToList();
+            var ListaPresentaciones = (await SincronizacionDataBase.ObtenerSKUProductos())?.Where(SKU => SKU.PRODUCTO == Producto?.ID).Select(SKU => SKU.CODIGO_UNIDAD_VENTA).ToList();
+            await Task.Delay(1000);
             if (ListaPresentaciones is not null)
             {
                 SKUs = new ObservableRangeCollection<string?>(ListaPresentaciones);
                 await Task.Delay(1000);
-                SKU = SKUs.FirstOrDefault();
+                SKU = SKUs.FirstOrDefault(SKU => DatosCompartidos.EvaluacionEditar is not null ? SKU == DatosCompartidos.EvaluacionEditar.Presentacion : true);
             }
         }
 
         //metodo que valida si se puede editar
         private async void ValidarEditar()
         {
-            await Task.Delay(1000);
+            await Task.Delay(50);
             if (DatosCompartidos.EvaluacionEditar is not null)
             {
-                Producto = Productos?.FirstOrDefault(P => P.ID == DatosCompartidos.EvaluacionEditar.IdProducto);
-                SKU = SKUs?.FirstOrDefault(sku => sku == DatosCompartidos.EvaluacionEditar.Presentacion);
                 Cantidad = DatosCompartidos.EvaluacionEditar.Cantidad;
                 Observaciones = DatosCompartidos.EvaluacionEditar.Observaciones;
             }
@@ -128,7 +125,6 @@ namespace VMedic.MVVM.ViewModels.Visitas
                                 }
                                 else
                                 {
-                                    DatosCompartidos.StatusVolver = 1;
                                     await Shell.Current.Navigation.PopAsync();
                                 }
                             }
@@ -176,9 +172,10 @@ namespace VMedic.MVVM.ViewModels.Visitas
                                 App.Evaluaciondetalles?.UpdateITEM(EvaluacionEditada);
                                 App.Muestras?.UpdateITEM(MuestraSeleciconada);
 
-                                App.Current?.Windows[0].Page?.DisplayAlert("Información", "Datos actualizados con éxito.", "ACEPTAR");
+                                await App.Current?.Windows[0].Page?.DisplayAlert("Información", "Datos actualizados con éxito.", "ACEPTAR");
 
-                                DatosCompartidos.StatusVolver = 1;
+                                DatosCompartidos.EvaluacionEditar = null;
+
                                 await Shell.Current.Navigation.PopAsync();
                             }
                             else

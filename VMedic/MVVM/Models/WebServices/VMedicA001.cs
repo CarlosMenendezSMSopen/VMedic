@@ -11,5 +11,6 @@ namespace VMedic.MVVM.Models.WebServices
         public int CODIGO_VENDEDOR { get; set; }
         public int UBICACION_REQUERIDA { get; set; }
         public int? CODIGO_PORTAFOLIO { get; set; }
+        public int? CODIGO_COMPANIA { get; set; }
     }
 }

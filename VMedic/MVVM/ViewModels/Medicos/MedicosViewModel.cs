@@ -1,17 +1,20 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Maui.Controls.Shapes;
 using Mopups.Services;
 using PropertyChanged;
+using Syncfusion.Maui.Scheduler;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using VMedic.Global;
 using VMedic.Behaviors;
+using VMedic.Global;
+using VMedic.MVVM.Views.Médicos;
 using VMedic.Servicios;
 using VMedic.Utilidades;
-using VMedic.MVVM.Views.Médicos;
 
 namespace VMedic.MVVM.ViewModels.Medicos
 {
@@ -27,6 +30,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
         [ObservableProperty]
         private bool _isRefreshing;
         public List<dynamic>? Medicos { get; set; }
+        SfScheduler? Calendario { get; set; }
         public MedicosViewModel()
         {
             MostrarMedicos();
@@ -38,26 +42,25 @@ namespace VMedic.MVVM.ViewModels.Medicos
             MostrarMedicos();
         }
 
-
         //metodo para formar la lista de los medicos desde 2 registros de la base de datos local
         public async void MostrarMedicos()
         {
             Indicador = true;
             TextoAviso = false;
+            Medicos?.Clear();
             DatosCompartidos.ListaMedicos?.Children.Clear();
+            var ListaEspecialidad = await SincronizacionDataBase.ObtenerEspecialidades();
+            var ListaClientes = await SincronizacionDataBase.ObtenerDoctores();
+
+            await Task.Delay(250);
             await Task.Run(() =>
             {
                 try
                 {
-                    SincronizacionDataBase.ObtenerDoctores();
-
-                    var ListaEspecialidad = App.Especialidades?.GetItems();
-                    var ListaClientes = App.Doctores?.GetItems();
                     if (ListaEspecialidad is not null && ListaClientes is not null && DatosCompartidos.TextoBusquedaMedicos is not null)
                     {
                         var ListaMedicos = (from c in ListaClientes
-                                            join e in ListaEspecialidad on c.CODIGO_DE_CLASE equals e.CODIGO_DE_CLASE
-                                            orderby c.NOMBRE_COMERCIAL
+                                            join e in ListaEspecialidad on c.CODIGO_DE_CLASE?.Trim() equals e.CODIGO_DE_CLASE
                                             where DatosCompartidos.TextoBusquedaMedicos == "" || (c.NOMBRE_COMERCIAL is not null && c.NOMBRE_COMERCIAL.Contains(DatosCompartidos.TextoBusquedaMedicos, StringComparison.OrdinalIgnoreCase)) || (e.DESCRIPCION_CLASE is not null && e.DESCRIPCION_CLASE.Contains(DatosCompartidos.TextoBusquedaMedicos, StringComparison.OrdinalIgnoreCase))
                                             select new
                                             {
@@ -66,7 +69,11 @@ namespace VMedic.MVVM.ViewModels.Medicos
                                                 e.CODIGO_DE_CLASE,
                                                 e.DESCRIPCION_CLASE,
                                                 c.LATITUD,
-                                                c.LONGITUD
+                                                c.LONGITUD,
+                                                c.COLOR,
+                                                c.DIRECCION_EMAIL,
+                                                c.TELEFONO_CLIENTE,
+                                                c.DIRECCION_CLIENTE
                                             }).ToList();
                         Medicos = [.. ListaMedicos.Cast<dynamic>()];
                         GenerarListaCustom(0);
@@ -78,20 +85,17 @@ namespace VMedic.MVVM.ViewModels.Medicos
                     {
                         Indicador = false;
                         IsRefreshing = false;
-                        ExceptionMessageMaker.Make("Error carga evaluaciones", ex.ToString(), ex.Message, App.Current?.Windows[0].Page);
+                        ExceptionMessageMaker.Make("Error carga medicos", ex.ToString(), ex.Message, App.Current?.Windows[0].Page);
                     });
                 }
                 finally
                 {
-                    App.Current?.Dispatcher.Dispatch(delegate
+                    Indicador = false;
+                    IsRefreshing = false;
+                    if (Medicos?.Count == 0)
                     {
-                        Indicador = false;
-                        IsRefreshing = false;
-                        if (DatosCompartidos.ListaMedicos?.Children.Count == 0)
-                        {
-                            TextoAviso = true;
-                        }
-                    });
+                        TextoAviso = true;
+                    }
                 }
             });
         }
@@ -106,58 +110,33 @@ namespace VMedic.MVVM.ViewModels.Medicos
                 {
                     foreach (var medico in lista)
                     {
-                        var container = new Grid
+                        var borderContainer = new Border
                         {
-                            Margin = new Thickness(15, 0),
+                            Margin = new Thickness(15, 5),
+                            Background = new LinearGradientBrush
+                            {
+                                StartPoint = new Point(0, 0),
+                                EndPoint = new Point(1, 0),
+                                GradientStops =
+                                {
+                                    new GradientStop
+                                    {
+                                        Color = Color.FromArgb("#f4fbfd"),
+                                        Offset = 0.0f
+                                    },
+                                    new GradientStop
+                                    {
+                                        Color = Color.FromArgb("#f8fdff"),
+                                        Offset = 1.0f
+                                    },
+                                }
+                            },
+                            StrokeShape = new RoundRectangle
+                            {
+                                CornerRadius = 10,
+                            },
                             BindingContext = medico,
                         };
-                        container.ColumnDefinitions.Add(new ColumnDefinition());
-
-                        container.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                        container.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                        container.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-                        var lbl_NombreMedico = new Label
-                        {
-                            Text = medico.NOMBRE_COMERCIAL,
-                            FontSize = 14,
-                            FontAttributes = FontAttributes.Bold,
-                            TextColor = Colors.Black,
-                            HorizontalOptions = LayoutOptions.Start,
-                            VerticalOptions = LayoutOptions.Center
-                        };
-
-                        Grid.SetRow(lbl_NombreMedico, 0);
-                        Grid.SetColumn(lbl_NombreMedico, 0);
-
-                        var lbl_especialidad = new Label
-                        {
-                            Text = medico.DESCRIPCION_CLASE,
-                            FontSize = 12,
-                            FontAttributes = FontAttributes.Bold,
-                            TextColor = Colors.Black,
-                            HorizontalOptions = LayoutOptions.Start,
-                            VerticalOptions = LayoutOptions.Center
-                        };
-
-                        Grid.SetRow(lbl_especialidad, 1);
-                        Grid.SetColumn(lbl_especialidad, 0);
-
-                        var frame = new Border
-                        {
-                            Stroke = Colors.Black,
-                            BackgroundColor = Colors.Black,
-                            Margin = new Thickness(0, 10),
-                            HeightRequest = 1.5,
-                        };
-
-                        Grid.SetRow(frame, 2);
-                        Grid.SetColumn(frame, 0);
-
-                        container.Children.Add(frame);
-
-                        container.Children.Add(lbl_NombreMedico);
-                        container.Children.Add(lbl_especialidad);
 
                         var tapGestureRecognizer = new TapGestureRecognizer();
                         tapGestureRecognizer.Tapped += (s, e) =>
@@ -166,18 +145,105 @@ namespace VMedic.MVVM.ViewModels.Medicos
                             {
                                 PressedPreferences.Pressing(s);
 
-                                dynamic? medicoContext = ((Grid?)s)?.BindingContext;
+                                dynamic? medicoContext = ((Border?)s)?.BindingContext;
 
                                 MopupService.Instance.PopAllAsync();
                                 Shell.Current.Navigation.PushAsync(new InformacionMedicoView(medicoContext?.CODIGO_DE_CLIENTE));
                             }
                         };
 
-                        container.GestureRecognizers.Add(tapGestureRecognizer);
+                        borderContainer.GestureRecognizers.Add(tapGestureRecognizer);
+
+                        var gridMain = new Grid
+                        {
+                            ColumnSpacing = 5,
+                            RowSpacing = 5,
+                        };
+
+                        gridMain.AddColumnDefinition(new ColumnDefinition { Width = 15 });
+                        gridMain.AddColumnDefinition(new ColumnDefinition());
+                        gridMain.AddColumnDefinition(new ColumnDefinition { Width = GridLength.Auto });
+                        gridMain.AddColumnDefinition(new ColumnDefinition { Width = 10 });
+
+                        gridMain.AddRowDefinition(new RowDefinition());
+                        gridMain.AddRowDefinition(new RowDefinition());
+                        gridMain.AddRowDefinition(new RowDefinition());
+                        gridMain.AddRowDefinition(new RowDefinition());
+
+                        var GridColor = new Grid
+                        {
+                            BackgroundColor = medico.COLOR == "Azul" ? Colors.Blue : medico.COLOR == "Rojo" ? Colors.Red : medico.COLOR == "Amarillo" ? Colors.Yellow : medico.COLOR == "Verde" ? Colors.Green : Colors.White,
+                            Margin = new Thickness(0, 0, 7.5, 0),
+                        };
+
+                        Grid.SetColumn(GridColor, 0);
+                        Grid.SetRow(GridColor, 0);
+                        Grid.SetRowSpan(GridColor, 4);
+
+                        var lblNombre = new Label
+                        {
+                            Text = medico.NOMBRE_COMERCIAL,
+                            Margin = new Thickness(0, 10, 0, 0),
+                            FontAttributes = FontAttributes.Bold,
+                            FontSize = 15,
+                        };
+
+                        Grid.SetColumn(lblNombre, 1);
+                        Grid.SetRow(lblNombre, 0);
+                        Grid.SetColumnSpan(lblNombre, 2);
+
+                        var lblEspecialidad = new Label
+                        {
+                            Text = medico.DESCRIPCION_CLASE,
+                            FontAttributes = FontAttributes.Bold,
+                            FontSize = 12,
+                        };
+
+                        Grid.SetColumn(lblEspecialidad, 1);
+                        Grid.SetRow(lblEspecialidad, 1);
+
+                        var lblCorreo = new Label
+                        {
+                            Text = medico.DIRECCION_EMAIL,
+                            FontSize = 13,
+                        };
+
+                        Grid.SetColumn(lblCorreo, 1);
+                        Grid.SetRow(lblCorreo, 2);
+
+                        var lblTelefono = new Label
+                        {
+                            Text = medico.TELEFONO_CLIENTE,
+                            FontSize = 13,
+                        };
+
+                        Grid.SetColumn(lblTelefono, 2);
+                        Grid.SetRow(lblTelefono, 2);
+
+                        var lblDireccion = new Label
+                        {
+                            Margin = new Thickness(0, 0, 0, 10),
+                            Text = medico.DIRECCION_CLIENTE,
+                            FontSize = 14,
+                        };
+
+                        Grid.SetColumn(lblDireccion, 1);
+                        Grid.SetColumnSpan(lblDireccion, 2);
+                        Grid.SetRow(lblDireccion, 3);
+
+                        gridMain.Add(GridColor);
+                        gridMain.Add(lblNombre);
+                        gridMain.Add(lblEspecialidad);
+                        gridMain.Add(lblCorreo);
+                        gridMain.Add(lblTelefono);
+                        gridMain.Add(lblDireccion);
+
+                        borderContainer.Content = gridMain;
 
                         App.Current?.Dispatcher.Dispatch(() =>
                         {
-                            DatosCompartidos.ListaMedicos?.Children.Add(container);
+                            if (borderContainer is not null)
+                                DatosCompartidos.ListaMedicos?.Children.Add(borderContainer);
                         });
                     }
                 }
@@ -200,6 +266,14 @@ namespace VMedic.MVVM.ViewModels.Medicos
                 });
             });
 
+        }
+
+        public void ObtenerMedicosPrueba(SfScheduler? calendario)
+        {
+            App.Current?.Dispatcher.Dispatch(delegate
+            {
+
+            });
         }
     }
 }

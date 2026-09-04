@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Maui.Controls.Shapes;
 using Mopups.Services;
 using PropertyChanged;
 using System;
@@ -38,21 +39,16 @@ namespace VMedic.MVVM.ViewModels.Inventario
         {
             try
             {
-                await Task.Delay(1000);
                 Indicador = true;
                 DatosCompartidos.ListaProductos?.Children.Clear();
+                var ListaProductos = await SincronizacionDataBase.ObtenerProductos();
+                var ListaPresentaciones = await SincronizacionDataBase.ObtenerPresentaciones();
+                var ListaNivelesPrecios = await SincronizacionDataBase.ObtenerNivelesdePrecios();
+                await Task.Delay(500);
                 await Task.Run(() =>
                 {
                     try
                     {
-                        SincronizacionDataBase.ObtenerProductos();
-                        SincronizacionDataBase.ObtenerPresentaciones();
-                        SincronizacionDataBase.ObtenerNivelesdePrecios();
-
-                        var ListaProductos = App.Productos?.GetItems();
-                        var ListaPresentaciones = App.Presentaciones?.GetItems();
-                        var ListaNivelesPrecios = App.NivelesPrecio?.GetItems();
-
                         if (ListaNivelesPrecios is not null && ListaProductos is not null && DatosCompartidos.TextoBusquedaProductos is not null)
                         {
                             var ListadeProductos = (from pre in ListaPresentaciones
@@ -101,17 +97,44 @@ namespace VMedic.MVVM.ViewModels.Inventario
         //metodo para general la vista de la lista de productos
         public void GenerarCustomLista(int v)
         {
-            var ListaProductos = DeviceInfo.Platform == DevicePlatform.Android ? Productos?.Skip(v).Take(30).ToList() : Productos;
+            var ListaProductos = DeviceInfo.Platform == DevicePlatform.Android ? Productos?.Skip(v).Take(20).ToList() : Productos;
             if (ListaProductos is not null)
             {
                 for (int i = 0; i < ListaProductos.Count; i++)
                 {
                     var producto = ListaProductos[i];
 
+                    var Mainborder = new Border
+                    {
+                        Padding = 10,
+                        Margin = new Thickness(15, 5),
+                        StrokeShape = new RoundRectangle
+                        {
+                            CornerRadius = 10,
+                        },
+                        Background = new LinearGradientBrush
+                        {
+                            StartPoint = new Point(0, 0),
+                            EndPoint = new Point(1, 0),
+                            GradientStops =
+                            {
+                                new GradientStop
+                                {
+                                    Color = Color.FromArgb("#f4fbfd"),
+                                    Offset = 0.0f
+                                },
+                                new GradientStop
+                                {
+                                    Color = Color.FromArgb("#f8fdff"),
+                                    Offset = 1.0f
+                                },
+                            }
+                        },
+                    };
+
                     var container = new Grid
                     {
                         BindingContext = producto,
-                        BackgroundColor = Color.FromArgb("#102693ff"),
                     };
 
                     container.AddColumnDefinition(new ColumnDefinition());
@@ -128,145 +151,138 @@ namespace VMedic.MVVM.ViewModels.Inventario
                     };
 
                     ContenedorVisible.AddColumnDefinition(new ColumnDefinition { Width = GridLength.Auto });
-                    ContenedorVisible.AddColumnDefinition(new ColumnDefinition { Width = 1 });
-                    ContenedorVisible.AddColumnDefinition(new ColumnDefinition { Width = GridLength.Auto });
                     ContenedorVisible.AddColumnDefinition(new ColumnDefinition());
+                    ContenedorVisible.AddColumnDefinition(new ColumnDefinition { Width = GridLength.Auto });
 
                     ContenedorVisible.AddRowDefinition(new RowDefinition());
-                    ContenedorVisible.AddRowDefinition(new RowDefinition { Height = 1 });
                     ContenedorVisible.AddRowDefinition(new RowDefinition());
-                    ContenedorVisible.AddRowDefinition(new RowDefinition { Height = 1 });
+                    ContenedorVisible.AddRowDefinition(new RowDefinition { Height = 15 });
                     ContenedorVisible.AddRowDefinition(new RowDefinition());
-
-                    var Separador1 = new Grid
-                    {
-                        Background = Colors.Gray
-                    };
-
-                    Grid.SetColumn(Separador1, 1);
-                    Grid.SetRowSpan(Separador1, 5);
-
-                    var Separador2 = new Grid
-                    {
-                        Background = Colors.Gray
-                    };
-
-                    Grid.SetColumn(Separador2, 2);
-                    Grid.SetRow(Separador2, 1);
-                    Grid.SetColumnSpan(Separador2, 3);
-
-                    var Separador3 = new Grid
-                    {
-                        Background = Colors.Gray
-                    };
-
-                    Grid.SetColumn(Separador3, 3);
-                    Grid.SetRowSpan(Separador3, 3);
 
                     var lblCodigoProducto = new Label
                     {
-                        Text = producto.PRODUCTO,
+                        Text = $"ID: {producto.PRODUCTO}",
                         FontAttributes = FontAttributes.Bold,
-                        VerticalTextAlignment = TextAlignment.Center,
+                        VerticalTextAlignment = TextAlignment.Start,
                     };
 
                     Grid.SetColumn(lblCodigoProducto, 0);
                     Grid.SetRow(lblCodigoProducto, 0);
-                    Grid.SetRowSpan(lblCodigoProducto, 5);
-
-                    var label1 = new Label
-                    {
-                        Text = "Descripción: ",
-                        FontSize = 12,
-                        FontAttributes = FontAttributes.Bold,
-                        VerticalTextAlignment = TextAlignment.Center,
-                    };
-
-                    Grid.SetColumn(label1, 2);
-                    Grid.SetRow(label1, 0);
 
                     var lblDescripcion = new Label
                     {
-                        Text = producto.DESCRIPCION_PROD,
-                        VerticalTextAlignment = TextAlignment.Center,
+                        Text = producto.DESCRIPCION_PROD.Split(" - ")[1],
+                        VerticalTextAlignment = TextAlignment.Start,
                     };
 
-                    Grid.SetColumn(lblDescripcion, 4);
-                    Grid.SetRow(lblDescripcion, 0);
-
-                    var label2 = new Label
-                    {
-                        Text = "Cantidad: ",
-                        FontSize = 12,
-                        FontAttributes = FontAttributes.Bold,
-                        VerticalTextAlignment = TextAlignment.Center,
-                    };
-
-                    Grid.SetColumn(label2, 2);
-                    Grid.SetRow(label2, 2);
+                    Grid.SetColumn(lblDescripcion, 0);
+                    Grid.SetRow(lblDescripcion, 1);
+                    Grid.SetColumnSpan(lblDescripcion, 3);
 
                     var lblCantidad = new Label
                     {
-                        Text = producto.CANTIDAD + "",
-                        VerticalTextAlignment = TextAlignment.Center,
+                        Text = $"Cantidad: {producto.CANTIDAD}",
+                        VerticalTextAlignment = TextAlignment.Start,
                     };
 
-                    Grid.SetColumn(lblCantidad, 4);
-                    Grid.SetRow(lblCantidad, 2);
+                    Grid.SetColumn(lblCantidad, 0);
+                    Grid.SetRow(lblCantidad, 3);
 
-                    var label3 = new Label
+                    var lblPrecioU = new Label
                     {
-                        Text = "Precio U.: ",
-                        FontSize = 12,
+                        Text = $"${producto.PRECIOU}/u",
+                        VerticalTextAlignment = TextAlignment.Center,
                         FontAttributes = FontAttributes.Bold,
-                        VerticalTextAlignment = TextAlignment.Center,
                     };
 
-                    Grid.SetColumn(label3, 2);
-                    Grid.SetRow(label3, 4);
+                    Grid.SetColumn(lblPrecioU, 2);
+                    Grid.SetRow(lblPrecioU, 0);
 
-                    var lblPrecio = new Label
-                    {
-                        Text = "$" + producto.PRECIOU,
-                        VerticalTextAlignment = TextAlignment.Center,
-                    };
-
-                    Grid.SetColumn(lblPrecio, 4);
-                    Grid.SetRow(lblPrecio, 4);
-
-                    ContenedorVisible.Children.Add(Separador1);
-                    ContenedorVisible.Children.Add(Separador2);
                     ContenedorVisible.Children.Add(lblCodigoProducto);
-                    ContenedorVisible.Children.Add(label1);
                     ContenedorVisible.Children.Add(lblDescripcion);
-                    ContenedorVisible.Children.Add(label2);
                     ContenedorVisible.Children.Add(lblCantidad);
-                    ContenedorVisible.Children.Add(label3);
-                    ContenedorVisible.Children.Add(lblPrecio);
+                    ContenedorVisible.Children.Add(lblPrecioU);
+
+                    Grid.SetColumn(ContenedorVisible, 0);
+                    Grid.SetRow(ContenedorVisible, 0);
 
                     var gradient = new LinearGradientBrush
                     {
                         StartPoint = new Point(0.5, 0),
                         EndPoint = new Point(0.5, 10),
-                        GradientStops = new GradientStopCollection
+                        GradientStops =
+                        [
+                            new GradientStop
+                            {
+                                Color = Color.FromArgb("#252693ff"),
+                                Offset = 0.0f
+                            },
+                            new GradientStop
+                            {
+                                Color = Color.FromArgb("#50007fff"),
+                                Offset = 1.0f
+                            }
+                        ]
+                    };
+
+                    var borderDetalles = new Border
+                    {
+                        IsVisible = false,
+                        Padding = 15,
+                        BackgroundColor = Color.FromArgb("#252693ff"),
+                        StrokeShape = new RoundRectangle
                         {
-                            new GradientStop { Color = Color.FromArgb("#252693ff"), Offset = 0.0f },
-                            new GradientStop { Color = Color.FromArgb("#50007fff"), Offset = 1.0f }
+                            CornerRadius = 10,
                         }
                     };
+
+                    var btnDetalles = new ImageButton
+                    {
+                        HeightRequest = 40,
+                        WidthRequest = 40,
+                        Padding = 7.5,
+                        VerticalOptions = LayoutOptions.End,
+                        Source = new FontImageSource
+                        {
+                            FontFamily = "Icon",
+                            Glyph = "\uE806",
+                            Size = 20,
+                            Color = (Color?)Application.Current?.Resources["Primary"],
+                        }
+                    };
+
+                    Grid.SetColumn(btnDetalles, 2);
+                    Grid.SetRow(btnDetalles, 2);
+                    Grid.SetRowSpan(btnDetalles, 2);
+
+                    btnDetalles.Clicked += async (s, e) =>
+                    {
+                        if (PressedPreferences.ValidatePressing())
+                        {
+                            PressedPreferences.Pressing(null);
+                            ImageButton? Contenedor = (ImageButton?)s;
+                            if (Contenedor is not null)
+                            {
+                                borderDetalles.IsVisible = !borderDetalles.IsVisible;
+                                await Contenedor.RotateTo(borderDetalles.IsVisible ? 180 : 0, 1000, Easing.CubicInOut);
+
+                                PressedPreferences.EndPressed();
+                            }
+                        }
+                    };
+
+                    ContenedorVisible.Children.Add(btnDetalles);
 
                     var ContenedorDetalles = new Grid
                     {
                         BindingContext = producto,
-                        IsVisible = false,
-                        Padding = new Thickness(20, 10),
                         ColumnSpacing = 10,
                         RowSpacing = 5,
-                        BackgroundColor = Color.FromArgb("#252693ff"),
                     };
 
                     ContenedorDetalles.AddColumnDefinition(new ColumnDefinition { Width = GridLength.Auto });
                     ContenedorDetalles.AddColumnDefinition(new ColumnDefinition());
+
                     ContenedorDetalles.AddRowDefinition(new RowDefinition());
                     ContenedorDetalles.AddRowDefinition(new RowDefinition());
 
@@ -306,42 +322,24 @@ namespace VMedic.MVVM.ViewModels.Inventario
                     Grid.SetColumn(lblPresentacion, 1);
                     Grid.SetRow(lblPresentacion, 1);
 
-                    var tapGestureRecognizer = new TapGestureRecognizer();
-                    tapGestureRecognizer.Tapped += async (s, e) =>
-                    {
-                        if (PressedPreferences.ValidatePressing())
-                        {
-                            PressedPreferences.Pressing(null);
-                            Grid? Contenedor = (Grid?)s;
-                            if (Contenedor is not null)
-                            {
-                                ContenedorDetalles.IsVisible = !ContenedorDetalles.IsVisible;
-                                //Contenedor.Background = ContenedorDetalles.IsVisible ? Colors.LightGray : int.Parse(Contenedor.ClassId) % 2 == 0 ? Color.FromArgb("#252693ff") : Color.FromArgb("#50007fff");
-                                //Contenedor.Background = ContenedorDetalles.IsVisible ? Colors.LightGray : Colors.Transparent;
-                                PressedPreferences.EndPressed();
-                            }
-                        }
-                    };
-
-                    ContenedorVisible.GestureRecognizers.Add(tapGestureRecognizer);
-
-                    Grid.SetColumn(ContenedorVisible, 0);
-                    Grid.SetRow(ContenedorVisible, 0);
-
                     ContenedorDetalles.Children.Add(label4);
                     ContenedorDetalles.Children.Add(lblNivel);
                     ContenedorDetalles.Children.Add(label5);
                     ContenedorDetalles.Children.Add(lblPresentacion);
 
-                    Grid.SetColumn(ContenedorDetalles, 0);
-                    Grid.SetRow(ContenedorDetalles, 1);
+                    Grid.SetColumn(borderDetalles, 0);
+                    Grid.SetRow(borderDetalles, 1);
+
+                    borderDetalles.Content = ContenedorDetalles;
 
                     container.Children.Add(ContenedorVisible);
-                    container.Children.Add(ContenedorDetalles);
+                    container.Children.Add(borderDetalles);
+
+                    Mainborder.Content = container;
 
                     App.Current?.Dispatcher.Dispatch(() =>
                     {
-                        DatosCompartidos.ListaProductos?.Children.Add(container);
+                        DatosCompartidos.ListaProductos?.Children.Add(Mainborder);
                     });
                 }
             }

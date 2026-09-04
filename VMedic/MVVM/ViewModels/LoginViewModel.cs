@@ -99,7 +99,7 @@ namespace VMedic.MVVM.ViewModels
                             {
                                 Indicador = true;
                                 var consulta = $"{nameof(VMedicA001)}/'{UserName}','{Password}'";
-                                var login = await servicio.ResultadoGET<VMedicA001>(consulta, null);
+                                var login = await servicio.ResultadoGET<VMedicA001>(App.Usuario.GetItems()?.FirstOrDefault()?.DominioIP, consulta, null);
                                 if (login is not null)
                                 {
                                     var Sesion = login.ToList().FirstOrDefault();
@@ -120,6 +120,7 @@ namespace VMedic.MVVM.ViewModels
                                             tablaUsuario.Remember = Guardar ? 1 : 0;
                                             tablaUsuario.UbicacionRequerida = Sesion.UBICACION_REQUERIDA;
                                             tablaUsuario.CodPortafolio = Sesion.CODIGO_PORTAFOLIO;
+                                            tablaUsuario.Codigo_COMPANIA = Sesion.CODIGO_COMPANIA;
 
                                             if (DatosCompartidos.Lbl_UsuarioNombre is not null)
                                             {
@@ -132,6 +133,11 @@ namespace VMedic.MVVM.ViewModels
                                             await Shell.Current.GoToAsync(new ShellNavigationState($"//{nameof(VisitasView)}"));
                                         }
                                     }
+                                }
+                                else if (DatosCompartidos.ErrorResponseValue is not null)
+                                {
+                                    Indicador = false;
+                                    ToastMaker.Make(DatosCompartidos.ErrorResponseValue.FirstOrDefault().Value, App.Current?.Windows[0].Page);
                                 }
                             }
                             else

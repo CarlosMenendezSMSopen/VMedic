@@ -11,7 +11,7 @@ namespace VMedic.MVVM.Models.WebServices
         public string? licenciaid { get; set; }
         public string? URL { get; set; }
         public string? LOGO { get; set; }
-        public int COMPANYID { get; set; }
+        public int? COMPANYID { get; set; }
         public int? PLATAFORMA { get; set; }
         public int? FuncionalidadesExtras { get; set; }
     }

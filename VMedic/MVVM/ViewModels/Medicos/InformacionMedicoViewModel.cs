@@ -111,7 +111,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
                 IsShowingUser = true,
                 MapType = MapType.Street
             };
-            _paddingImagen = DeviceInfo.Platform == DevicePlatform.Android ? 6 : 10;
+            _paddingImagen = DeviceInfo.Platform == DevicePlatform.Android ? 10 : 10;
             MostrarDetallesMedico();
         }
 
@@ -128,7 +128,7 @@ namespace VMedic.MVVM.ViewModels.Medicos
         {
             await Task.Delay(1000);
             Medico = App.Doctores?.GetItems()?.FirstOrDefault(D => D.CODIGO_DE_CLIENTE == CodigoCliente);
-            var especialidadMedico = App.Especialidades?.GetItems()?.FirstOrDefault(E => E.CODIGO_DE_CLASE == Medico?.CODIGO_DE_CLASE);
+            var especialidadMedico = App.Especialidades?.GetItems()?.FirstOrDefault(E => E.CODIGO_DE_CLASE == Medico?.CODIGO_DE_CLASE?.Trim());
             var categoriaMedico = App.Categoriasmedico?.GetItems()?.FirstOrDefault(C => C.CATEGORIAID == Medico?.CATEGORIAID);
             MedicoName = Medico?.NOMBRE_COMERCIAL;
             MedicoEspecialidad = especialidadMedico?.DESCRIPCION_CLASE;

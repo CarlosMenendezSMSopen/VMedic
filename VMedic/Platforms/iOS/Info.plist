@@ -27,7 +27,7 @@
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>Al activar los servicios de ubicación, la aplicación accederá a la ubicación precisa del dispositivo</string>
+		<string>Al activar los servicios de ubicación, se registrará el lugar de las visitas médicas, comentarios y planificación de visitas</string>
 		<key>XSAppIconAssets</key>
 		<string>Assets.xcassets/ic_launcher.appiconset</string>
 	</dict>

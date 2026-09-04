@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using VMedic.MVVM.Models.DataBase;
 using VMedic.MVVM.ViewModels.Medicos;
 using VMedic.Servicios;
+using VMedic.Utilidades;
 
 namespace VMedic.MVVM.Views.Médicos;
 
@@ -8,28 +10,9 @@ public partial class EditarMedicoView : ContentPage
 {
 	public EditarMedicoView(string? cODIGO_DE_CLIENTE)
 	{
-		InitializeComponent();
-        SincronizacionDataBase.ObtenerEspecialidades();
-        SincronizacionDataBase.ObtenerCategoriasMedico();
-        SincronizacionDataBase.ObtenerProductosPreferencias();
-        SincronizacionDataBase.ObtenerMedicosProductosPreferencias();
-        SincronizacionDataBase.ObtenerVisitasMensuales();
+		InitializeComponent();    
         BindingContext = new EditarMedicoViewModel(cODIGO_DE_CLIENTE);
-        InsertarPreferencias();
-    }
-
-    //metodo evento que habilita la lista desplegable de las especialidades
-    private void Especialidad_Tapped(object sender, TappedEventArgs e)
-    {
-        SelectEspecialidades.Unfocus();
-        SelectEspecialidades.Focus();
-    }
-
-    //metodo evento que habilira la lista desplegable de las categorias de visita
-    private void Categoria_Tapped(object sender, TappedEventArgs e)
-    {
-        SelectCategorias.Unfocus();
-        SelectCategorias.Focus();
+        //InsertarPreferencias();
     }
 
     //metodo evento que concatena la selección de las rpeferencias de visita
@@ -44,49 +27,6 @@ public partial class EditarMedicoView : ContentPage
         {
             vm.IdsPreferencias = string.Join(",", seleccionados);
         }
-    }
-
-    //metodo evento que asigna variables cuando se selecciona el tipo de visita en Rojo
-    private void Rojo_Tapped(object sender, TappedEventArgs e)
-    {
-        ColorSeleccionado.IsVisible = true;
-        var vm = (EditarMedicoViewModel)BindingContext;
-        vm.Position = 0;
-        vm.ColorSeleccionado = "Rojo";
-    }
-
-    //metodo evento que asigna variables cuando se selecciona el tipo de visita en Azul
-    private void Azul_Tapped(object sender, TappedEventArgs e)
-    {
-        ColorSeleccionado.IsVisible = true;
-        var vm = (EditarMedicoViewModel)BindingContext;
-        vm.Position = 1;
-        vm.ColorSeleccionado = "Azul";
-    }
-
-    //metodo evento que asigna variables cuando se selecciona el tipo de visita en Amarillo
-    private void Amarillo_Tapped(object sender, TappedEventArgs e)
-    {
-        ColorSeleccionado.IsVisible = true;
-        var vm = (EditarMedicoViewModel)BindingContext;
-        vm.Position = 2;
-        vm.ColorSeleccionado = "Amarillo";
-    }
-
-    //metodo evento que asigna variables cuando se selecciona el tipo de visita en Verde
-    private void Verde_Tapped(object sender, TappedEventArgs e)
-    {
-        ColorSeleccionado.IsVisible = true;
-        var vm = (EditarMedicoViewModel)BindingContext;
-        vm.Position = 3;
-        vm.ColorSeleccionado = "Verde";
-    }
-
-    //metodo evento que habilita la lista desplegable de la forma de adaptación de visita
-    private void Adopcion_Tapped(object sender, TappedEventArgs e)
-    {
-        SelectEscalaAdopcion.Unfocus();
-        SelectEscalaAdopcion.Focus();
     }
 
     //metodo evento que cierra el formulario completo al precionar el boton de cancelar
@@ -106,16 +46,74 @@ public partial class EditarMedicoView : ContentPage
     //metodo que concatena las preferencias seleccionadas
     private async void InsertarPreferencias()
     {
-        var vm = (EditarMedicoViewModel)BindingContext;
-        vm.MostrarPreferenciasdeProducto();
-        await Task.Delay(1000);
-        searchbox_preferencias.SelectedItems?.Clear();
-        if (vm.PreferenciasSeleccionadas is not null)
+        //var vm = (EditarMedicoViewModel)BindingContext;
+        //vm.;
+        //await Task.Delay(1000);
+        //searchbox_preferencias.SelectedItems?.Clear();
+        //if (vm.PreferenciasSeleccionadas is not null)
+        //{
+        //    foreach (var preferencia in vm.PreferenciasSeleccionadas)
+        //    {
+        //        searchbox_preferencias.SelectedItems?.Add(preferencia);
+        //    }
+        //}
+    }
+
+    protected override bool OnBackButtonPressed()
+    {
+        if (searchbox_preferencias.IsDropDownOpen)
         {
-            foreach (var preferencia in vm.PreferenciasSeleccionadas)
-            {
-                searchbox_preferencias.SelectedItems?.Add(preferencia);
-            }
+            searchbox_preferencias.IsDropDownOpen = false;
+        }
+        return base.OnBackButtonPressed();
+    }
+
+    private void searchbox_pais_SelectionChanged(object sender, Syncfusion.Maui.Inputs.SelectionChangedEventArgs e)
+    {
+        var vm = (EditarMedicoViewModel)BindingContext;
+        vm.MostrarDatosDepartamentos();
+    }
+
+    private void searchbox_departamento_SelectionChanged(object sender, Syncfusion.Maui.Inputs.SelectionChangedEventArgs e)
+    {
+        var vm = (EditarMedicoViewModel)BindingContext;
+        vm.MostrarDatosMunicipios();
+    }
+
+    public void sw_repetir_StateChanged(object? sender, Syncfusion.Maui.Buttons.SwitchStateChangedEventArgs? e)
+    {
+        if (e?.NewValue is not null)
+        {
+            date_FechaInicial.IsEnabled = !(bool)e.NewValue;
+            var vm = (EditarMedicoViewModel)BindingContext;
+            vm.EnableRepetir = (bool)e.NewValue;
+        }
+    }
+
+    private void Entry_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        try
+        {
+            //if (sender is not Entry entry)
+            //    return;
+
+            //string texto = new string(e.NewTextValue?
+            //    .Where(char.IsDigit)
+            //    .ToArray() ?? []);
+
+            //if (texto.Length > 9)
+            //    texto = texto[..9];
+
+            //string formateado = texto.Length > 4
+            //    ? $"{texto[..4]} {texto[4..]}"
+            //    : texto;
+
+            //if (entry.Text != formateado)
+            //    entry.Text = formateado;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.ToString());
         }
     }
 }

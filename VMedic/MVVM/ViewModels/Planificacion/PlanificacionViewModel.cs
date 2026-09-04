@@ -26,10 +26,13 @@ namespace VMedic.MVVM.ViewModels.Planificacion
         private int _rowSpan;
 
         [ObservableProperty]
-        private int _semanasVisibles;
+        private int _semanasVisibles = 6;
 
         [ObservableProperty]
         private bool _visibilidadAdenda;
+
+        [ObservableProperty]
+        private bool _indicador;
 
         private static readonly RestService servicio = new();
         private TablaUsuario? Usuario { get; set; } = App.Usuario?.GetItem();
@@ -39,57 +42,32 @@ namespace VMedic.MVVM.ViewModels.Planificacion
         //colores para mostrar la zona de calor desde el rojo hasta el violeta
         private List<Color> ColoresOrden { get; set; } =
             [
-                Color.FromArgb("#442F11"),
                 Color.FromArgb("#5F9EDB"),
-                Color.FromArgb("#C38348"),
-                Color.FromArgb("#0D5AA0"),
-                Color.FromArgb("#C44A56"),
-                Color.FromArgb("#B0D4B8"),
-                Color.FromArgb("#EAE7D6"),
-                Color.FromArgb("#A4C3A2"),
                 Color.FromArgb("#5D7B6F"),
-                Color.FromArgb("#F5D491"),
-                Color.FromArgb("#F9B9B7"),
-                Color.FromArgb("#F06C9B"),
-                Color.FromArgb("#96C9DC"),
-                Color.FromArgb("#61A0AF"),
-                Color.FromArgb("#C0DBAA"),
-                Color.FromArgb("#F0C0BF"),
-                Color.FromArgb("#F1E6B8"),
-                Color.FromArgb("#A1CAE1"),
+                Color.FromArgb("#C44A56"),
+                Color.FromArgb("#C38348"),
             ];
         public PlanificacionViewModel()
         {
             ShowAgendaDia(false);
-            ValidarSolicitudesPendientes();
-        }
-
-        //metodo para verificar registro de solicitudes no enviadas para hacer visible un texto que muestre la cantidad de dichos registros
-        public void ValidarSolicitudesPendientes()
-        {
-            if (DatosCompartidos.ContenedorCuentaPlanificacion is not null && DatosCompartidos.LabelContarPendientesPlanificacion is not null)
-            {
-                DatosCompartidos.ContenedorCuentaPlanificacion.IsVisible = App.SolicitudesPendientes?.GetItems()?.Where(SP => DatosCompartidos.OperacionesIDPlanifiacion.Contains(SP.OperacionID)).ToList()?.Count > 0;
-                DatosCompartidos.LabelContarPendientesPlanificacion.Text = App.SolicitudesPendientes?.GetItems()?.Where(SP => DatosCompartidos.OperacionesIDPlanifiacion.Contains(SP.OperacionID)).ToList().Count.ToString();
-            }
         }
 
         //metodo que cambia la visibilidad de la vista de agenda por día
         public void ShowAgendaDia(bool show)
         {
             RowSpan = show ? 1 : 2;
-            SemanasVisibles = show ? 3 : 6;
+            //SemanasVisibles = show ? 6 : 6;
             VisibilidadAdenda = show;
         }
 
         //funcion tarea para obtener los registros de las fechas de visita de los médicos y asignarlos en los recursos de la agenda principal
-        public async Task ObtenerPlanificaciones(SfScheduler calendario, ActivityIndicator status)
+        public void ObtenerPlanificaciones(SfScheduler calendario, SfScheduler agendaTareas)
         {
-            try
+            Task.Run(async () =>
             {
-                if (DatosCompartidos.CalendarioPlanificacion is not null)
+                try
                 {
-                    var data = await servicio.ResultadoGET<TablaAgenda>($"VMedicA047/'{Usuario?.UsuarioName}',{new DateTimeOffset(DatosCompartidos.CalendarioPlanificacion.DisplayDate.ToUniversalTime()).ToUnixTimeMilliseconds()}", null);
+                    var data = await servicio.ResultadoGET<TablaAgenda>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA047/'{Usuario?.UsuarioName}',{new DateTimeOffset(calendario.DisplayDate.ToUniversalTime()).ToUnixTimeMilliseconds()},{calendario.DisplayDate.Month}", null);
                     if (data is not null)
                     {
                         if (App.Agenda is not null)
@@ -97,28 +75,92 @@ namespace VMedic.MVVM.ViewModels.Planificacion
                             App.Agenda.DeleteItems();
                             App.Agenda?.InsertItems(data);
 
+                            var ListaTareas = new List<SchedulerAppointment>();
+
+                            foreach (var tarea in data.ToList())
+                            {
+                                ListaTareas.Add(new SchedulerAppointment
+                                {
+                                    ClassId = tarea.CodigoControlVisita + "",
+                                    StartTime = DateTime.ParseExact(tarea.Fecha?.Replace("T", " ") + "", "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
+                                    EndTime = DateTime.ParseExact(tarea.Fecha?.Replace("T", " ") + "", "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
+                                    Subject = $"{tarea.CodigoCliente}\n{tarea.Cliente}",
+                                    Background = tarea.HoraLlegada is not null ? Color.FromArgb("#4CAF50") : tarea.FechaFinal is not null && DateTime.Parse(tarea.FechaFinal) < DateTime.Today ? Color.FromArgb("#F44336") : Color.FromArgb("#2196F3"),
+                                    AutomationId = tarea.CodigoControlVisita + "",
+                                    StyleId = tarea.TipoControl + "",
+                                    TextColor = tarea.HoraLlegada is not null ? Color.FromArgb("#4CAF50") : tarea.FechaFinal is not null && DateTime.Parse(tarea.FechaFinal) < DateTime.Today ? Color.FromArgb("#F44336") : Color.FromArgb("#2196F3"),
+                                });
+                            }
+
                             App.Current?.Dispatcher.Dispatch(() =>
                             {
-                                Tareas.Clear();
-                                var ListaAgenda = App.Agenda?.GetItems();
-                                if (ListaAgenda is not null)
-                                    foreach (var tarea in ListaAgenda)
-                                    {
-                                        Tareas.Add(new SchedulerAppointment
-                                        {
-                                            StartTime = DateTime.ParseExact(tarea.FECHA_INICIAL + "", "yyyyMMdd HH:mm:ss", CultureInfo.InvariantCulture),
-                                            EndTime = DateTime.ParseExact(tarea.FECHA_FINAL + "", "yyyyMMdd HH:mm:ss", CultureInfo.InvariantCulture),
-                                            Subject = "Diario",
-                                            Background = ColorOrden(tarea.FECHA_INICIAL?.Split(' ')[0], tarea.TableID),
-                                        });
-                                    }
+                                Indicador = true;
+                                Tareas = new ObservableRangeCollection<SchedulerAppointment>(ListaTareas);
 
                                 calendario.AppointmentsSource = Tareas;
                                 calendario.ResumeAppointmentViewUpdate();
-                                status.IsRunning = false;
+
+                                VisualizarTareas(calendario, agendaTareas, new DateTimeOffset(calendario.DisplayDate.ToUniversalTime()).ToUnixTimeMilliseconds());
                             });
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                    App.Current?.Dispatcher.Dispatch(() =>
+                    {
+                        ExceptionMessageMaker.Make("Calendario error", ex.ToString(), ex.Message, App.Current.Windows[0].Page);
+                        calendario.ResumeAppointmentViewUpdate();
+                        Indicador = false;
+                    });
+                }
+                finally
+                {
+
+                }
+            });
+        }
+
+        //metodo que asigna las visitas en la agenda de vista de día
+        public async void VisualizarTareas(SfScheduler calendario, SfScheduler agendaTareas, long v)
+        {
+            try
+            {
+                var data = await servicio.ResultadoGET<TablaAgenda>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"VMedicA047/'{Usuario?.UsuarioName}',{v}", null);
+                agendaTareas.SuspendAppointmentViewUpdate();
+
+                var ListaTareas = new List<SchedulerAppointment>();
+                TareasDía.Clear();
+
+                if (data is not null)
+                {
+                    foreach (var tarea in data)
+                    {
+                        if (tarea.Fecha is not null && tarea.FechaFinal is not null)
+                        {
+                            var colorVerde = Color.FromArgb("#994CAF50");
+                            var colorRojo = Color.FromArgb("#99F44336");
+                            var colorAzul = Color.FromArgb("#992196F3");
+
+                            ListaTareas.Add(new SchedulerAppointment
+                            {
+                                ClassId = tarea.CodigoControlVisita + "",
+                                StartTime = DateTime.ParseExact(tarea.Fecha?.Replace("T", " ") + "", "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
+                                EndTime = DateTime.ParseExact(tarea.Fecha?.Split("T")[0] + " " + tarea.FechaFinal.Split("T")[1], "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
+                                Subject = $"{tarea.CodigoCliente}\n{tarea.Cliente}",
+                                Background = tarea.HoraLlegada is not null ? colorVerde : tarea.FechaFinal is not null && DateTime.Parse(tarea.FechaFinal) < DateTime.Today ? colorRojo : colorAzul,
+                                AutomationId = tarea.CodigoControlVisita + "",
+                                StyleId = tarea.TipoControl + "",
+                                TextColor = tarea.HoraLlegada is not null ? colorVerde : tarea.FechaFinal is not null && DateTime.Parse(tarea.FechaFinal) < DateTime.Today ? colorRojo : colorAzul,
+                            });
+                        }
+                    }
+
+                    TareasDía = new ObservableRangeCollection<SchedulerAppointment>(ListaTareas);
+
+                    agendaTareas.AppointmentsSource = TareasDía;
+                    agendaTareas.ResumeAppointmentViewUpdate();
                 }
             }
             catch (Exception ex)
@@ -126,248 +168,101 @@ namespace VMedic.MVVM.ViewModels.Planificacion
                 Debug.WriteLine(ex);
                 App.Current?.Dispatcher.Dispatch(() =>
                 {
+                    ExceptionMessageMaker.Make("Habilitar Día Calendario error", ex.ToString(), ex.Message, App.Current.Windows[0].Page);
                     calendario.ResumeAppointmentViewUpdate();
-                    calendario.ShowBusyIndicator = false;
                 });
             }
             finally
             {
-
+                Indicador = false;
             }
-        }
-
-        //funcion Color que asigna un color a la vista de visita en las 2 agendas
-        private Color ColorOrden(string? Fecha, int TableID)
-        {
-            if (App.Agenda is not null && Fecha is not null)
-                if (!App.Agenda.IsEmpty())
-                {
-                    var TareasFecha = App.Agenda.GetItems()?.Where(A => A.FECHA_INICIAL is not null && A.FECHA_INICIAL.Contains(Fecha)).ToList();
-                    var Agenda = App.Agenda.GetItems()?.FirstOrDefault(A => A.TableID == TableID);
-                    if (Agenda is not null)
-                    {
-                        var i = TareasFecha?.FindIndex(X => X.TableID == Agenda.TableID);
-                        if (i is not null)
-                        {
-                            return ColoresOrden[(int)i];
-                        }
-                    }
-                }
-
-            return Colors.Black;
-        }
-
-        //metodo que asigna las visitas en la agenda de vista de día
-        public void VisualizarTareas(SfScheduler calendario, SfScheduler agendaTareas, DateTime newValue, ActivityIndicator status)
-        {
-            ShowAgendaDia(true);
-
-            var FechaSeleccionada = newValue.Date.ToString("yyyyMMdd");
-            var TareasFecha = App.Agenda?.GetItems()?.Where(A => A.FECHA_INICIAL is not null && A.FECHA_INICIAL.Contains(FechaSeleccionada)).ToList();
-            agendaTareas.SuspendAppointmentViewUpdate();
-
-            TareasDía.Clear();
-            if (TareasFecha is not null)
-                foreach (var tarea in TareasFecha)
-                {
-                    var DoctorFecha = App.Doctores?.GetItems()?.FirstOrDefault(D => D.CODIGO_DE_CLIENTE == tarea.CODIGO_DE_CLIENTE.ToString());
-
-                    TareasDía.Add(new SchedulerAppointment
-                    {
-                        ClassId = tarea.CODIGO_CONTROL_VISITAS + "",
-                        StartTime = DateTime.ParseExact(tarea.FECHA_INICIAL + "", "yyyyMMdd HH:mm:ss", CultureInfo.InvariantCulture),
-                        EndTime = DateTime.ParseExact(tarea.FECHA_FINAL + "", "yyyyMMdd HH:mm:ss", CultureInfo.InvariantCulture),
-                        Subject = $"{DoctorFecha?.CODIGO_DE_CLIENTE}\n{DoctorFecha?.NOMBRE_COMERCIAL}",
-                        Background = ColorOrden(tarea.FECHA_INICIAL?.Split(' ')[0], tarea.TableID),
-                        AutomationId = tarea.CODIGO_DE_PROGRAMACION + "",
-                        StyleId = tarea.TIPO_DE_PROGRAMACION + "",
-                    });
-                }
-
-            agendaTareas.AppointmentsSource = TareasDía;
-
-            var fechaMasCercana = TareasDía.OrderBy(TD => Math.Abs((TD.StartTime - newValue).TotalSeconds)).FirstOrDefault()?.StartTime;
-            if (fechaMasCercana is not null)
-            {
-                agendaTareas.DisplayDate = (DateTime)fechaMasCercana;
-                agendaTareas.ResumeAppointmentViewUpdate();
-                status.IsRunning = false;
-            }
-        }
-
-        //metodo que vuelve invisible la vista de agenda por día
-        public async void CerrarVistaAgenda(SfScheduler calendario, SfScheduler agendaTareas, ActivityIndicator status)
-        {
-            ShowAgendaDia(false);
-            calendario.SelectedDate = null;
-
-            await Task.Delay(500);
-
-            PressedPreferences.EndPressed();
         }
 
         //metodo que elimina una programnación de visita, solicitando a la vez cual es la que se desea eliminar
-        public async void EliminarVisitaAgenda(SchedulerAppointment? SelectedAppointment)
+        public async void EliminarVisitaAgenda(SchedulerAppointment? SelectedAppointment, Views.Planificacion.PlanificacionView planificacionView)
         {
             if (SelectedAppointment is not null)
             {
-                int NumberEliminar = 0;
-                bool MensajeAlerta = false;
                 var MainPage = App.Current?.Windows[0].Page;
-                var ListaRepeticiones = new List<TablaAgenda>();
 
                 if (MainPage is not null)
                 {
-                    var VisitaSeleccionada = App.Agenda?.GetItems()?.FirstOrDefault(A => A.CODIGO_CONTROL_VISITAS == int.Parse(SelectedAppointment.ClassId));
+                    var VisitaSeleccionada = App.Agenda?.GetItems()?.FirstOrDefault(A => A.CodigoControlVisita == int.Parse(SelectedAppointment.ClassId));
 
-                    if (SelectedAppointment.AutomationId != "" && !SelectedAppointment.AutomationId.Contains("null"))
+                    if (VisitaSeleccionada is not null)
                     {
-                        ListaRepeticiones = App.Agenda?.GetItems()?.Where(A => A.CODIGO_DE_PROGRAMACION is not null && A.CODIGO_DE_PROGRAMACION == int.Parse(SelectedAppointment.AutomationId) && A.CODIGO_DE_CLIENTE == int.Parse(SelectedAppointment.Subject.Split("\n")[0])).ToList();
-                    }
-                    else
-                    {
-                        ListaRepeticiones = App.Agenda?.GetItems()?.Where(A => A.FECHA_INICIAL is not null && A.FECHA_INICIAL.Contains(SelectedAppointment.StartTime.ToString("HH:mm:ss")) && A.FECHA_FINAL is not null && A.FECHA_FINAL.Contains(SelectedAppointment.EndTime.ToString("HH:mm:ss")) && A.CODIGO_DE_CLIENTE == int.Parse(SelectedAppointment.Subject.Split("\n")[0])).ToList();
-                    }
-
-                    //Repeticion diaria
-                    if (ListaRepeticiones?.Count > 7 && ListaRepeticiones.Count <= 31)
-                    {
-                        var Opciones = await MainPage.DisplayActionSheet
-                            (
-                                "Esta instancia se programó con visitas diarias",
-                                "CANCELAR",
-                                null,
-                                "1. Eliminar esta Instancia",
-                                "2. Eliminar la Semana de esta Instancia",
-                                $"3. Eliminar las Instancias de los {ObtenerPlanificaciones(VisitaSeleccionada?.DIA)}",
-                                "4. Eliminar Todas las Instancias"
-                            );
-
-                        switch (Opciones.Split('.')[0])
+                        if (VisitaSeleccionada.HoraLlegada is null)
                         {
-                            case "1":
-                                NumberEliminar = 1;
-                                MensajeAlerta = await MainPage.DisplayAlert("Eliminar Visita", "¿Está seguro/a de Eliminar la agenda de visita seleccionada?", "ELIMINAR", "CANCELAR");
-                                break;
-                            case "2":
-                                NumberEliminar = 2;
-                                MensajeAlerta = await MainPage.DisplayAlert("Eliminar Visita", "¿Está seguro/a de Eliminar la semana agendada de la visita seleccionada?", "ELIMINAR", "CANCELAR");
-                                break;
-                            case "3":
-                                NumberEliminar = 3;
-                                MensajeAlerta = await MainPage.DisplayAlert("Eliminar Visita", $"¿Está seguro/a de Eliminar de las visitas agendadas para los {ObtenerPlanificaciones(VisitaSeleccionada?.DIA)}?", "ELIMINAR", "CANCELAR");
-                                break;
-                            case "4":
-                                NumberEliminar = 4;
-                                MensajeAlerta = await MainPage.DisplayAlert("Eliminar Visita", $"¿Está seguro/a de Eliminar toda la programación de visita agendada?", "ELIMINAR", "CANCELAR");
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    //Repeticion semanal
-                    else if (ListaRepeticiones?.Count <= 7 && ListaRepeticiones?.Count > 3)
-                    {
-                        var Opciones = await MainPage.DisplayActionSheet
-                            (
-                                "Esta instancia se programó con visitas semanales",
-                                "CANCELAR",
-                                null,
-                                "1. Eliminar esta Instancia",
-                                $"2. Eliminar las Instancias de los {ObtenerPlanificaciones(VisitaSeleccionada?.DIA)}",
-                                "3. Eliminar Todas las Instancias"
-                            );
+                            var Opciones = await MainPage.DisplayAlert
+                                (
+                                    $"{VisitaSeleccionada.TipoControl switch { 1 => "PROGRAMACIÓN DE UNA SOLA VISITA", 2 => "PROGRAMACIÓN DE DÍAS HÁBILES", 3 => "PROGRAMACIÓN DE UNA VEZ A LA SEMANA", 4 => "PROGRAMACIÓN DE UNA VEZ AL MES", _ => "" }}",
+                                    $"La instancia de\n{SelectedAppointment.Subject.Replace('\n', ' ')}\nse deshabilitará de la programación de visitas",
+                                    "ELIMINAR",
+                                    "CANCELAR"
+                                );
 
-                        switch (Opciones.Split('.')[0])
-                        {
-                            case "1":
-                                NumberEliminar = 1;
-                                MensajeAlerta = await MainPage.DisplayAlert("Eliminar Visita", "¿Está seguro/a de Eliminar la agenda de Visita seleccionada?", "ELIMINAR", "CANCELAR");
-                                break;
-                            case "2":
-                                NumberEliminar = 3;
-                                MensajeAlerta = await MainPage.DisplayAlert("Eliminar Visita", $"¿Está seguro/a de Eliminar las visitas agendadas para los {ObtenerPlanificaciones(VisitaSeleccionada?.DIA)}?", "ELIMINAR", "CANCELAR");
-                                break;
-                            case "3":
-                                NumberEliminar = 4;
-                                MensajeAlerta = await MainPage.DisplayAlert("Eliminar Visita", "¿Está seguro/a de Eliminar toda la programación de visita agendada?", "ELIMINAR", "CANCELAR");
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    //Repeticion Mensual
-                    else if (ListaRepeticiones?.Count <= 3)
-                    {
-                        var Opciones = await MainPage.DisplayActionSheet
-                            (
-                                "Esta instancia se programó con visitas mensuales",
-                                "CANCELAR",
-                                null,
-                                "1. Eliminar esta Instancia",
-                                "2. Eliminar Todas las Instancias"
-                            );
-
-                        switch (Opciones.Split('.')[0])
-                        {
-                            case "1":
-                                NumberEliminar = 1;
-                                MensajeAlerta = await MainPage.DisplayAlert("Eliminar Visita", "¿Está seguro/a de Eliminar la agenda de visita seleccionada?", "ELIMINAR", "CANCELAR");
-                                break;
-                            case "2":
-                                NumberEliminar = 4;
-                                MensajeAlerta = await MainPage.DisplayAlert("Eliminar Visita", "¿Está seguro/a de Eliminar toda la programación de visita agendada?", "ELIMINAR", "CANCELAR");
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    var parametros = $"{SelectedAppointment.Subject.Split("\n")[0]},'{App.Usuario?.GetItem().UsuarioName}',{VisitaSeleccionada?.SEMANA},{VisitaSeleccionada?.DIA},{NumberEliminar},{SelectedAppointment.AutomationId},{SelectedAppointment.StyleId}";
-
-                    if (MensajeAlerta)
-                    {
-                        var SolicitudEnviar = new TablaSolicitudesNoEnviadas
-                        {
-                            OperacionID = "VMedicA049",
-                            Parametros = $"{SelectedAppointment.Subject.Split("\n")[0]},'{App.Usuario?.GetItem().UsuarioName}',{VisitaSeleccionada?.SEMANA},{VisitaSeleccionada?.DIA},{NumberEliminar}",
-                            ClavesVacias = 0,
-                            TipoRestService = 1,
-                        };
-
-                        if (IsInternet.Avilable())
-                        {
-                            var datos = (await servicio.ResultadoGET<Resultado>(SolicitudEnviar.OperacionID + "/" + SolicitudEnviar.Parametros, null))?.FirstOrDefault();
-                            if (datos is not null)
+                            if (Opciones)
                             {
-                                switch (datos.MSG)
+                                var SolicitudEnviar = new TablaSolicitudesNoEnviadas
                                 {
-                                    case "1":
-                                        ShowAgendaDia(false);
-                                        if (DatosCompartidos.CalendarioPlanificacion is not null)
-                                            DatosCompartidos.CalendarioPlanificacion.SelectedDate = null;
-                                        ToastMaker.Make("Visita Eliminada Correctamente", App.Current?.Windows[0].Page);
-                                        break;
-                                    case "2":
-                                        ToastMaker.Make("Error: Medico no existente", App.Current?.Windows[0].Page);
-                                        break;
-                                    case "3":
-                                        ToastMaker.Make("No es posible eliminar la agenda seleciconada porque es la configuración predeterminada", App.Current?.Windows[0].Page);
-                                        break;
-                                    case "4":
-                                        ToastMaker.Make("Ha ocurrido un error inesperado", App.Current?.Windows[0].Page);
-                                        break;
-                                    default:
-                                        break;
+                                    IDSolicitud = App.SolicitudesPendientes?.GetItems()?.Where(S => S.OperacionID == "VMedicA049").ToList().Count,
+                                    OperacionID = "VMedicA049",
+                                    Parametros = $"{SelectedAppointment.Subject.Split("\n")[0]},'{App.Usuario?.GetItem().UsuarioName}',{VisitaSeleccionada?.CodigoControlVisita}",
+                                    ClavesVacias = 0,
+                                    TipoRestService = 1,
+                                    ModuloSolicitud = 3
+                                };
+
+                                var datos = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, SolicitudEnviar.OperacionID + "/" + SolicitudEnviar.Parametros, null))?.FirstOrDefault();
+                                if (datos is not null)
+                                {
+                                    switch (datos.MSG)
+                                    {
+                                        case "1":
+                                            ToastMaker.Make("Visita Eliminada Correctamente", App.Current?.Windows[0].Page);
+
+                                            planificacionView.Btn_actualizar_Clicked(null, null);
+                                            break;
+                                        case "2":
+                                            ToastMaker.Make("Error: Medico no existente", App.Current?.Windows[0].Page);
+                                            break;
+                                        case "3":
+                                            ToastMaker.Make("No es posible eliminar la agenda seleciconada porque es la configuración predeterminada", App.Current?.Windows[0].Page);
+                                            break;
+                                        case "4":
+                                            ToastMaker.Make("Ha ocurrido un error inesperado", App.Current?.Windows[0].Page);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                else if (DatosCompartidos.ErrorResponseValue is not null)
+                                {
+                                    DatosCompartidos.CantidadIntentos++;
+
+                                    if (DatosCompartidos.CantidadIntentos == 4)
+                                    {
+                                        var MyMainPage = App.Current?.Windows[0].Page;
+
+                                        if (MyMainPage is not null)
+                                            await MyMainPage.DisplayAlert("No fue posible completar el envío", "Después de 3 intentos, el registro se ha almacenado de forma local en el módulo de sincronización, ubicación en la que se podrá enviar nuevamente más tarde", "OK");
+                                        
+                                        App.SolicitudesPendientes?.InsertItem(SolicitudEnviar);
+                                        DatosCompartidos.CantidadIntentos = 0;
+                                    }
+                                    else
+                                    {
+                                        ToastMaker.Make(DatosCompartidos.ErrorResponseValue.FirstOrDefault().Value, App.Current?.Windows[0].Page);
+                                    }
                                 }
                             }
                         }
                         else
                         {
-                            ToastMaker.Make("No hay conexión a Internet, verifique su plan de datos para sincronizar la eliminación de la visita", App.Current?.Windows[0].Page);
-                            App.SolicitudesPendientes?.InsertItem(SolicitudEnviar);
-                            await Task.Delay(1000);
-                            ValidarSolicitudesPendientes();
+                            await MainPage.DisplayAlert
+                                (
+                                    "Visita Completada", $"La Visita seleccionada se efectuó el día {VisitaSeleccionada.HoraLlegada.Split("T")[0]} a las {VisitaSeleccionada.HoraLlegada.Split("T")[1]} horas, por lo que no se puede inhabilitar de la programación de visitas", "CANCELAR"
+                                );
                         }
                     }
                 }
@@ -396,7 +291,7 @@ namespace VMedic.MVVM.ViewModels.Planificacion
                 if (SolicitudesEnviar is not null)
                     foreach (var SolicitudEnviar in SolicitudesEnviar)
                     {
-                        var datos = (await servicio.ResultadoGET<Resultado>(SolicitudEnviar.OperacionID + "/" + SolicitudEnviar.Parametros, null))?.FirstOrDefault();
+                        var datos = (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, SolicitudEnviar.OperacionID + "/" + SolicitudEnviar.Parametros, null))?.FirstOrDefault();
                         if (datos is not null)
                         {
                             switch (datos.MSG)
@@ -422,7 +317,6 @@ namespace VMedic.MVVM.ViewModels.Planificacion
 
                 if (EstadoMensaje == SolicitudesEnviar?.Count)
                 {
-                    ValidarSolicitudesPendientes();
                     ToastMaker.Make("Sincronización realizada Correctamente", App.Current?.Windows[0].Page);
                 }
                 else

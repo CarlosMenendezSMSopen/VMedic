@@ -2,10 +2,30 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="VMedic.MVVM.Views.Médicos.NuevoMedicoView"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
              xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
              xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
              xmlns:toolkit="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
-             Shell.BackgroundColor="{StaticResource Primary}">
+             Shell.BackgroundColor="{StaticResource Secondary}">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0"
+                             EndPoint="1,0">
+            <GradientStop Color="#90c3e3"
+                          Offset="0.0" />
+            <GradientStop Color="#eafafc"
+                          Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <ContentPage.Resources>
+        <Style TargetType="buttons:SfCheckBox">
+            <Setter Property="CheckedColor"
+                    Value="{StaticResource Primary}" />
+            <Setter Property="UncheckedColor"
+                    Value="{StaticResource Primary}" />
+        </Style>
+    </ContentPage.Resources>
 
     <Shell.TitleView>
         <Grid>
@@ -22,468 +42,931 @@
     </Shell.TitleView>
 
     <Grid>
-        <ScrollView Padding="15">
-            <VerticalStackLayout VerticalOptions="Start"
-                                 Spacing="10">
-                <Grid ColumnDefinitions=".25*,.75*">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Label Text="Nombre:"
-                           VerticalTextAlignment="Center" />
-                    <Entry Grid.Column="1"
-                           TextColor="Black"
-                           Text="{Binding MedicoName, Mode=TwoWay}" />
-                    <Label Grid.Row="1"
-                           Text="Contacto:"
-                           VerticalTextAlignment="Center" />
-                    <Entry Grid.Column="1"
-                           Grid.Row="1"
-                           TextColor="Black"
-                           Text="{Binding MedicoContact, Mode=TwoWay}" />
-                    <Label Grid.Row="2"
-                           Text="Dirección:"
-                           VerticalTextAlignment="Center" />
-                    <Entry Grid.Column="1"
-                           Grid.Row="2"
-                           TextColor="Black"
-                           Text="{Binding MedicoDireccion, Mode=TwoWay}" />
-                    <Label Grid.Row="3"
-                           Text="Teléfono:"
-                           VerticalTextAlignment="Center" />
-                    <Entry Grid.Column="1"
-                           Grid.Row="3"
-                           TextColor="Black"
-                           Keyboard="Numeric"
-                           Text="{Binding MedicoTelefono, Mode=TwoWay}">
-                        <Entry.Behaviors>
-                            <toolkit:MaskedBehavior Mask="0000 0000"
-                                                    UnmaskedCharacter="0" />
-                        </Entry.Behaviors>
-                    </Entry>
-                    <Label Grid.Row="4"
-                           Text="E-mail:"
-                           VerticalTextAlignment="Center" />
-                    <Entry Grid.Column="1"
-                           Grid.Row="4"
-                           TextColor="Black"
-                           Text="{Binding MedicoMail, Mode=TwoWay}" />
-                    <Label Grid.Row="5"
-                           Text="JVPM:"
-                           VerticalTextAlignment="Center" />
-                    <Entry Grid.Column="1"
-                           Grid.Row="5"
-                           Keyboard="Numeric"
-                           TextColor="Black"
-                           Text="{Binding MedicoJVPM, Mode=TwoWay}">
-                        <Entry.Behaviors>
-                            <toolkit:MaskedBehavior Mask="00000000-0"
-                                                    UnmaskedCharacter="0" />
-                        </Entry.Behaviors>
-                    </Entry>
-                </Grid>
-                <Label Text="Seleccione la Especialidad:" />
-                <Border x:Name="frame_selectEspecialidad"
-                        BackgroundColor="White"
-                        Stroke="{StaticResource Accent}"
-                        Padding="20,2.5"
-                        StrokeShape="RoundRectangle 4">
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="Especialidad_Tapped" />
-                    </Border.GestureRecognizers>
-                    <Grid>
-                        <Picker x:Name="SelectEspecialidades"
-                                Title="{x:Null}"
-                                BackgroundColor="Transparent"
-                                FontAttributes="Bold"
-                                HeightRequest="45"
-                                FontSize="12"
-                                HorizontalOptions="Fill"
-                                ItemDisplayBinding="{Binding DESCRIPCION_CLASE}"
-                                ItemsSource="{Binding Especialidades, Mode=TwoWay}"
-                                SelectedItem="{Binding Especialidad, Mode=TwoWay}"
-                                TextColor="Black" />
-                        <Image HorizontalOptions="End">
-                            <Image.Source>
-                                <FontImageSource FontFamily="Icon"
-                                                 Glyph="&#xE806;"
-                                                 Size="20"
-                                                 Color="{StaticResource Gray500}" />
-                            </Image.Source>
-                        </Image>
+        <core:SfBusyIndicator x:Name="busyIndicator"
+                              Title="Cargando Formulario..."
+                              Grid.Row="1"
+                              AnimationType="Cupertino"
+                              FontSize="14"
+                              HorizontalOptions="Fill"
+                              IndicatorColor="#2d3e50"
+                              IsRunning="{Binding Indicador, Mode=TwoWay}"
+                              OverlayFill="Transparent"
+                              SizeFactor="0.65"
+                              VerticalOptions="Fill">
+            <ScrollView x:Name="formulario"
+                        Padding="15">
+                <VerticalStackLayout x:Name="List_FormularioNuevoMedico"
+                                     VerticalOptions="Start"
+                                     Spacing="5">
+                    <Border Stroke="#90c3e3"
+                            Padding="15"
+                            StrokeShape="RoundRectangle 10">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0"
+                                                 EndPoint="1,0">
+                                <GradientStop Color="#f4fbfd"
+                                              Offset="0.0" />
+                                <GradientStop Color="White"
+                                              Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <VerticalStackLayout>
+                            <Border Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 10"
+                                    Padding="10"
+                                    Margin="0,0,0,10">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,0">
+                                        <GradientStop Color="#9090c3e3"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="White"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Grid ColumnSpacing="15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.RowSpan="2"
+                                            StrokeShape="RoundRectangle 10"
+                                            Stroke="#eaf6f8"
+                                            BackgroundColor="#eaf6f8"
+                                            HeightRequest="35"
+                                            WidthRequest="35">
+                                        <Label Text="01"
+                                               TextColor="#1689a7"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               FontAttributes="Bold"
+                                               FontSize="18" />
+                                    </Border>
+                                    <Label Grid.Column="1"
+                                           Text="IDENTIFICACIÓN PROFESIONAL"
+                                           FontAttributes="Bold" />
+                                    <Label Grid.Column="1"
+                                           Grid.Row="1"
+                                           Text="Nombre, especialidad y registro médico."
+                                           FontSize="12" />
+                                </Grid>
+                            </Border>
+
+                            <Label Text="Nombre Completo:" />
+                            <core:SfTextInputLayout ContainerBackground="White"
+                                                    ContainerType="Outlined"
+                                                    ReserveSpaceForAssistiveLabels="False"
+                                                    ShowHint="False"
+                                                    InputViewPadding="15"
+                                                    HeightRequest="50"
+                                                    OutlineCornerRadius="10">
+                                <Entry FontSize="14"
+                                       Text="{Binding MedicoName, Mode=TwoWay}" />
+                            </core:SfTextInputLayout>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Especialidad:" />
+                            <Border x:Name="frame_selectEspecialidad"
+                                    BackgroundColor="White"
+                                    VerticalOptions="Center"
+                                    Stroke="{StaticResource Accent}"
+                                    Padding="20,5,17.5,5"
+                                    StrokeShape="RoundRectangle 10">
+                                <editors:SfComboBox x:Name="searchbox_especialidad"
+                                                    TextSearchMode="Contains"
+                                                    IsEditable="False"
+                                                    IsFilteringEnabled="False"
+                                                    TextMemberPath="DESCRIPCION_CLASE"
+                                                    DisplayMemberPath="DESCRIPCION_CLASE"
+                                                    IsClearButtonVisible="False"
+                                                    Placeholder="- Seleccione -"
+                                                    PlaceholderColor="Black"
+                                                    SelectionMode="Single"
+                                                    ItemsSource="{Binding Especialidades}"
+                                                    SelectedItem="{Binding Especialidad}"
+                                                    DropDownClosed="searchbox_especialidad_DropDownClosed">
+                                    <editors:SfComboBox.DropDownButtonSettings>
+                                        <editors:DropDownButtonSettings>
+                                            <editors:DropDownButtonSettings.View>
+                                                <Grid>
+                                                    <Image Grid.Column="1"
+                                                           HorizontalOptions="End">
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="Icon"
+                                                                             Glyph="&#xE806;"
+                                                                             Size="20"
+                                                                             Color="{StaticResource Gray500}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Grid>
+                                            </editors:DropDownButtonSettings.View>
+                                        </editors:DropDownButtonSettings>
+                                    </editors:SfComboBox.DropDownButtonSettings>
+                                    <editors:SfComboBox.NoResultsFoundTemplate>
+                                        <DataTemplate>
+                                            <Label Text="No Encontrado"
+                                                   FontSize="14"
+                                                   VerticalOptions="Center"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center" />
+                                        </DataTemplate>
+                                    </editors:SfComboBox.NoResultsFoundTemplate>
+                                </editors:SfComboBox>
+                            </Border>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Preferencia de Producto:" />
+                            <Border x:Name="frame_selectPreferencias"
+                                    BackgroundColor="White"
+                                    VerticalOptions="Center"
+                                    Stroke="{StaticResource Accent}"
+                                    Padding="20,5,17.5,5"
+                                    StrokeShape="RoundRectangle 10">
+                                <editors:SfComboBox x:Name="searchbox_preferencias"
+                                                    TextSearchMode="Contains"
+                                                    IsEditable="False"
+                                                    IsFilteringEnabled="False"
+                                                    MultiSelectionDisplayMode="Delimiter"
+                                                    TextMemberPath="DESCRIPCION_PROD_PREFERENCIA"
+                                                    DisplayMemberPath="DESCRIPCION_PROD_PREFERENCIA"
+                                                    IsClearButtonVisible="False"
+                                                    Placeholder="- Seleccione -"
+                                                    PlaceholderColor="Black"
+                                                    SelectionMode="Multiple"
+                                                    DelimiterText=", "
+                                                    ItemsSource="{Binding Preferencias}"
+                                                    DropDownClosed="searchbox_preferencias_DropDownClosed">
+                                    <editors:SfComboBox.DropDownButtonSettings>
+                                        <editors:DropDownButtonSettings>
+                                            <editors:DropDownButtonSettings.View>
+                                                <Grid>
+                                                    <Image Grid.Column="1"
+                                                           HorizontalOptions="End">
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="Icon"
+                                                                             Glyph="&#xE806;"
+                                                                             Size="20"
+                                                                             Color="{StaticResource Gray500}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Grid>
+                                            </editors:DropDownButtonSettings.View>
+                                        </editors:DropDownButtonSettings>
+                                    </editors:SfComboBox.DropDownButtonSettings>
+                                    <editors:SfComboBox.NoResultsFoundTemplate>
+                                        <DataTemplate>
+                                            <Label Text="No Encontrado"
+                                                   FontSize="14"
+                                                   VerticalOptions="Center"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center" />
+                                        </DataTemplate>
+                                    </editors:SfComboBox.NoResultsFoundTemplate>
+                                </editors:SfComboBox>
+                            </Border>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="DUI:" />
+                            <core:SfTextInputLayout ContainerBackground="White"
+                                                    ContainerType="Outlined"
+                                                    ReserveSpaceForAssistiveLabels="False"
+                                                    ShowHint="False"
+                                                    InputViewPadding="15"
+                                                    HeightRequest="50"
+                                                    OutlineCornerRadius="10">
+                                <editors:SfMaskedEntry FontSize="14"
+                                                       MaskType="Simple"
+                                                       Mask="00000000-0"
+                                                       Keyboard="Numeric"
+                                                       Text="{Binding MedicoDUI, Mode=TwoWay}" />
+
+
+                            </core:SfTextInputLayout>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="JVPM:" />
+                            <core:SfTextInputLayout ContainerBackground="White"
+                                                    ContainerType="Outlined"
+                                                    ReserveSpaceForAssistiveLabels="False"
+                                                    ShowHint="False"
+                                                    InputViewPadding="15"
+                                                    HeightRequest="50"
+                                                    OutlineCornerRadius="10">
+                                <Entry FontSize="14"
+                                       Text="{Binding MedicoJVPM, Mode=TwoWay}" />
+                            </core:SfTextInputLayout>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Categoría:" />
+                            <Border x:Name="frame_selectCategoria"
+                                    BackgroundColor="White"
+                                    VerticalOptions="Center"
+                                    Stroke="{StaticResource Accent}"
+                                    Padding="20,5,17.5,5"
+                                    StrokeShape="RoundRectangle 10">
+                                <editors:SfComboBox x:Name="searchbox_categoria"
+                                                    TextSearchMode="Contains"
+                                                    IsEditable="False"
+                                                    IsFilteringEnabled="False"
+                                                    TextMemberPath="CATEGORIA"
+                                                    DisplayMemberPath="CATEGORIA"
+                                                    IsClearButtonVisible="False"
+                                                    Placeholder="- Seleccione -"
+                                                    PlaceholderColor="Black"
+                                                    SelectionMode="Single"
+                                                    ItemsSource="{Binding Categorias}"
+                                                    SelectedItem="{Binding Categoria}"
+                                                    DropDownClosed="searchbox_categoria_DropDownClosed">
+                                    <editors:SfComboBox.DropDownButtonSettings>
+                                        <editors:DropDownButtonSettings>
+                                            <editors:DropDownButtonSettings.View>
+                                                <Grid>
+                                                    <Image Grid.Column="1"
+                                                           HorizontalOptions="End">
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="Icon"
+                                                                             Glyph="&#xE806;"
+                                                                             Size="20"
+                                                                             Color="{StaticResource Gray500}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Grid>
+                                            </editors:DropDownButtonSettings.View>
+                                        </editors:DropDownButtonSettings>
+                                    </editors:SfComboBox.DropDownButtonSettings>
+                                    <editors:SfComboBox.NoResultsFoundTemplate>
+                                        <DataTemplate>
+                                            <Label Text="No Encontrado"
+                                                   FontSize="14"
+                                                   VerticalOptions="Center"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center" />
+                                        </DataTemplate>
+                                    </editors:SfComboBox.NoResultsFoundTemplate>
+                                </editors:SfComboBox>
+                            </Border>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Escala de Adaptación:" />
+                            <Border x:Name="frame_selectAdaptacion"
+                                    BackgroundColor="White"
+                                    VerticalOptions="Center"
+                                    Stroke="{StaticResource Accent}"
+                                    Padding="20,5,17.5,5"
+                                    StrokeShape="RoundRectangle 10">
+                                <editors:SfComboBox x:Name="searchbox_adaptacion"
+                                                    TextSearchMode="Contains"
+                                                    IsEditable="False"
+                                                    IsFilteringEnabled="False"
+                                                    IsClearButtonVisible="False"
+                                                    Placeholder="- Seleccione -"
+                                                    PlaceholderColor="Black"
+                                                    SelectionMode="Single"
+                                                    ItemsSource="{Binding EscalasAdaptacion}"
+                                                    DropDownClosed="searchbox_adaptacion_DropDownClosed">
+                                    <editors:SfComboBox.DropDownButtonSettings>
+                                        <editors:DropDownButtonSettings>
+                                            <editors:DropDownButtonSettings.View>
+                                                <Grid>
+                                                    <Image Grid.Column="1"
+                                                           HorizontalOptions="End">
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="Icon"
+                                                                             Glyph="&#xE806;"
+                                                                             Size="20"
+                                                                             Color="{StaticResource Gray500}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Grid>
+                                            </editors:DropDownButtonSettings.View>
+                                        </editors:DropDownButtonSettings>
+                                    </editors:SfComboBox.DropDownButtonSettings>
+                                    <editors:SfComboBox.NoResultsFoundTemplate>
+                                        <DataTemplate>
+                                            <Label Text="No Encontrado"
+                                                   FontSize="14"
+                                                   VerticalOptions="Center"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center" />
+                                        </DataTemplate>
+                                    </editors:SfComboBox.NoResultsFoundTemplate>
+                                </editors:SfComboBox>
+                            </Border>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Color Clasificación:" />
+                            <Border x:Name="frame_colores"
+                                    BackgroundColor="White"
+                                    VerticalOptions="Center"
+                                    Stroke="{StaticResource Accent}"
+                                    Padding="20,5"
+                                    StrokeShape="RoundRectangle 10">
+                                <editors:SfComboBox x:Name="searchbox_colores"
+                                                    IsEditable="False"
+                                                    IsFilteringEnabled="False"
+                                                    IsClearButtonVisible="False"
+                                                    Placeholder="- Seleccione -"
+                                                    PlaceholderColor="Black"
+                                                    SelectionMode="Single"
+                                                    ItemsSource="{Binding Colores}"
+                                                    SelectedItem="{Binding SelectedColor}">
+                                    <editors:SfComboBox.DropDownButtonSettings>
+                                        <editors:DropDownButtonSettings Width="20">
+                                            <editors:DropDownButtonSettings.View>
+                                                <Grid>
+                                                    <Image>
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="Icon"
+                                                                             Glyph="&#xE806;"
+                                                                             Size="20"
+                                                                             Color="{StaticResource Gray500}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Grid>
+                                            </editors:DropDownButtonSettings.View>
+                                        </editors:DropDownButtonSettings>
+                                    </editors:SfComboBox.DropDownButtonSettings>
+                                    <editors:SfComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <HorizontalStackLayout Padding="10">
+                                                <Border HeightRequest="25"
+                                                        WidthRequest="25"
+                                                        Margin="15"
+                                                        Padding="15">
+                                                    <Border.Triggers>
+                                                        <DataTrigger TargetType="Border"
+                                                                     Binding="{Binding .}"
+                                                                     Value="Rojo">
+                                                            <Setter Property="BackgroundColor"
+                                                                    Value="Red" />
+                                                        </DataTrigger>
+
+                                                        <DataTrigger TargetType="Border"
+                                                                     Binding="{Binding .}"
+                                                                     Value="Azul">
+                                                            <Setter Property="BackgroundColor"
+                                                                    Value="Blue" />
+                                                        </DataTrigger>
+
+                                                        <DataTrigger TargetType="Border"
+                                                                     Binding="{Binding .}"
+                                                                     Value="Amarillo">
+                                                            <Setter Property="BackgroundColor"
+                                                                    Value="Yellow" />
+                                                        </DataTrigger>
+
+                                                        <DataTrigger TargetType="Border"
+                                                                     Binding="{Binding .}"
+                                                                     Value="Verde">
+                                                            <Setter Property="BackgroundColor"
+                                                                    Value="Green" />
+                                                        </DataTrigger>
+                                                    </Border.Triggers>
+                                                </Border>
+                                                <Label Text="{Binding .}"
+                                                       FontSize="14"
+                                                       TextColor="Black"
+                                                       FontAttributes="Bold"
+                                                       VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+                                        </DataTemplate>
+                                    </editors:SfComboBox.ItemTemplate>
+                                </editors:SfComboBox>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Stroke="#90c3e3"
+                            Padding="15"
+                            StrokeShape="RoundRectangle 10">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0"
+                                                 EndPoint="1,0">
+                                <GradientStop Color="#f4fbfd"
+                                              Offset="0.0" />
+                                <GradientStop Color="White"
+                                              Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <VerticalStackLayout>
+                            <Border Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 10"
+                                    Padding="10"
+                                    Margin="0,0,0,10">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,0">
+                                        <GradientStop Color="#9090c3e3"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="White"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Grid ColumnSpacing="15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.RowSpan="2"
+                                            StrokeShape="RoundRectangle 10"
+                                            Stroke="#eaf6f8"
+                                            BackgroundColor="#eaf6f8"
+                                            HeightRequest="35"
+                                            WidthRequest="35">
+                                        <Label Text="02"
+                                               TextColor="#1689a7"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               FontAttributes="Bold"
+                                               FontSize="18" />
+                                    </Border>
+                                    <Label Grid.Column="1"
+                                           Text="CONTACTO"
+                                           FontAttributes="Bold" />
+                                    <Label Grid.Column="1"
+                                           Grid.Row="1"
+                                           Text="Canales disponibles para coordinación y seguimiento."
+                                           FontSize="12" />
+                                </Grid>
+                            </Border>
+
+                            <Label Text="Nombre de Contacto:" />
+                            <core:SfTextInputLayout ContainerBackground="White"
+                                                    ContainerType="Outlined"
+                                                    ReserveSpaceForAssistiveLabels="False"
+                                                    ShowHint="False"
+                                                    InputViewPadding="15"
+                                                    HeightRequest="50"
+                                                    OutlineCornerRadius="10">
+                                <Entry FontSize="14"
+                                       Text="{Binding MedicoContact, Mode=TwoWay}" />
+                            </core:SfTextInputLayout>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Teléfono:" />
+                            <core:SfTextInputLayout ContainerBackground="White"
+                                                    ContainerType="Outlined"
+                                                    ReserveSpaceForAssistiveLabels="False"
+                                                    ShowHint="False"
+                                                    InputViewPadding="15"
+                                                    HeightRequest="50"
+                                                    OutlineCornerRadius="10">
+                                <editors:SfMaskedEntry FontSize="14"
+                                                       MaskType="Simple"
+                                                       Mask="0000 0000"
+                                                       Keyboard="Telephone"
+                                                       Text="{Binding MedicoTelefono, Mode=TwoWay}" />
+                            </core:SfTextInputLayout>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Correo Electrónico:" />
+                            <core:SfTextInputLayout ContainerBackground="White"
+                                                    ContainerType="Outlined"
+                                                    ReserveSpaceForAssistiveLabels="False"
+                                                    ShowHint="False"
+                                                    InputViewPadding="15"
+                                                    HeightRequest="50"
+                                                    OutlineCornerRadius="10">
+                                <Entry FontSize="14"
+                                       Text="{Binding MedicoMail, Mode=TwoWay}"
+                                       Keyboard="Email" />
+                            </core:SfTextInputLayout>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Stroke="#90c3e3"
+                            Padding="15"
+                            StrokeShape="RoundRectangle 10">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0"
+                                                 EndPoint="1,0">
+                                <GradientStop Color="#f4fbfd"
+                                              Offset="0.0" />
+                                <GradientStop Color="White"
+                                              Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <VerticalStackLayout>
+                            <Border Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 10"
+                                    Padding="10"
+                                    Margin="0,0,0,10">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,0">
+                                        <GradientStop Color="#9090c3e3"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="White"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Grid ColumnSpacing="15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.RowSpan="2"
+                                            StrokeShape="RoundRectangle 10"
+                                            Stroke="#eaf6f8"
+                                            BackgroundColor="#eaf6f8"
+                                            HeightRequest="35"
+                                            WidthRequest="35">
+                                        <Label Text="03"
+                                               TextColor="#1689a7"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               FontAttributes="Bold"
+                                               FontSize="18" />
+                                    </Border>
+                                    <Label Grid.Column="1"
+                                           Text="UBICACIÓN"
+                                           FontAttributes="Bold" />
+                                    <Label Grid.Column="1"
+                                           Grid.Row="1"
+                                           Text="Dirección administrativa y coordenadas de visita."
+                                           FontSize="12" />
+                                </Grid>
+                            </Border>
+
+                            <Label Text="Dirección:" />
+                            <core:SfTextInputLayout ContainerBackground="White"
+                                                    ContainerType="Outlined"
+                                                    ReserveSpaceForAssistiveLabels="False"
+                                                    ShowHint="False"
+                                                    InputViewPadding="15"
+                                                    HeightRequest="50"
+                                                    OutlineCornerRadius="10">
+                                <Entry FontSize="14"
+                                       Text="{Binding MedicoDireccion, Mode=TwoWay}" />
+                            </core:SfTextInputLayout>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="País:" />
+                            <Border x:Name="frame_selectPais"
+                                    BackgroundColor="White"
+                                    VerticalOptions="Center"
+                                    Stroke="{StaticResource Accent}"
+                                    Padding="20,5,17.5,5"
+                                    StrokeShape="RoundRectangle 10">
+                                <editors:SfComboBox x:Name="searchbox_pais"
+                                                    TextSearchMode="Contains"
+                                                    IsEditable="False"
+                                                    IsFilteringEnabled="False"
+                                                    TextMemberPath="Text"
+                                                    DisplayMemberPath="Text"
+                                                    IsClearButtonVisible="False"
+                                                    Placeholder="- Seleccione -"
+                                                    PlaceholderColor="Black"
+                                                    SelectionMode="Single"
+                                                    ItemsSource="{Binding Paises}"
+                                                    SelectedItem="{Binding Pais}"
+                                                    SelectionChanged="searchbox_pais_SelectionChanged">
+                                    <editors:SfComboBox.DropDownButtonSettings>
+                                        <editors:DropDownButtonSettings>
+                                            <editors:DropDownButtonSettings.View>
+                                                <Grid>
+                                                    <Image Grid.Column="1"
+                                                           HorizontalOptions="End">
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="Icon"
+                                                                             Glyph="&#xE806;"
+                                                                             Size="20"
+                                                                             Color="{StaticResource Gray500}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Grid>
+                                            </editors:DropDownButtonSettings.View>
+                                        </editors:DropDownButtonSettings>
+                                    </editors:SfComboBox.DropDownButtonSettings>
+                                    <editors:SfComboBox.NoResultsFoundTemplate>
+                                        <DataTemplate>
+                                            <Label Text="No Encontrado"
+                                                   FontSize="14"
+                                                   VerticalOptions="Center"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center" />
+                                        </DataTemplate>
+                                    </editors:SfComboBox.NoResultsFoundTemplate>
+                                </editors:SfComboBox>
+                            </Border>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Departamento:" />
+                            <Border x:Name="frame_selectDepartamento"
+                                    BackgroundColor="White"
+                                    Opacity="0.5"
+                                    VerticalOptions="Center"
+                                    Stroke="{StaticResource Accent}"
+                                    Padding="20,5,17.5,5"
+                                    StrokeShape="RoundRectangle 10">
+                                <editors:SfComboBox x:Name="searchbox_departamento"
+                                                    IsEnabled="False"
+                                                    TextSearchMode="Contains"
+                                                    IsEditable="False"
+                                                    IsFilteringEnabled="False"
+                                                    TextMemberPath="Text"
+                                                    DisplayMemberPath="Text"
+                                                    IsClearButtonVisible="False"
+                                                    Placeholder="- Seleccione -"
+                                                    PlaceholderColor="Black"
+                                                    SelectionMode="Single"
+                                                    ItemsSource="{Binding Departamentos}"
+                                                    SelectedItem="{Binding Departamento}"
+                                                    SelectionChanged="searchbox_departamento_SelectionChanged">
+                                    <editors:SfComboBox.DropDownButtonSettings>
+                                        <editors:DropDownButtonSettings>
+                                            <editors:DropDownButtonSettings.View>
+                                                <Grid>
+                                                    <Image Grid.Column="1"
+                                                           HorizontalOptions="End">
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="Icon"
+                                                                             Glyph="&#xE806;"
+                                                                             Size="20"
+                                                                             Color="{StaticResource Gray500}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Grid>
+                                            </editors:DropDownButtonSettings.View>
+                                        </editors:DropDownButtonSettings>
+                                    </editors:SfComboBox.DropDownButtonSettings>
+                                    <editors:SfComboBox.NoResultsFoundTemplate>
+                                        <DataTemplate>
+                                            <Label Text="No Encontrado"
+                                                   FontSize="14"
+                                                   VerticalOptions="Center"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center" />
+                                        </DataTemplate>
+                                    </editors:SfComboBox.NoResultsFoundTemplate>
+                                </editors:SfComboBox>
+                            </Border>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Municipio:" />
+                            <Border x:Name="frame_selectMunicipio"
+                                    BackgroundColor="White"
+                                    Opacity="0.5"
+                                    VerticalOptions="Center"
+                                    Stroke="{StaticResource Accent}"
+                                    Padding="20,5,17.5,5"
+                                    StrokeShape="RoundRectangle 10">
+                                <editors:SfComboBox x:Name="searchbox_municipio"
+                                                    IsEnabled="False"
+                                                    TextSearchMode="Contains"
+                                                    IsEditable="False"
+                                                    IsFilteringEnabled="False"
+                                                    TextMemberPath="Text"
+                                                    DisplayMemberPath="Text"
+                                                    IsClearButtonVisible="False"
+                                                    Placeholder="- Seleccione -"
+                                                    PlaceholderColor="Black"
+                                                    SelectionMode="Single"
+                                                    ItemsSource="{Binding Municipios}"
+                                                    SelectedItem="{Binding Municipio}">
+                                    <editors:SfComboBox.DropDownButtonSettings>
+                                        <editors:DropDownButtonSettings>
+                                            <editors:DropDownButtonSettings.View>
+                                                <Grid>
+                                                    <Image Grid.Column="1"
+                                                           HorizontalOptions="End">
+                                                        <Image.Source>
+                                                            <FontImageSource FontFamily="Icon"
+                                                                             Glyph="&#xE806;"
+                                                                             Size="20"
+                                                                             Color="{StaticResource Gray500}" />
+                                                        </Image.Source>
+                                                    </Image>
+                                                </Grid>
+                                            </editors:DropDownButtonSettings.View>
+                                        </editors:DropDownButtonSettings>
+                                    </editors:SfComboBox.DropDownButtonSettings>
+                                    <editors:SfComboBox.NoResultsFoundTemplate>
+                                        <DataTemplate>
+                                            <Label Text="No Encontrado"
+                                                   FontSize="14"
+                                                   VerticalOptions="Center"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center" />
+                                        </DataTemplate>
+                                    </editors:SfComboBox.NoResultsFoundTemplate>
+                                </editors:SfComboBox>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Stroke="#90c3e3"
+                            Padding="15"
+                            StrokeShape="RoundRectangle 10">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0"
+                                                 EndPoint="1,0">
+                                <GradientStop Color="#f4fbfd"
+                                              Offset="0.0" />
+                                <GradientStop Color="White"
+                                              Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <VerticalStackLayout>
+                            <Border Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 10"
+                                    Padding="10"
+                                    Margin="0,0,0,10">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,0">
+                                        <GradientStop Color="#9090c3e3"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="White"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Grid ColumnSpacing="15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.RowSpan="2"
+                                            StrokeShape="RoundRectangle 10"
+                                            Stroke="#eaf6f8"
+                                            BackgroundColor="#eaf6f8"
+                                            HeightRequest="35"
+                                            WidthRequest="35">
+                                        <Label Text="04"
+                                               TextColor="#1689a7"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               FontAttributes="Bold"
+                                               FontSize="18" />
+                                    </Border>
+                                    <Label Grid.Column="1"
+                                           Text="CONFIGURACIÓN DE VISITA"
+                                           FontAttributes="Bold" />
+                                    <Label Grid.Column="1"
+                                           Grid.Row="1"
+                                           Text="Programación de semanas y días disponibles para realizar la visita."
+                                           FontSize="12" />
+                                </Grid>
+                            </Border>
+
+                            <Grid ColumnDefinitions=".6*, .4*"
+                                  ColumnSpacing="15">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Label Text="Fecha de Visita:" />
+                                <Border Grid.Row="1"
+                                        HorizontalOptions="Start"
+                                        StrokeShape="RoundRectangle 10"
+                                        Background="#10000000">
+                                    <DatePicker x:Name="date_FechaInicial"
+                                                Margin="10,0"
+                                                Format="ddd dd MMMM, yyyy"
+                                                IsEnabled="False"
+                                                FontAttributes="Bold"
+                                                Date="{Binding FechaInicial, Mode=TwoWay}"
+                                                DateSelected="date_FechaInicial_DateSelected" />
+                                </Border>
+                                <Label Grid.Column="1"
+                                       Text="Repetir Visita:" />
+                                <buttons:SfSwitch x:Name="sw_repetir"
+                                                  Grid.Column="1"
+                                                  Grid.Row="1"
+                                                  FlowDirection="LeftToRight"
+                                                  HorizontalOptions="Start"
+                                                  IsOn="True"
+                                                  StateChanged="sw_repetir_StateChanged">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup  x:Name="CommonStates">
+                                            <VisualState x:Name="On">
+                                                <VisualState.Setters>
+                                                    <Setter Property="SwitchSettings">
+                                                        <Setter.Value>
+                                                            <buttons:SwitchSettings ThumbBackground="{StaticResource Primary}"
+                                                                                    ThumbStroke="{StaticResource Primary}"
+                                                                                    TrackBackground="{StaticResource PrimaryTransparency8}"
+                                                                                    TrackStroke="{StaticResource Primary}" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                            <VisualState x:Name="Off">
+                                                <VisualState.Setters>
+                                                    <Setter Property="SwitchSettings">
+                                                        <Setter.Value>
+                                                            <buttons:SwitchSettings ThumbBackground="Gray"
+                                                                                    ThumbStroke="Gray"
+                                                                                    TrackBackground="White"
+                                                                                    TrackStroke="Gray" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                </buttons:SfSwitch>
+                            </Grid>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Semanas Visita:" />
+                            <Grid ColumnDefinitions=".25*, .25*, .25*, .25*">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <buttons:SfCheckBox Text="S1"
+                                                    IsChecked="{Binding CheckS1}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Column="1"
+                                                    Text="S2"
+                                                    IsChecked="{Binding CheckS2}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Column="2"
+                                                    Text="S3"
+                                                    IsChecked="{Binding CheckS3}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Column="3"
+                                                    Text="S4"
+                                                    IsChecked="{Binding CheckS4}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Row="1"
+                                                    Text="S5"
+                                                    IsChecked="{Binding CheckS5}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    Text="S6"
+                                                    IsChecked="{Binding CheckS6}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                            </Grid>
+
+                            <Label Margin="0,10,0,0"
+                                   Text="Días Visita:" />
+                            <Grid ColumnDefinitions=".2*, .2*, .2*, .2*, .2*">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <buttons:SfCheckBox Text="D"
+                                                    IsChecked="{Binding CheckD}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Column="1"
+                                                    Text="L"
+                                                    IsChecked="{Binding CheckL}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Column="2"
+                                                    Text="M"
+                                                    IsChecked="{Binding CheckM}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Column="3"
+                                                    Text="Mi"
+                                                    IsChecked="{Binding CheckMi}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Column="4"
+                                                    Text="J"
+                                                    IsChecked="{Binding CheckJ}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Row="1"
+                                                    Text="V"
+                                                    IsChecked="{Binding CheckV}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                                <buttons:SfCheckBox Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    Text="S"
+                                                    IsChecked="{Binding CheckS}"
+                                                    IsEnabled="{Binding EnableRepetir}" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Grid ColumnDefinitions=".5*,.5*"
+                          ColumnSpacing="15"
+                          Margin="0,15,0,0">
+                        <Button Text="CANCELAR"
+                                Clicked="Cancelar_Clicked" />
+                        <Button Text="GUARDAR"
+                                Grid.Column="1"
+                                Clicked="Guardar_Clicked" />
                     </Grid>
-                </Border>
-                <Label Text="Selecicone la Categoría" />
-                <Border x:Name="frame_selectCategoria"
-                        BackgroundColor="White"
-                        Stroke="{StaticResource Accent}"
-                        Padding="20,2.5"
-                        StrokeShape="RoundRectangle 4">
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="Categoria_Tapped" />
-                    </Border.GestureRecognizers>
-                    <Grid>
-                        <Picker x:Name="SelectCategorias"
-                                Title="{x:Null}"
-                                BackgroundColor="Transparent"
-                                FontAttributes="Bold"
-                                HeightRequest="45"
-                                FontSize="12"
-                                HorizontalOptions="Fill"
-                                ItemDisplayBinding="{Binding CATEGORIA}"
-                                ItemsSource="{Binding Categorias, Mode=TwoWay}"
-                                SelectedItem="{Binding Categoria, Mode=TwoWay}"
-                                TextColor="Black" />
-                        <Image HorizontalOptions="End">
-                            <Image.Source>
-                                <FontImageSource FontFamily="Icon"
-                                                 Glyph="&#xE806;"
-                                                 Size="20"
-                                                 Color="{StaticResource Gray500}" />
-                            </Image.Source>
-                        </Image>
-                    </Grid>
-                </Border>
-                <Label Text="Seleccione la Preferencia de Producto:" />
-                <Border x:Name="frame_selectPreferencias"
-                        BackgroundColor="White"
-                        VerticalOptions="Center"
-                        Stroke="{StaticResource Accent}"
-                        Padding="20,5,17.5,5"
-                        StrokeShape="RoundRectangle 4">
-                    <editors:SfComboBox x:Name="searchbox_preferencias"
-                                        TextSearchMode="Contains"
-                                        IsEditable="False"
-                                        IsFilteringEnabled="False"
-                                        MultiSelectionDisplayMode="Delimiter"
-                                        TextMemberPath="DESCRIPCION_PROD_PREFERENCIA"
-                                        DisplayMemberPath="DESCRIPCION_PROD_PREFERENCIA"
-                                        IsClearButtonVisible="False"
-                                        Placeholder="No hay Selección"
-                                        PlaceholderColor="Gray"
-                                        SelectionMode="Multiple"
-                                        DelimiterText=", "
-                                        ItemsSource="{Binding Preferencias}"
-                                        DropDownClosed="searchbox_preferencias_DropDownClosed">
-                        <editors:SfComboBox.DropDownButtonSettings>
-                            <editors:DropDownButtonSettings>
-                                <editors:DropDownButtonSettings.View>
-                                    <Grid>
-                                        <Image Grid.Column="1"
-                                               HorizontalOptions="End">
-                                            <Image.Source>
-                                                <FontImageSource FontFamily="Icon"
-                                                                 Glyph="&#xE806;"
-                                                                 Size="20"
-                                                                 Color="{StaticResource Gray500}" />
-                                            </Image.Source>
-                                        </Image>
-                                    </Grid>
-                                </editors:DropDownButtonSettings.View>
-                            </editors:DropDownButtonSettings>
-                        </editors:SfComboBox.DropDownButtonSettings>
-                        <editors:SfComboBox.NoResultsFoundTemplate>
-                            <DataTemplate>
-                                <Label Text="No Encontrado"
-                                       FontSize="14"
-                                       VerticalOptions="Center"
-                                       FontAttributes="Bold"
-                                       HorizontalOptions="Center" />
-                            </DataTemplate>
-                        </editors:SfComboBox.NoResultsFoundTemplate>
-                    </editors:SfComboBox>
-                </Border>
-                <Label Text="Seleccione el Color:" />
-                <Grid ColumnDefinitions=".25*, .25*,.25*,.25*"
-                      ColumnSpacing="15">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="25" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Border x:Name="ColorSeleccionado"
-                            Grid.Column="{Binding Position}"
-                            Grid.RowSpan="2"
-                            Stroke="Blue"
-                            BackgroundColor="#5000EEFF"
-                            IsVisible="False" />
-                    <Border x:Name="seleccion_rojo"
-                            BackgroundColor="Red"
-                            Stroke="Transparent"
-                            Margin="5">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="Rojo_Tapped" />
-                        </Border.GestureRecognizers>
-                    </Border>
-                    <Border x:Name="seleccion_azul"
-                            Grid.Column="1"
-                            BackgroundColor="Blue"
-                            Stroke="Transparent"
-                            Margin="5">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="Azul_Tapped" />
-                        </Border.GestureRecognizers>
-                    </Border>
-                    <Border x:Name="seleccion_amarillo"
-                            Grid.Column="2"
-                            BackgroundColor="Yellow"
-                            Stroke="Transparent"
-                            Margin="5">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="Amarillo_Tapped" />
-                        </Border.GestureRecognizers>
-                    </Border>
-                    <Border x:Name="seleccion_verde"
-                            Grid.Column="3"
-                            BackgroundColor="Green"
-                            Stroke="Transparent"
-                            Margin="5">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="Verde_Tapped" />
-                        </Border.GestureRecognizers>
-                    </Border>
-                    <Label Grid.Row="1"
-                           Text="Rojo"
-                           HorizontalTextAlignment="Center"
-                           VerticalTextAlignment="Center"
-                           FontAttributes="Bold"
-                           FontSize="16"
-                           Margin="0,0,0,5">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="Rojo_Tapped" />
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Grid.Column="1"
-                           Grid.Row="1"
-                           Text="Azul"
-                           HorizontalTextAlignment="Center"
-                           VerticalTextAlignment="Center"
-                           FontAttributes="Bold"
-                           FontSize="16"
-                           Margin="0,0,0,5">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="Azul_Tapped" />
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Grid.Column="2"
-                           Grid.Row="1"
-                           Text="Amarillo"
-                           HorizontalTextAlignment="Center"
-                           VerticalTextAlignment="Center"
-                           FontAttributes="Bold"
-                           FontSize="16"
-                           Margin="0,0,0,5">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="Amarillo_Tapped" />
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Grid.Column="3"
-                           Grid.Row="1"
-                           Text="Verde"
-                           HorizontalTextAlignment="Center"
-                           VerticalTextAlignment="Center"
-                           FontAttributes="Bold"
-                           FontSize="16"
-                           Margin="0,0,0,5">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="Verde_Tapped" />
-                        </Label.GestureRecognizers>
-                    </Label>
-                </Grid>
-                <Label Text="Seleccione la Escala de Adaptación" />
-                <Border x:Name="frame_selectAdopcion"
-                        BackgroundColor="White"
-                        Stroke="{StaticResource Accent}"
-                        Padding="20,2.5"
-                        StrokeShape="RoundRectangle 4">
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="Adopcion_Tapped" />
-                    </Border.GestureRecognizers>
-                    <Grid>
-                        <Picker x:Name="SelectEscalaAdopcion"
-                                Title="{x:Null}"
-                                BackgroundColor="Transparent"
-                                FontAttributes="Bold"
-                                HeightRequest="45"
-                                FontSize="12"
-                                HorizontalOptions="Fill"
-                                ItemsSource="{Binding EscalasAdaptacion, Mode=TwoWay}"
-                                SelectedItem="{Binding Adaptacion, Mode=TwoWay}"
-                                TextColor="Black" />
-                        <Image HorizontalOptions="End">
-                            <Image.Source>
-                                <FontImageSource FontFamily="Icon"
-                                                 Glyph="&#xE806;"
-                                                 Size="20"
-                                                 Color="{StaticResource Gray500}" />
-                            </Image.Source>
-                        </Image>
-                    </Grid>
-                </Border>
-                <HorizontalStackLayout Spacing="15">
-                    <Label Text="Fecha de Visita"
-                           FontAttributes="Bold"
-                           VerticalTextAlignment="Center"
-                           FontSize="16" />
-                    <Entry x:Name="txt_fechaVisita"
-                           IsEnabled="False"
-                           Text="{Binding FechaVisita, Mode=TwoWay}">
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroupList>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal" />
-                                    <VisualState x:Name="Disabled">
-                                        <VisualState.Setters>
-                                            <Setter Property="TextColor"
-                                                    Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray600}}" />
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateGroupList>
-                        </VisualStateManager.VisualStateGroups>
-                    </Entry>
-                </HorizontalStackLayout>
-                <Grid ColumnDefinitions=".25*,.25*,.25*,.25*">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <HorizontalStackLayout IsVisible="{Binding VisibilidadNuevo}"
-                                           HeightRequest="50"
-                                           Spacing="10">
-                        <Switch x:Name="swt_repetirVisita"
-                                VerticalOptions="Center"
-                                IsToggled="True"
-                                Toggled="swt_repetirVisita_Toggled" />
-                        <Label FontAttributes="Bold"
-                               FontSize="16"
-                               VerticalTextAlignment="Center"
-                               Text="Repetir Visita" />
-                    </HorizontalStackLayout>
-                    <Label Grid.Row="1"
-                           Grid.ColumnSpan="2"
-                           Text="Semanas Visita:" />
-                    <HorizontalStackLayout Grid.Row="2"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckS1, Mode=TwoWay}" />
-                        <Label Text="S1"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Column="1"
-                                           Grid.Row="2"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckS2, Mode=TwoWay}" />
-                        <Label Text="S2"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Column="2"
-                                           Grid.Row="2"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckS3, Mode=TwoWay}" />
-                        <Label Text="S3"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Row="2"
-                                           Grid.Column="3"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckS4, Mode=TwoWay}" />
-                        <Label Text="S4"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Row="3"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckS5, Mode=TwoWay}" />
-                        <Label Text="S5"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Row="3"
-                                           Grid.Column="1"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckS6, Mode=TwoWay}" />
-                        <Label Text="S6"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <Label Grid.Row="4"
-                           Text="Días Visita:" />
-                    <HorizontalStackLayout Grid.Row="5"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckL, Mode=TwoWay}" />
-                        <Label Text="L"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Column="1"
-                                           Grid.Row="5"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckM, Mode=TwoWay}" />
-                        <Label Text="M"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Column="2"
-                                           Grid.Row="5"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckMi, Mode=TwoWay}" />
-                        <Label Text="Mi"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Column="3"
-                                           Grid.Row="5"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckJ, Mode=TwoWay}" />
-                        <Label Text="J"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Row="6"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckV, Mode=TwoWay}" />
-                        <Label Text="V"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Column="1"
-                                           Grid.Row="6"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckS, Mode=TwoWay}" />
-                        <Label Text="S"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Column="2"
-                                           Grid.Row="6"
-                                           HorizontalOptions="Center">
-                        <CheckBox IsEnabled="{Binding EnableRepetir}"
-                                  IsChecked="{Binding CheckD, Mode=TwoWay}" />
-                        <Label Text="D"
-                               VerticalTextAlignment="Center" />
-                    </HorizontalStackLayout>
-                </Grid>
-                <Grid ColumnDefinitions=".5*,.5*"
-                      ColumnSpacing="15">
-                    <Button Text="CANCELAR"
-                            Clicked="Cancelar_Clicked" />
-                    <Button Text="GUARDAR"
-                            Grid.Column="1"
-                            Clicked="Guardar_Clicked" />
-                </Grid>
-            </VerticalStackLayout>
-        </ScrollView>
+                </VerticalStackLayout>
+            </ScrollView>
+        </core:SfBusyIndicator>
     </Grid>
 </ContentPage>

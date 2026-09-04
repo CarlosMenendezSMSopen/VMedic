@@ -38,9 +38,8 @@ namespace VMedic.Efectos
                     var btn = (Grid)sender;
                     await btn.ScaleTo(0.90, 50, Easing.CubicInOut);
                 }
-                else if (sender is Border)
+                else if (sender is Border btn)
                 {
-                    var btn = (Border)sender;
                     var label = btn.FindByName<Label>("lbl_cerrar");
                     if (label != null)
                     {
@@ -48,7 +47,7 @@ namespace VMedic.Efectos
                     }
                     else
                     {
-                        await btn.ScaleTo(0.80, 50, Easing.CubicInOut);
+                        await btn.ScaleTo(0.9, 50, Easing.CubicInOut);
                     }
                 }
             });
@@ -86,9 +85,8 @@ namespace VMedic.Efectos
                     var btn = (Grid)sender;
                     await btn.ScaleTo(1, 50, Easing.CubicInOut);
                 }
-                else if (sender is Border)
+                else if (sender is Border btn)
                 {
-                    var btn = (Border)sender;
                     var label = btn.FindByName<Label>("lbl_cerrar");
                     if (label != null)
                     {

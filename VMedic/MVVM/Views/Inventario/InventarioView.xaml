@@ -3,31 +3,48 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
              x:Class="VMedic.MVVM.Views.Inventario.InventarioView"
-             Shell.BackgroundColor="{StaticResource Primary}"
+             Shell.BackgroundColor="{StaticResource Secondary}"
              Title="InventarioView">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0"
+                             EndPoint="1,0">
+            <GradientStop Color="#90c3e3"
+                          Offset="0.0" />
+            <GradientStop Color="#eafafc"
+                          Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
     <Shell.TitleView>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="50" />
             </Grid.ColumnDefinitions>
-            <Label x:Name="titulo" FontAttributes="Bold"
+            <Label x:Name="titulo"
+                   FontAttributes="Bold"
                    FontSize="20"
                    HorizontalOptions="Fill"
                    HorizontalTextAlignment="Start"
                    Text="Inventario"
                    TextColor="White"
                    VerticalOptions="Center" />
-            <ImageButton x:Name="btn_habilitarBusqueda"
+            <ImageButton x:Name="btn_sincronizar"
                          Grid.Column="1"
-                         Padding="12"
+                         Padding="15"
+                         HeightRequest="50"
+                         Clicked="refreshvie_Refreshing"
+                         Source="refresh.png" />
+            <ImageButton x:Name="btn_habilitarBusqueda"
+                         Grid.Column="2"
+                         Padding="12.5"
                          HeightRequest="50"
                          Clicked="btn_habilitarBusqueda_Clicked"
                          Source="ic_search.png" />
             <Grid x:Name="SearchProducto"
                   IsVisible="False"
-                  Grid.ColumnSpan="2">
+                  Grid.ColumnSpan="3">
                 <Entry x:Name="searchBox_Producto"
                        TextChanged="searchBox_Producto_TextChanged"
                        HorizontalOptions="Fill"
@@ -55,34 +72,29 @@
                               OverlayFill="#90ffffff"
                               SizeFactor="1"
                               VerticalOptions="Fill">
-            <Border Grid.Row="1"
-                    BackgroundColor="White"
-                    Stroke="Transparent"
-                    StrokeShape="RoundRectangle 0"
-                    CompressedLayout.IsHeadless="True">
-                <Grid>
-                    <Label x:Name="lbl_results_productos"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"
-                           IsVisible="{Binding VisibilidadAviso}"
-                           FontSize="24"
-                           FontAttributes="Bold"
-                           TextColor="{StaticResource Gray600}"
-                           Text="No hay resultados" />
-                    <RefreshView x:Name="refreshvie"
-                                 Refreshing="refreshvie_Refreshing"
-                                 IsRefreshing="{Binding Refreshing}">
-                        <ScrollView CompressedLayout.IsHeadless="True"
-                                    Scrolled="ScrollView_Scrolled"
-                                    VerticalOptions="Fill">
-                            <VerticalStackLayout x:Name="List_Productos"
-                                                 HorizontalOptions="Fill"
-                                                 VerticalOptions="Fill"
-                                                 CompressedLayout.IsHeadless="True" />
-                        </ScrollView>
-                    </RefreshView>
-                </Grid>
-            </Border>
+            <Grid>
+                <Label x:Name="lbl_results_productos"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       IsVisible="{Binding VisibilidadAviso}"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource Gray600}"
+                       Text="No hay resultados" />
+                <RefreshView x:Name="refreshvie"
+                             Refreshing="refreshvie_Refreshing"
+                             IsRefreshing="{Binding Refreshing}">
+                    <ScrollView CompressedLayout.IsHeadless="True"
+                                Scrolled="ScrollView_Scrolled"
+                                VerticalOptions="Fill">
+                        <VerticalStackLayout x:Name="List_Productos"
+                                             HorizontalOptions="Fill"
+                                             VerticalOptions="Fill"
+                                             CompressedLayout.IsHeadless="True"
+                                             Margin="0,10" />
+                    </ScrollView>
+                </RefreshView>
+            </Grid>
         </core:SfBusyIndicator>
     </Grid>
 </ContentPage>

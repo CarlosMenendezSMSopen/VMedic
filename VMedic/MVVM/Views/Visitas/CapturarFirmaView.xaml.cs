@@ -26,9 +26,50 @@ public partial class CapturarFirmaView : PopupPage
         BtnFirmar = btn_sign;
         Context = bindingContext;
         dibujoFirma.Drawable = Drawable;
+        ObtenerListadeEvaluaciones();
         PressedPreferences.EndPressed();
     }
 
+    private void ObtenerListadeEvaluaciones()
+    {
+        var ListaDetallesdeEvaluacion = App.Evaluaciondetalles?.GetItems()?.Where(DE => DE.IdCliente == IDCliente).ToList();
+        var ListaMuestra = App.Muestras?.GetItems();
+        if (ListaDetallesdeEvaluacion is not null && ListaMuestra is not null)
+        {
+            var ListaEvaluaciones = (from a in ListaDetallesdeEvaluacion
+                                     join b in ListaMuestra on a.IdProducto equals b.CODIGO_MUESTRA
+                                     select new
+                                     {
+                                         a.IdProducto,
+                                         b.DESCRIPCION_MUESTRA,
+                                     }).ToList();
+            if (ListaEvaluaciones is not null)
+            {
+                foreach (var evaluacion in ListaEvaluaciones)
+                {
+                    var verticalContainer = new VerticalStackLayout();
+
+                    var lblCodigo = new Label
+                    {
+                        Text = "Código: " + evaluacion.IdProducto,
+                        FontAttributes = FontAttributes.Bold,
+                        FontSize = 11,
+                    };
+
+                    var lblDescripcion = new Label
+                    {
+                        Text = evaluacion.DESCRIPCION_MUESTRA,
+                        FontAttributes = FontAttributes.Bold,
+                    };
+
+                    verticalContainer.Children.Add(lblCodigo);
+                    verticalContainer.Children.Add(lblDescripcion);
+
+                    Lista_NombresEvaluaciones.Children.Add(verticalContainer);
+                }
+            }
+        }
+    }
 
     private void Close_Clicked(object sender, EventArgs e)
     {
@@ -54,7 +95,7 @@ public partial class CapturarFirmaView : PopupPage
     private void DibujoFirma_EndInteraction(object sender, TouchEventArgs e)
     {
 
-    }   
+    }
 
     private void Btn_limpiar_Clicked(object sender, EventArgs e)
     {
@@ -99,5 +140,10 @@ public partial class CapturarFirmaView : PopupPage
         }
 
         return "";
+    }
+
+    private void ScroLL_Scrolled(object sender, ScrolledEventArgs e)
+    {
+
     }
 }

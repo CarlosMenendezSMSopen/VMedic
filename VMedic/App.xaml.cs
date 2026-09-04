@@ -32,6 +32,7 @@ namespace VMedic
         public static BaseRepository<TablaProductoPreferencia>? Productospreferencias { get; private set; }
         public static BaseRepository<TablaMedicoProductoPreferencia>? Medicoprodpreferencias { get; private set; }
         public static BaseRepository<TablaAgenda>? Agenda { get; private set; }
+        public static BaseRepository<TablaDatosPais>? DatosPais { get; private set; }
         public App
         (
             BaseRepository<TablaUsuario> repo,
@@ -56,10 +57,11 @@ namespace VMedic
             BaseRepository<TablaVisitasPendientes> repoL1,
             BaseRepository<TablaDetallesEvaluacion> repoL2,
             BaseRepository<TablaEncabezadoEvaluacion> repoL3,
-            BaseRepository<TablaSolicitudesNoEnviadas> repoL4
+            BaseRepository<TablaSolicitudesNoEnviadas> repoL4,
+            BaseRepository<TablaDatosPais> repo54
         )
         {
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWH5fcnVdRWJdVUB/XUVWYEg=");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JAaF5cX2pCd1p/TH5YfUNzdUVEY1ZUTXxaS1ZhSXxVdk1hXX1ecnJRTmlaU019XEY=");
             InitializeComponent();
 
             Usuario = repo;
@@ -85,6 +87,7 @@ namespace VMedic
             Evaluaciondetalles = repoL2;
             Evaluacionencabezado = repoL3;
             SolicitudesPendientes = repoL4;
+            DatosPais = repo54;
 
             if (Application.Current is not null)
                 Application.Current.UserAppTheme = AppTheme.Light;
@@ -127,8 +130,8 @@ namespace VMedic
                                             if (solicitud.TipoRestService is 1)
                                             {
                                                 var datos = solicitud.ClavesVacias == 0
-                                                    ? (await servicio.ResultadoGET<Resultado>($"{solicitud.OperacionID}/{solicitud.Parametros}", null))?.FirstOrDefault()
-                                                    : (await servicio.ResultadoGET($"{solicitud.OperacionID}/{solicitud.Parametros}", valores => new Resultado
+                                                    ? (await servicio.ResultadoGET<Resultado>(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"{solicitud.OperacionID}/{solicitud.Parametros}", null))?.FirstOrDefault()
+                                                    : (await servicio.ResultadoGET(App.Usuario?.GetItems()?.FirstOrDefault()?.DominioIP, $"{solicitud.OperacionID}/{solicitud.Parametros}", valores => new Resultado
                                                     {
                                                         Id = valores[0],
                                                         MSG = valores[1],
@@ -143,12 +146,6 @@ namespace VMedic
                                                             switch (solicitud.OperacionID)
                                                             {
                                                                 case "VMedicA017" or "VMedicA038" or "VMedicA043":
-                                                                    var DoctorSeleciconado = App.Doctores?.GetItems()?.Where(D => D.CODIGO_DE_CLIENTE == solicitud.CodigoCliente).FirstOrDefault();
-                                                                    if (DoctorSeleciconado is not null)
-                                                                    {
-                                                                        DoctorSeleciconado.Visitas = 1;
-                                                                        App.Doctores?.UpdateITEM(DoctorSeleciconado);
-                                                                    }
                                                                     break;
                                                                 default:
                                                                     break;
@@ -191,15 +188,12 @@ namespace VMedic
                                                                         foreach (var codigo in Codigos)
                                                                         {
                                                                             var muestraActualizar = App.Muestras?.GetItems()?.FirstOrDefault(M => M.CODIGO_MUESTRA == codigo.Split(CaracteresEspeciales.BARRA_VERTICAL_ROTA)[0]);
-                                                                            var clienteActualizar = App.Doctores?.GetItems()?.FirstOrDefault(D => D.CODIGO_DE_CLIENTE == solicitud.CodigoCliente);
 
-                                                                            if (muestraActualizar is not null && clienteActualizar is not null)
+                                                                            if (muestraActualizar is not null)
                                                                             {
                                                                                 muestraActualizar.CANT_DISPONIBLE = int.Parse(codigo.Split(CaracteresEspeciales.BARRA_VERTICAL_ROTA)[1]);
-                                                                                clienteActualizar.Visitas = 1;
 
                                                                                 App.Muestras?.UpdateITEM(muestraActualizar);
-                                                                                App.Doctores?.UpdateITEM(clienteActualizar);
 
                                                                                 var detallesEliminar = App.Evaluaciondetalles?.GetItems()?.Where(Edet => Edet.IdCliente == solicitud.CodigoCliente).ToList();
                                                                                 var encabezadoEliminar = App.Evaluacionencabezado?.GetItems()?.Where(Eenc => Eenc.IdCliente == solicitud.CodigoCliente).ToList();
